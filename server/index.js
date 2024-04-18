@@ -10,7 +10,7 @@ const db = mysql.createConnection({
     host:"localhost",
     user:"root",
     password:"root",
-    database:"bdsistemahorario"
+    database:"dbsistemahorario"
 });
 
 app.listen(3001,()=>{
