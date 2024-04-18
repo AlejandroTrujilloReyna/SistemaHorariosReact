@@ -8,9 +8,9 @@ import '/node_modules/primeflex/primeflex.css';
 import Menu from './components/Menu';
 import UnidadAcademica from './components/UnidadAcademica';
 import ProgramaEducativo from './components/ProgramaEducativo';
-import UnidadAprendizaje from './components/UnidadAprendizaje';
 import Edificio from './components/Edificio';
 import Sala from './components/Sala';
+import UsarEdificio from './components/UsarEdificio';
 //import Axios from "axios";
 
 function App() {
@@ -21,8 +21,10 @@ function App() {
         <Routes>
           <Route path='/UnidadAcademica' element={<UnidadAcademica/>}/>
           <Route path='/ProgramaEducativo' element={<ProgramaEducativo/>}/>
-          <Route path='/UnidadAprendizaje' element={<UnidadAprendizaje/>}/>
+          {/*<Route path='/UnidadAprendizaje' element={<UnidadAprendizaje/>}/>*/}
           <Route path='/Edificio' element={<Edificio/>}/>
+          <Route path='/Edificio' element={<Edificio/>}/>
+          <Route path='/UsarEdificio' element={<UsarEdificio/>}/>
           <Route path='/Sala' element={<Sala/>}/>
         </Routes>
       </BrowserRouter>

@@ -17,14 +17,18 @@ const Menu = () => {
             command: () => {window.location.href='/ProgramaEducativo';}
         },
         {
-            label: 'Unidad de Aprendizaje',
-            icon: 'pi pi-book',
-            command: () => {window.location.href='/UnidadAprendizaje';}
-        },
-        {
             label: 'Edificio',
             icon: 'pi pi-building',
-            command: () => {window.location.href='/Edificio';}
+            items: [
+                {
+                    label: 'Edificios',
+                    command: () => {window.location.href='/Edificio';}                 
+                },                
+                {
+                    label: 'Uso de Edificios',
+                    command: () => {window.location.href='/UsarEdificio';}                    
+                },
+            ]
         },
         {
             label: 'Sala',
