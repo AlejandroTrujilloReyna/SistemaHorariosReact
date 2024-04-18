@@ -8,7 +8,7 @@ import '/node_modules/primeflex/primeflex.css'
 function App() {
   return (
     <div className="App">
-      Esto es para ver como funciona el github
+      El hombre que dicta sentencia debe usar la espada
     </div>
   );
 }
