@@ -40,7 +40,7 @@ const UnidadAcademica = () => {
         <div className="formgrid grid mx-8">
           <div className="field col-2">
               <label>Clave</label>
-              <InputText type="text" keyfilter="pint" value={clave_UnidadAcademica}
+              <InputText type="text" keyfilter="pint" value={clave_UnidadAcademica} maxLength={10}
                   onChange={(event)=>{
                     setclave_UnidadAcademica(event.target.value);
                     setError(false);
@@ -49,7 +49,7 @@ const UnidadAcademica = () => {
           </div>
           <div className="field col-10">
               <label>Nombre</label>
-              <InputText type="text" keyfilter="alpha" value={nombre_UnidadAcademica}
+              <InputText type="text" keyfilter="alpha" value={nombre_UnidadAcademica} maxLength={255}
                   onChange={(event)=>{
                     setnombre_UnidadAcademica(event.target.value);
                     setError(false);
