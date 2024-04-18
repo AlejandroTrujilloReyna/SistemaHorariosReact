@@ -1,8 +1,71 @@
-import React from 'react'
+import React from 'react';
+import Axios from "axios";
+import { useState } from "react";
+import { Panel } from 'primereact/panel';
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
+import { Message } from 'primereact/message';
 
 const UnidadAcademica = () => {
+  const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState(0);
+  const [nombre_UnidadAcademica,setnombre_UnidadAcademica] = useState("");
+  const [error, setError] = useState(false);
+
+  const add = ()=>{
+    if (!clave_UnidadAcademica || !nombre_UnidadAcademica) {
+      setError(true);
+      return;
+    }
+    Axios.post("http://localhost:3001/registrarUnidadAcademica",{
+      clave_UnidadAcademica:clave_UnidadAcademica,
+      nombre_UnidadAcademica:nombre_UnidadAcademica
+    }).then(response=>{
+      if (response.status === 200) {
+        limpiarCampos();
+        setError(false);
+      }
+    }).catch(error=>{
+      if (error.response.status === 400) {
+        setError(true);
+      }     
+    });
+  }
+  const limpiarCampos = () =>{
+    setclave_UnidadAcademica(0);
+    setnombre_UnidadAcademica("");
+  }    
   return (
-    <div>UnidadAcademica</div>
+    <>
+      <Panel header="Registrar Unidad Academica" className='mt-3' toggleable>
+        <div className="formgrid grid mx-8">
+          <div className="field col-2">
+              <label>Clave</label>
+              <InputText type="text" keyfilter="pint" value={clave_UnidadAcademica}
+                  onChange={(event)=>{
+                    setclave_UnidadAcademica(event.target.value);
+                    setError(false);
+                  }}  
+              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
+          </div>
+          <div className="field col-10">
+              <label>Nombre</label>
+              <InputText type="text" keyfilter="alpha" value={nombre_UnidadAcademica}
+                  onChange={(event)=>{
+                    setnombre_UnidadAcademica(event.target.value);
+                    setError(false);
+                  }}  
+              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
+          </div>                             
+        </div>
+        <div className="mx-8 mt-4">
+                <Button label="Guardar" onClick={add} className="p-button-success" />
+        </div>
+        <div className="mx-8 mt-4">
+          {error && <Message severity="error" text="Faltan campos por llenar" />} 
+        </div>         
+      </Panel>
+      <Panel header="Consultar Unidad Academica" className='mt-3' toggleable></Panel>              
+    </>
   )
 }
 

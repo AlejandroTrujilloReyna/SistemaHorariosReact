@@ -11,7 +11,6 @@ import ProgramaEducativo from './components/ProgramaEducativo';
 import Edificio from './components/Edificio';
 import Sala from './components/Sala';
 import UsarEdificio from './components/UsarEdificio';
-//import Axios from "axios";
 
 function App() {
   return (
