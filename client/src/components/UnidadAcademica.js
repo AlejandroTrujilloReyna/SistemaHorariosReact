@@ -10,9 +10,11 @@ const UnidadAcademica = () => {
   const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState(0);
   const [nombre_UnidadAcademica,setnombre_UnidadAcademica] = useState("");
   const [error, setError] = useState(false);
+  const [mensajeError, setmensajeError] = useState("");
 
   const add = ()=>{
     if (!clave_UnidadAcademica || !nombre_UnidadAcademica) {
+      setmensajeError("Existen campos vacios");
       setError(true);
       return;
     }
@@ -26,6 +28,10 @@ const UnidadAcademica = () => {
       }
     }).catch(error=>{
       if (error.response.status === 400) {
+        setmensajeError("Clave ya existente");
+        setError(true);
+      }else if(error.response.status === 500){
+        setmensajeError("Error interno del servidor");
         setError(true);
       }     
     });
@@ -61,7 +67,7 @@ const UnidadAcademica = () => {
                 <Button label="Guardar" onClick={add} className="p-button-success" />
         </div>
         <div className="mx-8 mt-4">
-          {error && <Message severity="error" text="Faltan campos por llenar" />} 
+          {error && <Message severity="error" text={mensajeError} />} 
         </div>         
       </Panel>
       <Panel header="Consultar Unidad Academica" className='mt-3' toggleable></Panel>              
