@@ -1,10 +1,10 @@
 import React from 'react';
-import Axios from "axios";
 import { useState } from "react";
 import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
+import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
 const UnidadAcademica = () => {
   const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState(0);
@@ -18,7 +18,7 @@ const UnidadAcademica = () => {
       setError(true);
       return;
     }
-    Axios.post("http://localhost:3001/registrarUnidadAcademica",{
+    UnidadAcademicaService.registrarUnidadAcademica({
       clave_UnidadAcademica:clave_UnidadAcademica,
       nombre_UnidadAcademica:nombre_UnidadAcademica
     }).then(response=>{
@@ -64,7 +64,7 @@ const UnidadAcademica = () => {
           </div>                             
         </div>
         <div className="mx-8 mt-4">
-                <Button label="Guardar" onClick={add} className="p-button-success" />
+          <Button label="Guardar" onClick={add} className="p-button-success" />
         </div>
         <div className="mx-8 mt-4">
           {error && <Message severity="error" text={mensajeError} />} 
