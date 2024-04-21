@@ -1,5 +1,4 @@
 import React from 'react';
-import Axios from "axios";
 import { useState } from "react";
 import { useEffect } from "react";
 import { Panel } from 'primereact/panel';
@@ -7,6 +6,8 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
 import { Dropdown } from 'primereact/dropdown';
+import ProgramaEducativoService from '../services/ProgramaEducativoService';
+import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
 const ProgramaEducativo = () => {
   const [clave_ProgramaEducativo,setclave_ProgramaEducativo] = useState(0);
@@ -19,8 +20,9 @@ const ProgramaEducativo = () => {
   const [mensajeError, setmensajeError] = useState("");
   const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
 
+  //MANDAR A LLAMAR A LA LISTA DE UNIDADES SERVICE
   useEffect(() => {
-    Axios.get("http://localhost:3001/unidadesAcademicas")
+    UnidadAcademicaService.unidadesAcademicas()
       .then(response => {
         setUnidadesAcademicas(response.data);
       })
@@ -29,8 +31,9 @@ const ProgramaEducativo = () => {
       });
   }, []);  
 
+  //MANDAR A LLAMAR AL REGISTRO SERVICE
   const add = ()=>{
-    Axios.post("http://localhost:3001/registrarProgramaEducativo",{
+    ProgramaEducativoService.registrarProgramaEducativo({
       clave_ProgramaEducativo:clave_ProgramaEducativo,
       nombre_ProgramaEducativo:nombre_ProgramaEducativo,
       banco_Horas:banco_Horas,

@@ -18,6 +18,7 @@ const UnidadAcademica = () => {
       setError(true);
       return;
     }
+    //MANDAR A LLAMAR AL REGISTRO SERVICE
     UnidadAcademicaService.registrarUnidadAcademica({
       clave_UnidadAcademica:clave_UnidadAcademica,
       nombre_UnidadAcademica:nombre_UnidadAcademica
