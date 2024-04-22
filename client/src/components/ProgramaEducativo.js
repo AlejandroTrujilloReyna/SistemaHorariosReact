@@ -33,7 +33,12 @@ const ProgramaEducativo = () => {
 
   //MANDAR A LLAMAR AL REGISTRO SERVICE
   const add = ()=>{
-    ProgramaEducativoService.registrarProgramaEducativo({
+    if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo || !min_Grupo || !max_Grupo) {
+      setmensajeError("Existen campos vacios");
+      setError(true);
+      return;
+    }
+      ProgramaEducativoService.registrarProgramaEducativo({
       clave_ProgramaEducativo:clave_ProgramaEducativo,
       nombre_ProgramaEducativo:nombre_ProgramaEducativo,
       banco_Horas:banco_Horas,
@@ -49,7 +54,10 @@ const ProgramaEducativo = () => {
       if (error.response.status === 400) {
         setmensajeError("Clave ya existente");
         setError(true);
-      }else if(error.response.status === 500){
+      } else if (error.response.status === 401) {
+        setmensajeError("Nombre ya existente");
+        setError(true);      
+      }else if(error.response.status === 500){          
         setmensajeError("Error interno del servidor");
         setError(true);
       }     
@@ -78,7 +86,7 @@ const ProgramaEducativo = () => {
           </div>
           <div className="field col-10">
               <label>Nombre</label>
-              <InputText type="text" keyfilter="alpha" value={nombre_ProgramaEducativo} maxLength={255}
+              <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_ProgramaEducativo} maxLength={255}
                   onChange={(event)=>{
                     setnombre_ProgramaEducativo(event.target.value);
                     setError(false);

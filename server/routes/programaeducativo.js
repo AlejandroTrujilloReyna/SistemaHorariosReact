@@ -17,14 +17,35 @@ router.post("/registrarProgramaEducativo", (req, res) => {
     const max_Grupo = req.body.max_Grupo;
     const clave_UnidadAcademica = req.body.clave_UnidadAcademica;
 
-    db.query('INSERT INTO programaeducativo(clave_ProgramaEducativo, nombre_ProgramaEducativo, banco_Horas, min_Grupo, max_Grupo, clave_UnidadAcademica) VALUES (?, ?, ?, ?, ?, ?)',
-        [clave_ProgramaEducativo, nombre_ProgramaEducativo, banco_Horas, min_Grupo, max_Grupo, clave_UnidadAcademica], (err, result) => {
-            if (err) {
+    db.query('SELECT * FROM programaeducativo WHERE clave_ProgramaEducativo = ?',[clave_ProgramaEducativo], (err, results) => {
+        if(err) {
+            console.log(err);
+            return res.status(500).send("Error interno del servidor");
+        }
+
+        if(results.length > 0) {
+            return res.status(400).send("La clave del Programa Educativo ya existe");
+        }
+        db.query('SELECT * FROM programaeducativo WHERE nombre_ProgramaEducativo = ?',[nombre_ProgramaEducativo], (err, results) => {
+            if(err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
             }
-            res.status(200).send("Programa educativo registrado con éxito");
-        });
+    
+            if(results.length > 0) {
+                return res.status(401).send("El Nombre del Programa Educativo ya existe");
+            }
+            db.query('INSERT INTO programaeducativo(clave_ProgramaEducativo, nombre_ProgramaEducativo, banco_Horas, min_Grupo, max_Grupo, clave_UnidadAcademica) VALUES (?, ?, ?, ?, ?, ?)',
+            [clave_ProgramaEducativo, nombre_ProgramaEducativo, banco_Horas, min_Grupo, max_Grupo, clave_UnidadAcademica], (err, result) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send("Error interno del servidor");
+                }
+                res.status(200).send("Programa educativo registrado con éxito");
+            });  
+        });  
+    });
+
 });
 
 module.exports = router;
