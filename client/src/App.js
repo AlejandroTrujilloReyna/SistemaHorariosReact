@@ -22,7 +22,6 @@ function App() {
           <Route path='/UnidadAcademica' element={<UnidadAcademica/>}/>
           <Route path='/ProgramaEducativo' element={<ProgramaEducativo/>}/>
          <Route path='/UnidadAprendizaje' element={<UnidadAprendizaje/>}/>
-          {/*<Route path='/UnidadAprendizaje' element={<UnidadAprendizaje/>}/>*/}
           <Route path='/Edificio' element={<Edificio/>}/>
           <Route path='/Edificio' element={<Edificio/>}/>
           <Route path='/UsarEdificio' element={<UsarEdificio/>}/>

@@ -45,6 +45,7 @@ router.post("/registrarUnidadAcademica",(req,res)=>{
     });
 });
 
+//NO SE LLAMA ASI ASI QUE MODIFICAR
 router.get("/unidadesAcademicas", (req, res) => {
     db.query('SELECT clave_UnidadAcademica, nombre_UnidadAcademica FROM unidadacademica', (err, results) => {
       if (err) {

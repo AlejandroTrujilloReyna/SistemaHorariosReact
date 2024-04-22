@@ -1,12 +1,12 @@
 import React from 'react';
 import { useState } from "react";
+import { useEffect } from 'react'; 
 import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
 import { Dropdown } from 'primereact/dropdown';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
-import { useEffect } from 'react'; 
 
 const UnidadAprendizaje = () => {
   const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState(0);
