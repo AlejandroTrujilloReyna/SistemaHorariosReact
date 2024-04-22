@@ -22,7 +22,7 @@ const ProgramaEducativo = () => {
 
   //MANDAR A LLAMAR A LA LISTA DE UNIDADES SERVICE
   useEffect(() => {
-    UnidadAcademicaService.unidadesAcademicas()
+    UnidadAcademicaService.consultarUnidadAcademica()
       .then(response => {
         setUnidadesAcademicas(response.data);
       })

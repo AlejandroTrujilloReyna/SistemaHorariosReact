@@ -12,7 +12,10 @@ const programaeducativoRoutes = require("./routes/programaeducativo");
 app.use("/programaeducativo", programaeducativoRoutes);
 
 const unidadaprendizajeRoutes = require("./routes/unidadaprendizaje")
-app.use("/unidadaprendizaje", unidadaprendizajeRoutes)
+app.use("/unidadaprendizaje", unidadaprendizajeRoutes);
+
+const edificioRoutes = require("./routes/edificio");
+app.use("/edificio", edificioRoutes);
 
 
 app.listen(3001,()=>{

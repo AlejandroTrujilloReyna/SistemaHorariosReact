@@ -45,9 +45,8 @@ router.post("/registrarUnidadAcademica",(req,res)=>{
     });
 });
 
-//NO SE LLAMA ASI ASI QUE MODIFICAR
-router.get("/unidadesAcademicas", (req, res) => {
-    db.query('SELECT clave_UnidadAcademica, nombre_UnidadAcademica FROM unidadacademica', (err, results) => {
+router.get("/consultarUnidadAcademica", (req, res) => {
+    db.query('SELECT * FROM unidadacademica', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");
