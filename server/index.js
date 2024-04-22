@@ -11,6 +11,10 @@ app.use("/unidadacademica", unidadacademicaRoutes);
 const programaeducativoRoutes = require("./routes/programaeducativo");
 app.use("/programaeducativo", programaeducativoRoutes);
 
+const unidadaprendizajeRoutes = require("./routes/unidadaprendizaje")
+app.use("/unidadaprendizaje", unidadaprendizajeRoutes)
+
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });

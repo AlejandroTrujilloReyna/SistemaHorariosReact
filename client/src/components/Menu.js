@@ -10,12 +10,20 @@ const Menu = () => {
             label: 'Unidad Academica',
             icon: 'pi pi-building-columns',
             command: () => {window.location.href='/UnidadAcademica';}
-        },             
+        }, 
+        
         {
             label: 'Programa Educativo',
             icon: 'pi pi-briefcase',
             command: () => {window.location.href='/ProgramaEducativo';}
         },
+
+        {
+            label: 'Unidad de Aprendizaje',
+            icon: 'pi pi-building-columns',
+            command: () => {window.location.href='/UnidadAprendizaje';}
+        }, 
+
         {
             label: 'Edificio',
             icon: 'pi pi-building',

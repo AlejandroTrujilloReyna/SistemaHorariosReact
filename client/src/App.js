@@ -11,6 +11,7 @@ import ProgramaEducativo from './components/ProgramaEducativo';
 import Edificio from './components/Edificio';
 import Sala from './components/Sala';
 import UsarEdificio from './components/UsarEdificio';
+import UnidadAprendizaje from './components/UnidadAprendizaje';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route path='/UnidadAcademica' element={<UnidadAcademica/>}/>
           <Route path='/ProgramaEducativo' element={<ProgramaEducativo/>}/>
+         <Route path='/UnidadAprendizaje' element={<UnidadAprendizaje/>}/>
           {/*<Route path='/UnidadAprendizaje' element={<UnidadAprendizaje/>}/>*/}
           <Route path='/Edificio' element={<Edificio/>}/>
           <Route path='/Edificio' element={<Edificio/>}/>
