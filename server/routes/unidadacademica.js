@@ -21,16 +21,27 @@ router.post("/registrarUnidadAcademica",(req,res)=>{
 
         if(results.length > 0) {
             return res.status(400).send("La clave de la Unidad Académica ya existe");
-        }        
-
-        db.query('INSERT INTO unidadacademica(clave_UnidadAcademica, nombre_UnidadAcademica) VALUES (?, ?)',
-        [clave_UnidadAcademica, nombre_UnidadAcademica], (err, result) => {
+        }
+        
+        db.query('SELECT * FROM unidadacademica WHERE nombre_UnidadAcademica = ?',[nombre_UnidadAcademica], (err, results) => {
             if(err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
             }
-            res.status(200).send("Unidad Académica registrada con éxito");
-        });    
+    
+            if(results.length > 0) {
+                return res.status(401).send("El nombre de la Unidad Académica ya existe");
+            }
+
+            db.query('INSERT INTO unidadacademica(clave_UnidadAcademica, nombre_UnidadAcademica) VALUES (?, ?)',
+            [clave_UnidadAcademica, nombre_UnidadAcademica], (err, result) => {
+                if(err) {
+                    console.log(err);
+                    return res.status(500).send("Error interno del servidor");
+                }
+                res.status(200).send("Unidad Académica registrada con éxito");
+            });  
+        });
     });
 });
 

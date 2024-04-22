@@ -31,6 +31,9 @@ const UnidadAcademica = () => {
       if (error.response.status === 400) {
         setmensajeError("Clave ya existente");
         setError(true);
+      }else if(error.response.status === 401){
+        setmensajeError("Nombre ya existente");
+        setError(true);
       }else if(error.response.status === 500){
         setmensajeError("Error interno del servidor");
         setError(true);
@@ -56,7 +59,7 @@ const UnidadAcademica = () => {
           </div>
           <div className="field col-10">
               <label>Nombre</label>
-              <InputText type="text" keyfilter="alpha" value={nombre_UnidadAcademica} maxLength={255}
+              <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_UnidadAcademica} maxLength={255}
                   onChange={(event)=>{
                     setnombre_UnidadAcademica(event.target.value);
                     setError(false);
