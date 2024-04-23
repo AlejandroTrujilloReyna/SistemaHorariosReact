@@ -6,20 +6,36 @@ import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import EdificioService from '../services/EdificioService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
 import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
 const Edificio = () => {
+  const columns = [
+    { field: 'clave_Edificio', header: 'CLAVE' },
+    { field: 'nombre_Edificio', header: 'NOMBRE' },
+    { field: 'clave_ProgramaEducativo', header: 'PROGRAMA EDUCATIVO' },
+    { field: 'clave_UnidadAcademica', header: 'UNIDAD ACADEMICA' },      
+  ];  
+
   const [clave_Edificio, setclave_Edificio] = useState(null);
   const [nombre_Edificio,setnombre_Edificio] = useState("");  
   const [clave_UnidadAcademica, setclave_UnidadAcademica] = useState(null);
   const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(null);
   const [programasEducativos, setProgramasEducativos] = useState([]);
   const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
+  const [edificiosList,setEdificios] = useState([]);
+  const [filtroEdificio, setfiltroEdificio] = useState([]);
+  const [error, setError] = useState(false);
   const toast = useRef(null); // Referencia al componente Toast
 
+  useEffect(() => {
+    get();
+  }, []);
+  
   // Función para mostrar un Toast de error  
   const showErrorToastVerde = (message) => {
     toast.current.show({ severity: 'success', summary: 'Exito', detail: message, life: 2000 });
@@ -62,6 +78,23 @@ const Edificio = () => {
     }
   }, [clave_ProgramaEducativo, programasEducativos]);
 
+  //BUSQUEDA
+  const onSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    const filteredData = edificiosList.filter((item) => {
+        const programaEducativo = item.clave_ProgramaEducativo ? item.clave_ProgramaEducativo.toString() : '';
+        const unidadAcademica = item.clave_UnidadAcademica ? item.clave_UnidadAcademica.toString() : '';
+        return (
+            item.clave_Edificio.toString().includes(value) ||
+            item.nombre_Edificio.toLowerCase().includes(value) ||
+            programaEducativo.toString().includes(value) ||
+            unidadAcademica.toString().includes(value)
+        );
+    });
+    
+    setfiltroEdificio(filteredData);
+  };
+
   //MANDAR A LLAMAR AL REGISTRO SERVICE
   const add = ()=>{
     if (!clave_Edificio || !nombre_Edificio || !clave_UnidadAcademica) {      
@@ -88,6 +121,18 @@ const Edificio = () => {
       }     
     });
   }  
+
+  const get = ()=>{
+    EdificioService.consultarEdificio().then((response)=>{
+      setEdificios(response.data);  
+    }).catch(error=>{
+      if (error.response.status === 500) {
+        showErrorToastRojo("Error del sistema");
+        setError(true);
+      }
+    });    
+  }
+
   const limpiarCampos = () =>{
     setclave_Edificio("");
     setnombre_Edificio("");
@@ -96,8 +141,8 @@ const Edificio = () => {
   }   
   return (
     <>
-    <Toast ref={toast} />
-      <Panel header="Registrar Programa Educativo" className='mt-3' toggleable>
+      <Toast ref={toast} />
+      <Panel header="Registrar Programa Educativo" className='mt-3' toggleable>        
         <div className="formgrid grid mx-8">
           <div className="field col-2">
               <label>Clave*</label>
@@ -151,7 +196,48 @@ const Edificio = () => {
                 <Button label="Guardar" onClick={add} className="p-button-success" />
         </div>                
       </Panel>
-      <Panel header="Consultar Programa Educativo" className='mt-3' toggleable></Panel>     
+      <Panel header="Consultar Edificio" className='mt-3' toggleable>
+        <div className="mx-8 mb-4">
+          <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
+        </div>
+        <DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} tableStyle={{ minWidth: '50rem' }} sortField="clave_Edificio" sortOrder={1}>                                  
+          {columns.map(({ field, header }) => {
+            if (field === 'clave_UnidadAcademica') {
+              return (
+                <Column
+                  key={field}
+                  field={field}
+                  header={header}
+                  sortable
+                  sortField="clave_UnidadAcademica"
+                  body={(rowData) => {
+                    const unidad = unidadesAcademicas.find((unidad) => unidad.clave_UnidadAcademica === rowData.clave_UnidadAcademica);
+                    return unidad ? `${unidad.clave_UnidadAcademica} - ${unidad.nombre_UnidadAcademica}` : '';
+                  }}
+                  style={{ width: '25%' }}
+                />
+              );
+            } else if (field === 'clave_ProgramaEducativo') {
+              return (
+                <Column
+                  key={field}
+                  field={field}
+                  header={header}
+                  sortable
+                  sortField="clave_ProgramaEducativo"
+                  body={(rowData) => {
+                    const programa = programasEducativos.find((programa) => programa.clave_ProgramaEducativo === rowData.clave_ProgramaEducativo);
+                    return programa ? `${programa.clave_ProgramaEducativo} - ${programa.nombre_ProgramaEducativo}` : '';
+                  }}
+                  style={{ width: '25%' }}
+                />
+              );
+            } else {
+              return <Column key={field} field={field} header={header} sortable style={{ width: '25%' }} />;
+            }
+          })}
+        </DataTable>       
+      </Panel>     
     </>
   )
 }
