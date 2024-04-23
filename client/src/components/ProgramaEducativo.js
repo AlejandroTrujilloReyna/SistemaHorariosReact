@@ -5,21 +5,58 @@ import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
 import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
 const ProgramaEducativo = () => {
+  const columns = [
+    {field: 'clave_UnidadAcademica', header: 'Unidad Academica'},
+    { field: 'clave_ProgramaEducativo', header: 'Clave' },
+    { field: 'nombre_ProgramaEducativo', header: 'Nombre' },
+    {field: 'min_Grupo', header: 'Minimo Horas'},
+    {field: 'max_Grupo', header: 'Maximo Horas'},
+    {field: 'banco_Horas', header: 'Banco de Horas'},
+  ];
+
   const [clave_ProgramaEducativo,setclave_ProgramaEducativo] = useState(0);
   const [nombre_ProgramaEducativo,setnombre_ProgramaEducativo] = useState("");
   const [banco_Horas,setbanco_Horas] = useState(0);
   const [min_Grupo,setmin_Grupo] = useState(0);
   const [max_Grupo,setmax_Grupo] = useState(0);
+  const [programaeducativoList,setprogramaeducativoList] = useState([]);
   const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState(null);
   const [error, setError] = useState(false);
   const [mensajeError, setmensajeError] = useState("");
   const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
+  const [filtroprogramaeducativo, setfiltroprogramaeducativo] = useState([]);
 
+  useEffect(() => {
+    get();
+  }, []);
+
+  useEffect(() => {
+    // Ordenar los datos por clave_UnidadAcademica al cargar la lista
+    setfiltroprogramaeducativo([...programaeducativoList].sort((a, b) => a.clave_ProgramaEducativo - b.clave_ProgramaEducativo));
+  }, [programaeducativoList]);
+
+  const onSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    const filteredData = programaeducativoList.filter((item) => {
+        return (
+            item.clave_UnidadAcademica.toString().includes(value) ||
+            item.clave_ProgramaEducativo.toString().includes(value) ||
+            item.nombre_ProgramaEducativo.toLowerCase().includes(value) ||
+            item.min_Grupo.toString().includes(value) ||
+            item.max_Grupo.toString().includes(value) ||
+            item.banco_Horas.toString().includes(value)            
+        );
+    });
+
+    setfiltroprogramaeducativo(filteredData);
+  }; 
   //MANDAR A LLAMAR A LA LISTA DE UNIDADES SERVICE
   useEffect(() => {
     UnidadAcademicaService.consultarUnidadAcademica()
@@ -47,6 +84,7 @@ const ProgramaEducativo = () => {
       clave_UnidadAcademica:clave_UnidadAcademica      
     }).then(response=>{
       if (response.status === 200) {
+        get();
         limpiarCampos();
         setError(false);
       }
@@ -63,6 +101,18 @@ const ProgramaEducativo = () => {
       }     
     });
   }  
+
+  const get = ()=>{
+    ProgramaEducativoService.consultarProgramaEducativo().then((response)=>{
+      setprogramaeducativoList(response.data);  
+    }).catch(error=>{
+      if (error.response.status === 500) {
+        setmensajeError("Error del sistema");
+        setError(true);
+      }
+    });    
+  }
+
   const limpiarCampos = () =>{
     setclave_ProgramaEducativo(0);
     setnombre_ProgramaEducativo("");
@@ -141,8 +191,18 @@ const ProgramaEducativo = () => {
         <div className="mx-8 mt-4">
           {error && <Message severity="error" text={mensajeError} />} 
         </div>         
-      </Panel>
-      <Panel header="Consultar Programa Educativo" className='mt-3' toggleable></Panel>     
+      </Panel>    
+      
+      <Panel header="Consultar Programa Educativo" className='mt-3' toggleable>
+      <div className="mx-8 mb-4">
+        <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
+      </div>  
+        <DataTable value={filtroprogramaeducativo.length ? filtroprogramaeducativo :programaeducativoList} size='small' tableStyle={{ minWidth: '50rem' }}>
+          {columns.map(({ field, header }) => {
+              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }}/>;
+          })}
+        </DataTable>
+      </Panel>  
     </>
   )
 }
