@@ -13,12 +13,12 @@ import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
 const ProgramaEducativo = () => {
   const columns = [
-    {field: 'clave_UnidadAcademica', header: 'Unidad Academica'},
-    { field: 'clave_ProgramaEducativo', header: 'Clave' },
-    { field: 'nombre_ProgramaEducativo', header: 'Nombre' },
+    {field: 'clave_ProgramaEducativo', header: 'Clave' },
+    {field: 'nombre_ProgramaEducativo', header: 'Nombre' },
     {field: 'min_Grupo', header: 'Minimo Horas'},
     {field: 'max_Grupo', header: 'Maximo Horas'},
     {field: 'banco_Horas', header: 'Banco de Horas'},
+    {field: 'clave_UnidadAcademica', header: 'Unidad Academica'}    
   ];
 
   const [clave_ProgramaEducativo,setclave_ProgramaEducativo] = useState(0);
@@ -26,12 +26,14 @@ const ProgramaEducativo = () => {
   const [banco_Horas,setbanco_Horas] = useState(0);
   const [min_Grupo,setmin_Grupo] = useState(0);
   const [max_Grupo,setmax_Grupo] = useState(0);
-  const [programaeducativoList,setprogramaeducativoList] = useState([]);
   const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState(null);
+
+  const [programaeducativoList,setprogramaeducativoList] = useState([]);
+  const [filtroprogramaeducativo, setfiltroprogramaeducativo] = useState([]);
+  const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
+
   const [error, setError] = useState(false);
   const [mensajeError, setmensajeError] = useState("");
-  const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
-  const [filtroprogramaeducativo, setfiltroprogramaeducativo] = useState([]);
 
   useEffect(() => {
     get();
@@ -57,6 +59,7 @@ const ProgramaEducativo = () => {
 
     setfiltroprogramaeducativo(filteredData);
   }; 
+
   //MANDAR A LLAMAR A LA LISTA DE UNIDADES SERVICE
   useEffect(() => {
     UnidadAcademicaService.consultarUnidadAcademica()
@@ -78,7 +81,8 @@ const ProgramaEducativo = () => {
       ProgramaEducativoService.registrarProgramaEducativo({
       clave_ProgramaEducativo:clave_ProgramaEducativo,
       nombre_ProgramaEducativo:nombre_ProgramaEducativo,
-      banco_Horas:banco_Horas,
+                  //VALIDACION PARA EL CAMPO NUMERICO NO OBLIGATORIO BANCO DE HORAS
+      banco_Horas:banco_Horas.trim() !== '' ? banco_Horas : 0,
       min_Grupo:min_Grupo,
       max_Grupo:max_Grupo,
       clave_UnidadAcademica:clave_UnidadAcademica      

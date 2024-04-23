@@ -12,43 +12,36 @@ import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 
 const UnidadAprendizaje = () => {
   const columns = [
-    {field: 'clave_PlanEstudios', header: 'Plan de Estudios'},
     { field: 'clave_UnidadAprendizaje', header: 'Clave' },
     { field: 'nombre_UnidadAprendizaje', header: 'Nombre' },
-    {field: 'semestre', header: 'semestre'}
+    {field: 'semestre', header: 'Semestre'},
+    {field: 'clave_PlanEstudios', header: 'Plan de Estudios'},
   ];
-
-
 
   const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState(0);
   const [nombre_UnidadAprendizaje,setnombre_UnidadAprendizaje] = useState("");
+  const [clave_PlanEstudios,setclave_PlanEstudios] = useState(null);
   const [semestre,setsemestre] = useState(0);
-  const [unidadaprnedizajeList,setunidadaprendizajeList] = useState([]);
-  const [clave_PlanEstudios,setclave_PlanEstudios] = useState("");
+
+  const [unidadaprendizajeList,setunidadaprendizajeList] = useState([]);
+  const [filtrounidadaprendizaje, setfiltrounidadaprendizaje] = useState([]);
+  const [planesdeestudios, setplanesdeestudios] = useState([]);
+
   const [error, setError] = useState(false);
   const [mensajeError, setmensajeError] = useState("");
-  const [planesdeestudios, setplanesdeestudios] = useState([]);
-  const [filtrounidadaprendizaje, setfiltrounidadaprendizaje] = useState([]);
-
 
   useEffect(() => {
-    UnidadAprendizajeService.consultarUnidadAprendizaje()
-      .then(response => {
-        setunidadaprendizajeList(response.data);
-      })
-      .catch(error => {
-        console.error("Error fetching Unidades de Aprendizaje:", error);
-      });
+    get();
   }, []);  
 
   useEffect(() => {
     // Ordenar los datos por clave_UnidadAprendizaje al cargar la lista
-    setfiltrounidadaprendizaje([...unidadaprnedizajeList].sort((a, b) => a.clave_UnidadAprendizaje - b.clave_UnidadAprendizaje));
-  }, [unidadaprnedizajeList]);
-////busqueda?????
+    setfiltrounidadaprendizaje([...unidadaprendizajeList].sort((a, b) => a.clave_UnidadAprendizaje - b.clave_UnidadAprendizaje));
+  }, [unidadaprendizajeList]);
+  
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
-    const filteredData = unidadaprnedizajeList.filter((item) => {
+    const filteredData = unidadaprendizajeList.filter((item) => {
         return (
             item.clave_PlanEstudios.toString().includes(value) ||
             item.clave_UnidadAprendizaje.toString().includes(value) ||
@@ -58,8 +51,9 @@ const UnidadAprendizaje = () => {
     });
 
     setfiltrounidadaprendizaje(filteredData);
-  }; 
-  //MANDAR A LLAMAR A LA LISTA DE UNIDADES Aprendizaje SERVICE
+  };   
+
+  //MANDAR A LLAMAR A LA LISTA DE PLANES DE ESTUDIOS
   useEffect(() => {
     UnidadAprendizajeService.consultarPlandeestudios()
       .then(response => {
@@ -70,31 +64,17 @@ const UnidadAprendizaje = () => {
       });
   }, []);  
 
-
-
-
-
-
-
-
-
-
-
-
   const add = ()=>{
     if (!clave_UnidadAprendizaje || !nombre_UnidadAprendizaje || !semestre || !clave_PlanEstudios) {
       setmensajeError("Existen campos vacios");
       setError(true);
       return;
     }
-    
     UnidadAprendizajeService.registrarUnidadAprendizaje({
-    
       clave_UnidadAprendizaje:clave_UnidadAprendizaje,
       nombre_UnidadAprendizaje:nombre_UnidadAprendizaje,
       semestre:semestre,
       clave_PlanEstudios:clave_PlanEstudios
-
     }).then(response=>{
       if (response.status === 200) {
         limpiarCampos();
@@ -114,13 +94,24 @@ const UnidadAprendizaje = () => {
       }      
     });
   }
+
+  const get = ()=>{
+    UnidadAprendizajeService.consultarUnidadAprendizaje().then((response)=>{
+      setunidadaprendizajeList(response.data);  
+    }).catch(error=>{
+      if (error.response.status === 500) {
+        setmensajeError("Error del sistema");
+        setError(true);
+      }
+    });    
+  }
+
   const limpiarCampos = () =>{
     setclave_UnidadAprendizaje(0);
     setnombre_UnidadAprendizaje("");
     setsemestre(0);
     setclave_PlanEstudios("");
   }  
-
   return (
     <>
       <Panel header="Registrar Unidad Aprendizaje" className='mt-3' toggleable>
@@ -175,26 +166,18 @@ const UnidadAprendizaje = () => {
           {error && <Message severity="error" text={mensajeError} />} 
         </div>         
       </Panel>
-      
-      
-      <Panel header="Consultar Programa Educativo" className='mt-3' toggleable>
+      <Panel header="Consultar Unidad de Aprendizaje" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
-        <DataTable value={filtrounidadaprendizaje.length ? filtrounidadaprendizaje :unidadaprnedizajeList} size='small' tableStyle={{ minWidth: '50rem' }}>
+        <DataTable value={filtrounidadaprendizaje.length ? filtrounidadaprendizaje :unidadaprendizajeList} size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
               return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }}/>;
           })}
         </DataTable>
       </Panel> 
-
-  
   </>
-  
-  
   )
-
-
 }
 
 

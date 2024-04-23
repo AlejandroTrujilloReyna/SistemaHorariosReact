@@ -13,18 +13,18 @@ const UnidadAcademica = () => {
   const columns = [
     { field: 'clave_UnidadAcademica', header: 'Clave' },
     { field: 'nombre_UnidadAcademica', header: 'Nombre' },
-];
-
-  useEffect(() => {
-    get();
-  }, []);
+  ];
 
   const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState(0);
   const [nombre_UnidadAcademica,setnombre_UnidadAcademica] = useState("");
   const [unidadacademicaList,setunidadacademicaList] = useState([]);
+  const [filtrounidadacademica, setfiltrounidadacademica] = useState([]);
   const [error, setError] = useState(false);
   const [mensajeError, setmensajeError] = useState("");
-  const [filtrounidadacademica, setfiltrounidadacademica] = useState([]);
+
+  useEffect(() => {
+    get();
+  }, []);
 
   useEffect(() => {
     // Ordenar los datos por clave_UnidadAcademica al cargar la lista
@@ -41,7 +41,8 @@ const UnidadAcademica = () => {
     });
     
     setfiltrounidadacademica(filteredData);
-  }; 
+  };
+
   const add = ()=>{
     if (!clave_UnidadAcademica || !nombre_UnidadAcademica) {
       setmensajeError("Existen campos vacios");

@@ -15,26 +15,32 @@ import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
 const Edificio = () => {
   const columns = [
-    { field: 'clave_Edificio', header: 'CLAVE' },
-    { field: 'nombre_Edificio', header: 'NOMBRE' },
-    { field: 'clave_ProgramaEducativo', header: 'PROGRAMA EDUCATIVO' },
-    { field: 'clave_UnidadAcademica', header: 'UNIDAD ACADEMICA' },      
+    {field: 'clave_Edificio', header: 'Clave' },
+    {field: 'nombre_Edificio', header: 'Nombre' },
+    {field: 'clave_ProgramaEducativo', header: 'Programa Educativo' },
+    {field: 'clave_UnidadAcademica', header: 'Unidad Academica' },      
   ];  
 
-  const [clave_Edificio, setclave_Edificio] = useState(null);
-  const [nombre_Edificio,setnombre_Edificio] = useState("");  
+  const [clave_Edificio, setclave_Edificio] = useState(0);
+  const [nombre_Edificio,setnombre_Edificio] = useState("");
   const [clave_UnidadAcademica, setclave_UnidadAcademica] = useState(null);
   const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(null);
+
+  const [edificiosList,setedificiosList] = useState([]);
+  const [filtroEdificio, setfiltroEdificio] = useState([]);
   const [programasEducativos, setProgramasEducativos] = useState([]);
   const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
-  const [edificiosList,setEdificios] = useState([]);
-  const [filtroEdificio, setfiltroEdificio] = useState([]);
-  const [error, setError] = useState(false);
+
   const toast = useRef(null); // Referencia al componente Toast
 
   useEffect(() => {
     get();
-  }, []);
+  }/*,[]*/);
+
+  useEffect(() => {
+    // Ordenar los datos por clave_Edificio al cargar la lista
+    setfiltroEdificio([...edificiosList].sort((a, b) => a.clave_Edificio - b.clave_Edificio));
+  }, [edificiosList]);
   
   // Función para mostrar un Toast de error  
   const showErrorToastVerde = (message) => {
@@ -48,6 +54,24 @@ const Edificio = () => {
   const showErrorToastRojo = (message) => {
     toast.current.show({ severity: 'error', summary: 'Error', detail: message, life: 2000 });
   };
+
+  //BUSQUEDA
+  const onSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    const filteredData = edificiosList.filter((item) => {
+    const programaEducativo = item.clave_ProgramaEducativo ? item.clave_ProgramaEducativo.toString() : '';
+    const unidadAcademica = item.clave_UnidadAcademica ? item.clave_UnidadAcademica.toString() : '';
+        return (
+            item.clave_Edificio.toString().includes(value) ||
+            item.nombre_Edificio.toLowerCase().includes(value) ||
+            programaEducativo.toString().includes(value) ||
+            unidadAcademica.toString().includes(value)
+        );
+    });
+    
+    setfiltroEdificio(filteredData);
+  };  
+
   //MANDAR A LLAMAR A LA LISTA DE UNIDADES SERVICE
   useEffect(() => {
     UnidadAcademicaService.consultarUnidadAcademica()
@@ -57,7 +81,8 @@ const Edificio = () => {
       .catch(error => {
         console.error("Error fetching unidades académicas:", error);
       });
-  }, []);  
+  }, []);
+    
   useEffect(() => {
     ProgramaEducativoService.consultarProgramaEducativo()
       .then(response => {
@@ -68,7 +93,7 @@ const Edificio = () => {
       });
   }, []);
   
-  // Actualizar la unidad académica al cambiar el programa educativo seleccionado
+  // Actualizar la unidad académica al cambiar el programa educativo seleccionado (INNECESARIO POR AHORA)
   useEffect(() => {
     if (clave_ProgramaEducativo) {
       const programaSeleccionado = programasEducativos.find(prog => prog.clave_ProgramaEducativo === clave_ProgramaEducativo);
@@ -77,23 +102,6 @@ const Edificio = () => {
       }
     }
   }, [clave_ProgramaEducativo, programasEducativos]);
-
-  //BUSQUEDA
-  const onSearch = (e) => {
-    const value = e.target.value.toLowerCase();
-    const filteredData = edificiosList.filter((item) => {
-        const programaEducativo = item.clave_ProgramaEducativo ? item.clave_ProgramaEducativo.toString() : '';
-        const unidadAcademica = item.clave_UnidadAcademica ? item.clave_UnidadAcademica.toString() : '';
-        return (
-            item.clave_Edificio.toString().includes(value) ||
-            item.nombre_Edificio.toLowerCase().includes(value) ||
-            programaEducativo.toString().includes(value) ||
-            unidadAcademica.toString().includes(value)
-        );
-    });
-    
-    setfiltroEdificio(filteredData);
-  };
 
   //MANDAR A LLAMAR AL REGISTRO SERVICE
   const add = ()=>{
@@ -124,11 +132,10 @@ const Edificio = () => {
 
   const get = ()=>{
     EdificioService.consultarEdificio().then((response)=>{
-      setEdificios(response.data);  
+      setedificiosList(response.data);  
     }).catch(error=>{
       if (error.response.status === 500) {
         showErrorToastRojo("Error del sistema");
-        setError(true);
       }
     });    
   }
@@ -142,10 +149,10 @@ const Edificio = () => {
   return (
     <>
       <Toast ref={toast} />
-      <Panel header="Registrar Programa Educativo" className='mt-3' toggleable>        
+      <Panel header="Registrar Edificio" className='mt-3' toggleable>        
         <div className="formgrid grid mx-8">
           <div className="field col-2">
-              <label>Clave*</label>
+              <label>Clave</label>
               <InputText type="text" keyfilter="pint" value={clave_Edificio} maxLength={10}
                   onChange={(event)=>{
                     setclave_Edificio(event.target.value);
@@ -154,7 +161,7 @@ const Edificio = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
-              <label>Nombre*</label>
+              <label>Nombre</label>
               <InputText type="text" keyfilter={/[a-zA-Z\s]/} value={nombre_Edificio} maxLength={255}
                   onChange={(event)=>{
                     setnombre_Edificio(event.target.value);
@@ -177,7 +184,7 @@ const Edificio = () => {
             />
           </div>         
           <div className="field col-6">
-              <label>Unidad Academica*</label>
+              <label>Unidad Academica</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
               value={clave_UnidadAcademica} 
               options={unidadesAcademicas} 
@@ -200,7 +207,12 @@ const Edificio = () => {
         <div className="mx-8 mb-4">
           <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
         </div>
-        <DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} tableStyle={{ minWidth: '50rem' }} sortField="clave_Edificio" sortOrder={1}>                                  
+        <DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} size='small' tableStyle={{ minWidth: '50rem' }}>
+          {columns.map(({ field, header }) => {
+              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }}/>;
+          })}
+        </DataTable>        
+        {/*<DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} size='small' tableStyle={{ minWidth: '50rem' }} sortField="clave_Edificio" sortOrder={1}>                                  
           {columns.map(({ field, header }) => {
             if (field === 'clave_UnidadAcademica') {
               return (
@@ -236,7 +248,7 @@ const Edificio = () => {
               return <Column key={field} field={field} header={header} sortable style={{ width: '25%' }} />;
             }
           })}
-        </DataTable>       
+        </DataTable>*/}       
       </Panel>     
     </>
   )
