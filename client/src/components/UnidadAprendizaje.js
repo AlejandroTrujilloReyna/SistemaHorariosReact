@@ -1,22 +1,65 @@
 import React from 'react';
 import { useState } from "react";
-import { useEffect } from 'react'; 
+import { useEffect } from "react";
 import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 
 const UnidadAprendizaje = () => {
+  const columns = [
+    {field: 'clave_PlanEstudios', header: 'Plan de Estudios'},
+    { field: 'clave_UnidadAprendizaje', header: 'Clave' },
+    { field: 'nombre_UnidadAprendizaje', header: 'Nombre' },
+    {field: 'semestre', header: 'semestre'}
+  ];
+
+
+
   const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState(0);
   const [nombre_UnidadAprendizaje,setnombre_UnidadAprendizaje] = useState("");
   const [semestre,setsemestre] = useState(0);
+  const [unidadaprnedizajeList,setunidadaprendizajeList] = useState([]);
   const [clave_PlanEstudios,setclave_PlanEstudios] = useState("");
   const [error, setError] = useState(false);
   const [mensajeError, setmensajeError] = useState("");
   const [planesdeestudios, setplanesdeestudios] = useState([]);
+  const [filtrounidadaprendizaje, setfiltrounidadaprendizaje] = useState([]);
 
+
+  useEffect(() => {
+    UnidadAprendizajeService.consultarUnidadAprendizaje()
+      .then(response => {
+        setunidadaprendizajeList(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching Unidades de Aprendizaje:", error);
+      });
+  }, []);  
+
+  useEffect(() => {
+    // Ordenar los datos por clave_UnidadAprendizaje al cargar la lista
+    setfiltrounidadaprendizaje([...unidadaprnedizajeList].sort((a, b) => a.clave_UnidadAprendizaje - b.clave_UnidadAprendizaje));
+  }, [unidadaprnedizajeList]);
+////busqueda?????
+  const onSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    const filteredData = unidadaprnedizajeList.filter((item) => {
+        return (
+            item.clave_PlanEstudios.toString().includes(value) ||
+            item.clave_UnidadAprendizaje.toString().includes(value) ||
+            item.nombre_UnidadAprendizaje.toLowerCase().includes(value) ||
+            item.semestre.toString().includes(value)           
+        )
+    });
+
+    setfiltrounidadaprendizaje(filteredData);
+  }; 
+  //MANDAR A LLAMAR A LA LISTA DE UNIDADES Aprendizaje SERVICE
   useEffect(() => {
     UnidadAprendizajeService.consultarPlandeestudios()
       .then(response => {
@@ -26,6 +69,15 @@ const UnidadAprendizaje = () => {
         console.error("Error fetching unidades académicas:", error);
       });
   }, []);  
+
+
+
+
+
+
+
+
+
 
 
 
@@ -123,7 +175,20 @@ const UnidadAprendizaje = () => {
           {error && <Message severity="error" text={mensajeError} />} 
         </div>         
       </Panel>
-      <Panel header="Consultar Unidad Aprendizaje" className='mt-3' toggleable></Panel>              
+      
+      
+      <Panel header="Consultar Programa Educativo" className='mt-3' toggleable>
+      <div className="mx-8 mb-4">
+        <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
+      </div>  
+        <DataTable value={filtrounidadaprendizaje.length ? filtrounidadaprendizaje :unidadaprnedizajeList} size='small' tableStyle={{ minWidth: '50rem' }}>
+          {columns.map(({ field, header }) => {
+              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }}/>;
+          })}
+        </DataTable>
+      </Panel> 
+
+  
   </>
   
   
