@@ -23,7 +23,6 @@ function App() {
           <Route path='/ProgramaEducativo' element={<ProgramaEducativo/>}/>
          <Route path='/UnidadAprendizaje' element={<UnidadAprendizaje/>}/>
           <Route path='/Edificio' element={<Edificio/>}/>
-          <Route path='/Edificio' element={<Edificio/>}/>
           <Route path='/UsarEdificio' element={<UsarEdificio/>}/>
           <Route path='/Sala' element={<Sala/>}/>
         </Routes>

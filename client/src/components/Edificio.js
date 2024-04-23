@@ -1,14 +1,14 @@
 import React from 'react';
 import { useState } from "react";
 import { useEffect } from "react";
-import { useRef } from "react";
+//import { useRef } from "react";
 import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Toast } from 'primereact/toast';
+//import { Toast } from 'primereact/toast';
 import EdificioService from '../services/EdificioService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
 import UnidadAcademicaService from '../services/UnidadAcademicaService';
@@ -18,7 +18,7 @@ const Edificio = () => {
     {field: 'clave_Edificio', header: 'Clave' },
     {field: 'nombre_Edificio', header: 'Nombre' },
     {field: 'clave_ProgramaEducativo', header: 'Programa Educativo' },
-    {field: 'clave_UnidadAcademica', header: 'Unidad Academica' },      
+    {field: 'clave_UnidadAcademica', header: 'Unidad Academica' }      
   ];  
 
   const [clave_Edificio, setclave_Edificio] = useState(0);
@@ -31,11 +31,11 @@ const Edificio = () => {
   const [programasEducativos, setProgramasEducativos] = useState([]);
   const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
 
-  const toast = useRef(null); // Referencia al componente Toast
+  //const toast = useRef(null); // Referencia al componente Toast
 
   useEffect(() => {
     get();
-  }/*,[]*/);
+  },[]);
 
   useEffect(() => {
     // Ordenar los datos por clave_Edificio al cargar la lista
@@ -43,7 +43,7 @@ const Edificio = () => {
   }, [edificiosList]);
   
   // Función para mostrar un Toast de error  
-  const showErrorToastVerde = (message) => {
+  /*const showErrorToastVerde = (message) => {
     toast.current.show({ severity: 'success', summary: 'Exito', detail: message, life: 2000 });
   };
 
@@ -53,7 +53,7 @@ const Edificio = () => {
 
   const showErrorToastRojo = (message) => {
     toast.current.show({ severity: 'error', summary: 'Error', detail: message, life: 2000 });
-  };
+  };*/
 
   //BUSQUEDA
   const onSearch = (e) => {
@@ -106,7 +106,7 @@ const Edificio = () => {
   //MANDAR A LLAMAR AL REGISTRO SERVICE
   const add = ()=>{
     if (!clave_Edificio || !nombre_Edificio || !clave_UnidadAcademica) {      
-      showErrorToastNaranja("Existen campos vacios");
+      //showErrorToastNaranja("Existen campos vacios");
       return;
     }
     EdificioService.registrarEdificio({
@@ -116,16 +116,16 @@ const Edificio = () => {
       clave_ProgramaEducativo:clave_ProgramaEducativo     
     }).then(response=>{
       if (response.status === 200) {
-        showErrorToastVerde("Registro Exitoso");
+        //showErrorToastVerde("Registro Exitoso");
         limpiarCampos();
       }
     }).catch(error=>{
       if (error.response.status === 400) {        
-        showErrorToastNaranja("Clave ya existente");
+        //showErrorToastNaranja("Clave ya existente");
       }else if(error.response.status === 401){
-        showErrorToastNaranja("Nombre ya existente");        
+        //showErrorToastNaranja("Nombre ya existente");        
       }else if(error.response.status === 500){  
-        showErrorToastRojo("Error interno del servidor");
+        //showErrorToastRojo("Error interno del servidor");
       }     
     });
   }  
@@ -135,7 +135,7 @@ const Edificio = () => {
       setedificiosList(response.data);  
     }).catch(error=>{
       if (error.response.status === 500) {
-        showErrorToastRojo("Error del sistema");
+        //showErrorToastRojo("Error del sistema");
       }
     });    
   }
@@ -148,7 +148,7 @@ const Edificio = () => {
   }   
   return (
     <>
-      <Toast ref={toast} />
+      {/*<Toast ref={toast} />*/}
       <Panel header="Registrar Edificio" className='mt-3' toggleable>        
         <div className="formgrid grid mx-8">
           <div className="field col-2">
