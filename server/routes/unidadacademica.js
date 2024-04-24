@@ -55,4 +55,16 @@ router.get("/consultarUnidadAcademica", (req, res) => {
     });
 });
 
+router.put("/modificarUnidadAcademica", (req, res) => {
+    const clave_UnidadAcademica = req.body.clave_UnidadAcademica;
+    const nombre_UnidadAcademica = req.body.nombre_UnidadAcademica;
+    db.query('UPDATE unidadacademica SET nombre_UnidadAcademica=? WHERE clave_UnidadAcademica=?',[nombre_UnidadAcademica,clave_UnidadAcademica],(err,result) =>{
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error interno del servidor");
+          }
+        res.status(200).send("Unidad Academica modificada con exito");        
+    });
+});
+
 module.exports = router;

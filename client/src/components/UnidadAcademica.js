@@ -83,10 +83,43 @@ const UnidadAcademica = () => {
       }
     });    
   }
+
+  const put = (rowData) =>{
+    UnidadAcademicaService.modificarUnidadAcademica(rowData).then(()=>{
+      //FALTAN MIS VALIDACIONES
+    });
+  }
   const limpiarCampos = () =>{
     setclave_UnidadAcademica(0);
     setnombre_UnidadAcademica("");
-  }    
+  }
+  
+  //ACTIVAR EDICION DE CELDA
+  const cellEditor = (options) => {
+    return textEditor(options);
+  };
+  //EDITAR TEXTO
+  const textEditor = (options) => {
+    return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+  };
+  //COMPLETAR MODIFICACION
+  const onCellEditComplete = (e) => {
+      let { rowData, newValue, field, originalEvent: event } = e;
+      switch (field) {
+        //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
+        case 'nombre_UnidadAcademica':
+          if (newValue.trim().length > 0){ 
+            rowData[field] = newValue; put(rowData);
+          }
+          else{
+            event.preventDefault();
+          } 
+        break;
+        default:
+        break;
+      }
+  };    
+
   return (
     <>
       <Panel header="Registrar Unidad Academica" className='mt-3' toggleable>
@@ -122,9 +155,10 @@ const UnidadAcademica = () => {
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
-        <DataTable value={filtrounidadacademica.length ? filtrounidadacademica :unidadacademicaList} size='small' tableStyle={{ minWidth: '50rem' }}>
+        <DataTable value={filtrounidadacademica.length ? filtrounidadacademica :unidadacademicaList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }}/>;
+            //EDICION
+              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'nombre_UnidadAcademica' ? (options) => cellEditor(options): null} onCellEditComplete={onCellEditComplete}/>;
           })}
         </DataTable>
       </Panel>              
