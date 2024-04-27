@@ -21,6 +21,7 @@ const UnidadAcademica = () => {
   const [filtrounidadacademica, setfiltrounidadacademica] = useState([]);
   const [error, setError] = useState(false);
   const [mensajeError, setmensajeError] = useState("");
+  const [editando, seteditando] = useState(false);
 
   useEffect(() => {
     get();
@@ -85,8 +86,19 @@ const UnidadAcademica = () => {
   }
 
   const put = (rowData) =>{
-    UnidadAcademicaService.modificarUnidadAcademica(rowData).then(()=>{
-      //FALTAN MIS VALIDACIONES
+    UnidadAcademicaService.modificarUnidadAcademica(rowData).then(response=>{
+      if(response.status === 200){
+        setError(false);
+      }
+    }).catch(error=>{
+      if(error.response.status === 401){
+        setmensajeError("Nombre ya existente");
+        get();
+        setError(true);
+      }else if(error.response.status === 401){
+        setmensajeError("Error del sistema");
+        setError(true);
+      }
     });
   }
   const limpiarCampos = () =>{
@@ -96,6 +108,7 @@ const UnidadAcademica = () => {
   
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
+    seteditando(true);
     return textEditor(options);
   };
   //EDITAR TEXTO
@@ -108,7 +121,7 @@ const UnidadAcademica = () => {
       switch (field) {
         //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
         case 'nombre_UnidadAcademica':
-          if (newValue.trim().length > 0){ 
+          if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
             rowData[field] = newValue; put(rowData);
           }
           else{
@@ -118,6 +131,7 @@ const UnidadAcademica = () => {
         default:
         break;
       }
+      seteditando(false);
   };    
 
   return (
@@ -158,7 +172,7 @@ const UnidadAcademica = () => {
         <DataTable value={filtrounidadacademica.length ? filtrounidadacademica :unidadacademicaList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
             //EDICION
-              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'nombre_UnidadAcademica' ? (options) => cellEditor(options): null} onCellEditComplete={onCellEditComplete}/>;
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'nombre_UnidadAcademica' ? (options) => cellEditor(options): null} onCellEditComplete={onCellEditComplete}/>;
           })}
         </DataTable>
       </Panel>              
