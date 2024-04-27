@@ -17,6 +17,9 @@ app.use("/unidadaprendizaje", unidadaprendizajeRoutes);
 const edificioRoutes = require("./routes/edificio");
 app.use("/edificio", edificioRoutes);
 
+const salaRoutes = require("./routes/sala");
+app.use("/sala", salaRoutes);
+
 
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
