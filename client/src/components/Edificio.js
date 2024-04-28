@@ -1,14 +1,14 @@
 import React from 'react';
 import { useState } from "react";
 import { useEffect } from "react";
-//import { useRef } from "react";
+import { useRef } from "react";
 import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-//import { Toast } from 'primereact/toast';
+import { Toast } from 'primereact/toast';
 import EdificioService from '../services/EdificioService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
 import UnidadAcademicaService from '../services/UnidadAcademicaService';
@@ -21,7 +21,7 @@ const Edificio = () => {
     {field: 'clave_UnidadAcademica', header: 'Unidad Academica' }      
   ];  
 
-  const [clave_Edificio, setclave_Edificio] = useState(0);
+  const [clave_Edificio, setclave_Edificio] = useState("");
   const [nombre_Edificio,setnombre_Edificio] = useState("");
   const [clave_UnidadAcademica, setclave_UnidadAcademica] = useState(null);
   const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(null);
@@ -31,7 +31,8 @@ const Edificio = () => {
   const [programasEducativos, setProgramasEducativos] = useState([]);
   const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
 
-  //const toast = useRef(null); // Referencia al componente Toast
+  const toast = useRef(null); // Referencia al componente Toast  
+
 
   useEffect(() => {
     get();
@@ -43,7 +44,7 @@ const Edificio = () => {
   }, [edificiosList]);
   
   // Función para mostrar un Toast de error  
-  /*const showErrorToastVerde = (message) => {
+  const showErrorToastVerde = (message) => {
     toast.current.show({ severity: 'success', summary: 'Exito', detail: message, life: 2000 });
   };
 
@@ -53,7 +54,7 @@ const Edificio = () => {
 
   const showErrorToastRojo = (message) => {
     toast.current.show({ severity: 'error', summary: 'Error', detail: message, life: 2000 });
-  };*/
+  };
 
   //BUSQUEDA
   const onSearch = (e) => {
@@ -61,11 +62,15 @@ const Edificio = () => {
     const filteredData = edificiosList.filter((item) => {
     const programaEducativo = item.clave_ProgramaEducativo ? item.clave_ProgramaEducativo.toString() : '';
     const unidadAcademica = item.clave_UnidadAcademica ? item.clave_UnidadAcademica.toString() : '';
+    const nombreProgramaEducativo = programasEducativos.find(prog => prog.clave_ProgramaEducativo === item.clave_ProgramaEducativo)?.nombre_ProgramaEducativo || '';
+        const nombre_UnidadAcademica = unidadesAcademicas.find(prog => prog.clave_UnidadAcademica === item.clave_UnidadAcademica)?.nombre_UnidadAcademica || '';
         return (
             item.clave_Edificio.toString().includes(value) ||
             item.nombre_Edificio.toLowerCase().includes(value) ||
             programaEducativo.toString().includes(value) ||
-            unidadAcademica.toString().includes(value)
+            unidadAcademica.toString().includes(value) ||
+            nombreProgramaEducativo.toLowerCase().includes(value) ||
+            nombre_UnidadAcademica.toLowerCase().includes(value)
         );
     });
     
@@ -106,7 +111,7 @@ const Edificio = () => {
   //MANDAR A LLAMAR AL REGISTRO SERVICE
   const add = ()=>{
     if (!clave_Edificio || !nombre_Edificio || !clave_UnidadAcademica) {      
-      //showErrorToastNaranja("Existen campos vacios");
+      showErrorToastNaranja("Existen campos vacios");
       return;
     }
     EdificioService.registrarEdificio({
@@ -116,28 +121,43 @@ const Edificio = () => {
       clave_ProgramaEducativo:clave_ProgramaEducativo     
     }).then(response=>{
       if (response.status === 200) {
-        //showErrorToastVerde("Registro Exitoso");
+        showErrorToastVerde("Registro Exitoso");
         limpiarCampos();
       }
     }).catch(error=>{
       if (error.response.status === 400) {        
-        //showErrorToastNaranja("Clave ya existente");
+        showErrorToastNaranja("Clave ya existente");
       }else if(error.response.status === 401){
-        //showErrorToastNaranja("Nombre ya existente");        
+        showErrorToastNaranja("Nombre ya existente");        
       }else if(error.response.status === 500){  
-        //showErrorToastRojo("Error interno del servidor");
+        showErrorToastRojo("Error interno del servidor");
       }     
     });
   }  
 
   const get = ()=>{
     EdificioService.consultarEdificio().then((response)=>{
-      setedificiosList(response.data);  
+      setedificiosList(response.data);      
     }).catch(error=>{
       if (error.response.status === 500) {
-        //showErrorToastRojo("Error del sistema");
+        showErrorToastRojo("Error del sistema");
       }
     });    
+  }
+
+  const put = (rowData) =>{
+    EdificioService.modificarEdificio(rowData).then((response)=>{
+      if (response.status === 200) {
+        showErrorToastVerde("Modificación Exitosa");        
+      }
+    }).catch(error=>{
+      get();
+      if (error.response.status === 500) {
+        showErrorToastRojo("Error del sistema");
+      } else if (error.response.status === 401) {
+        showErrorToastRojo("El nombre ya se encuentra registrado");
+      }
+    });
   }
 
   const limpiarCampos = () =>{
@@ -145,10 +165,107 @@ const Edificio = () => {
     setnombre_Edificio("");
     setclave_UnidadAcademica(null);
     setclave_ProgramaEducativo(null);
-  }   
+  }  
+
+  //ACTIVAR EDICION DE CELDA
+  const cellEditor = (options) => {
+    switch(options.field){
+      case 'nombre_Edificio':
+        return textEditor(options);        
+      case 'clave_ProgramaEducativo':
+        return ProgramaEducativoEditor(options);
+      case 'clave_UnidadAcademica':
+        return UnidadAcademicaEditor(options);
+      default:
+        return textEditor(options);
+    }    
+  };
+  //EDITAR TEXTO
+  const textEditor = (options) => {
+    return <InputText type="text" keyfilter={/[a-zA-Z\s]/} value={options.value} maxLength={255} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+  };
+
+  const ProgramaEducativoEditor = (options) => {
+    return (
+        <Dropdown
+            value={options.value}
+            options={programasEducativos}
+            onChange={(e) => options.editorCallback(e.value)}            
+            optionLabel = {(option) => `${option.clave_ProgramaEducativo} - ${option.nombre_ProgramaEducativo}`}
+            optionValue="clave_ProgramaEducativo" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            placeholder="Seleccione un Programa Educativo" 
+            showClear 
+        />
+    );
+  };
+
+  const UnidadAcademicaEditor = (options) => {
+    return (
+        <Dropdown
+          value={options.value}
+          options={unidadesAcademicas}
+          onChange={(e) => options.editorCallback(e.value)}            
+          optionLabel = {(option) => `${option.clave_UnidadAcademica} - ${option.nombre_UnidadAcademica}`}
+          optionValue="clave_UnidadAcademica" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+          placeholder="Seleccione una Unidad Académica"
+          showClear
+        />
+    );
+  };
+  
+  //COMPLETAR MODIFICACION
+  const onCellEditComplete = (e) => {            
+      let { rowData, newValue, field, originalEvent: event } = e;                       
+      switch (field) {
+        //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
+        case 'nombre_Edificio':
+          if (newValue.trim().length > 0 && newValue !== rowData[field]){                                    
+                rowData[field] = newValue;               
+                put(rowData);                       
+          }else{        
+            get();                           
+            event.preventDefault();
+          } 
+          break;
+        case 'clave_ProgramaEducativo':
+          if (newValue > 0 && newValue !== rowData[field]){             
+            rowData[field] = newValue;
+            put(rowData);                       
+          }else{
+            get();
+            event.preventDefault();
+          } 
+          break;
+        case 'clave_UnidadAcademica':
+            if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
+              rowData[field] = newValue;
+              put(rowData);              
+            }else{
+              get();
+              event.preventDefault();
+            } 
+            break;
+        default:
+          break;
+      }
+  }; 
+
+  // Define una función independiente para el cuerpo de la columna
+  const renderBody = (rowData, field) => {
+    if (field === 'clave_UnidadAcademica') {
+      const unidad = unidadesAcademicas.find((unidad) => unidad.clave_UnidadAcademica === rowData.clave_UnidadAcademica);
+      return unidad ? `${unidad.clave_UnidadAcademica} - ${unidad.nombre_UnidadAcademica}` : '';
+    } else if (field === 'clave_ProgramaEducativo') {
+      const programa = programasEducativos.find((programa) => programa.clave_ProgramaEducativo === rowData.clave_ProgramaEducativo);
+      return programa ? `${programa.clave_ProgramaEducativo} - ${programa.nombre_ProgramaEducativo}` : '';
+    } else {
+      return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
+    }
+  };
+  
   return (
     <>
-      {/*<Toast ref={toast} />*/}
+      <Toast ref={toast} />
       <Panel header="Registrar Edificio" className='mt-3' toggleable>        
         <div className="formgrid grid mx-8">
           <div className="field col-2">
@@ -181,6 +298,7 @@ const Edificio = () => {
               optionLabel = {(option) => `${option.clave_ProgramaEducativo} - ${option.nombre_ProgramaEducativo}`}
               optionValue="clave_ProgramaEducativo" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
               placeholder="Seleccione un Programa Educativo" 
+              showClear
             />
           </div>         
           <div className="field col-6">
@@ -195,7 +313,8 @@ const Edificio = () => {
               //optionLabel="nombre_UnidadAcademica" 
               optionLabel = {(option) => `${option.clave_UnidadAcademica} - ${option.nombre_UnidadAcademica}`}
               optionValue="clave_UnidadAcademica" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-              placeholder="Seleccione una Unidad Académica" 
+              placeholder="Seleccione una Unidad Académica"
+              showClear 
             />
           </div>                                                                           
         </div>
@@ -209,46 +328,11 @@ const Edificio = () => {
         </div>
         <DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }}/>;
+              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_Edificio' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}
+              body={(rowData) => renderBody(rowData, field)} // Llama a la función renderBody para generar el cuerpo de la columna
+              />;
           })}
-        </DataTable>        
-        {/*<DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} size='small' tableStyle={{ minWidth: '50rem' }} sortField="clave_Edificio" sortOrder={1}>                                  
-          {columns.map(({ field, header }) => {
-            if (field === 'clave_UnidadAcademica') {
-              return (
-                <Column
-                  key={field}
-                  field={field}
-                  header={header}
-                  sortable
-                  sortField="clave_UnidadAcademica"
-                  body={(rowData) => {
-                    const unidad = unidadesAcademicas.find((unidad) => unidad.clave_UnidadAcademica === rowData.clave_UnidadAcademica);
-                    return unidad ? `${unidad.clave_UnidadAcademica} - ${unidad.nombre_UnidadAcademica}` : '';
-                  }}
-                  style={{ width: '25%' }}
-                />
-              );
-            } else if (field === 'clave_ProgramaEducativo') {
-              return (
-                <Column
-                  key={field}
-                  field={field}
-                  header={header}
-                  sortable
-                  sortField="clave_ProgramaEducativo"
-                  body={(rowData) => {
-                    const programa = programasEducativos.find((programa) => programa.clave_ProgramaEducativo === rowData.clave_ProgramaEducativo);
-                    return programa ? `${programa.clave_ProgramaEducativo} - ${programa.nombre_ProgramaEducativo}` : '';
-                  }}
-                  style={{ width: '25%' }}
-                />
-              );
-            } else {
-              return <Column key={field} field={field} header={header} sortable style={{ width: '25%' }} />;
-            }
-          })}
-        </DataTable>*/}       
+        </DataTable>          
       </Panel>     
     </>
   )

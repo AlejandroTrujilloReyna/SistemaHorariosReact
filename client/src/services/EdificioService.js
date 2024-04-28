@@ -6,6 +6,9 @@ const EdificioService = {
     },
     consultarEdificio: () => {
         return Axios.get("http://localhost:3001/edificio/consultarEdificio");
+    },
+    modificarEdificio: (datos) => {
+        return Axios.put("http://localhost:3001/edificio/modificarEdificio",datos);
     }
 }
 
