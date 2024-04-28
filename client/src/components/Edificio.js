@@ -140,7 +140,7 @@ const Edificio = () => {
       setedificiosList(response.data);      
     }).catch(error=>{
       if (error.response.status === 500) {
-        showErrorToastRojo("Error del sistema");
+        //showErrorToastRojo("Error del sistema");
       }
     });    
   }

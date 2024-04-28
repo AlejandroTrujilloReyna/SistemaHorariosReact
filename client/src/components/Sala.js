@@ -9,6 +9,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
+import { ToggleButton } from 'primereact/togglebutton';
 import SalaService from '../services/SalaService';
 import EdificiosService from '../services/EdificioService';
 
@@ -18,7 +19,7 @@ const Sala = () => {
     {field: 'clave_Sala', header: 'Clave' },
     {field: 'nombre_Sala', header: 'Nombre' },
     {field: 'capacidad_Sala', header: 'Capacidad'},
-    {field: 'validar_Traslape', header: 'Existe Traslape'},
+    {field: 'validar_Traslape', header: 'Validar Traslape'},
     {field: 'nota_Descriptiva', header: 'Nota Descriptiva'},
     {field: 'clave_Edificio', header: 'Clave Edificio'},    
     {field: 'clave_TipoSala', header: 'Clave Tipo Sala'}    
@@ -83,7 +84,7 @@ const Sala = () => {
   }, []); 
 
   const add = ()=>{
-    if (!nombre_Sala || !capacidad_Sala || !validar_Traslape || !clave_Edificio || !clave_TipoSala) {
+    if (!nombre_Sala || !capacidad_Sala || !clave_Edificio || !clave_TipoSala) {
       setmensajeError("Existen campos vacios");
       setError(true);
       return;
@@ -157,12 +158,15 @@ const Sala = () => {
           </div>
           <div className="field col-2">
               <label>Validar Traslape</label>
-              <InputText type="text" keyfilter="pint" value={validar_Traslape} maxLength={10}
-                  onChange={(event)=>{
-                    setvalidar_Traslape(event.target.value);
-                    setError(false);
-                  }}  
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
+              <ToggleButton
+                invalid
+                onLabel="Si"
+                onIcon="pi pi-check" 
+                offIcon="pi pi-times" 
+                checked={validar_Traslape === 1} 
+                onChange={(e) => setvalidar_Traslape(e.value ? 1 : 0)} 
+                className="w-8rem" 
+            />
           </div>
           <div className="field col-5">
             <label>Edificio</label>
@@ -216,7 +220,7 @@ const Sala = () => {
       </div>  
         <DataTable value={filtrosala.length ? filtrosala :salaList} size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }}/>;
+              return <Column sortable key={field} field={field} header={header} style={{ width: '15%' }}/>;
           })}
         </DataTable>
       </Panel>            
