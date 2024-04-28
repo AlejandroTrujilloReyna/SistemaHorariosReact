@@ -10,6 +10,10 @@ const UnidadAprendizajeService = {
     },
     consultarUnidadAprendizaje:()=>{
         return Axios.get("http://localhost:3001/unidadaprendizaje/consultarUnidadAprendizaje");
+    },
+    modificarUnidadAprendizaje:(datos)=>{
+        return Axios.put("http://localhost:3001/unidadaprendizaje/modificarUnidadAprendizaje", datos)
+
     }
 
 }

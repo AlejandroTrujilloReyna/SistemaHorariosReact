@@ -106,12 +106,117 @@ const UnidadAprendizaje = () => {
     });    
   }
 
+const put = (rowData) =>{
+  UnidadAprendizajeService.modificarUnidadAprendizaje(rowData).then((response)=>{
+    if(response.status === 200){
+      setError(false);
+    }
+  }).catch(error=>{
+    if (error.response.status === 500) {
+      setmensajeError("Error del sistema");
+      setError(true);
+    }else if (error.response.status === 401) {
+      setmensajeError("Nombre ya registrado");
+      setError(true);
+    }
+
+
+  });
+}
+
   const limpiarCampos = () =>{
     setclave_UnidadAprendizaje(0);
     setnombre_UnidadAprendizaje("");
     setsemestre(0);
     setclave_PlanEstudios("");
   }  
+
+  const cellEditor = (options) => {
+    
+    switch (options.field) {
+      
+      case 'nombre_UnidadAprendizaje':
+        return textEditor(options); 
+        
+
+      case 'semestre':
+        return numberEditor(options);
+        
+
+      case 'clave_PlanEstudios':
+        return PlanEstudiosEditor(options);           
+       
+default:
+  return textEditor(options); 
+    }  
+  
+  }
+
+  const textEditor = (options) => {
+    return <InputText keyfilter={/^[a-zA-Z\s]*$/} type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+  };
+
+  const numberEditor = (options) => {
+    return <InputText keyfilter="pint"  type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+  };
+
+ //COMPLETAR MODIFICACION
+ const onCellEditComplete = (e) => {
+  let { rowData, newValue, field, originalEvent: event } = e;
+  switch (field) {
+    //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
+    case 'nombre_UnidadAprendizaje':
+      if (newValue.trim().length > 0){ 
+        rowData[field] = newValue; put(rowData);
+      }
+      else{
+        get();
+        event.preventDefault();
+      } 
+    break;
+    case 'semestre':
+      if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
+        rowData[field] = newValue; put(rowData);
+      }
+      else{
+        get();
+        event.preventDefault();          
+      } 
+    break;
+
+    case 'clave_PlanEstudios':
+      if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
+        rowData[field] = newValue; put(rowData);
+      }
+      else{
+        get();
+        event.preventDefault();          
+      } 
+    break;
+
+    default:
+    break;
+  }
+};
+
+const PlanEstudiosEditor = (options) => {
+return (
+
+<Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                value={options.value} 
+                options={planesdeestudios}  
+                onChange={(e) => {
+                  setclave_PlanEstudios(e.value);
+                  setError(false);
+                }} 
+                optionLabel="nombre_PlanEstudios" 
+                optionValue="clave_PlanEstudios" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+                placeholder="Selecciona un Plan de Estudios" 
+              />
+              );
+
+};
+
   return (
     <>
       <Panel header="Registrar Unidad Aprendizaje" className='mt-3' toggleable>
@@ -166,14 +271,18 @@ const UnidadAprendizaje = () => {
           {error && <Message severity="error" text={mensajeError} />} 
         </div>         
       </Panel>
+
       <Panel header="Consultar Unidad de Aprendizaje" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
         <DataTable value={filtrounidadaprendizaje.length ? filtrounidadaprendizaje :unidadaprendizajeList} size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }}/>;
+
+              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_UnidadAprendizaje' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
           })}
+
+
         </DataTable>
       </Panel> 
   </>
