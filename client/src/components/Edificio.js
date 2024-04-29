@@ -14,57 +14,128 @@ import ProgramaEducativoService from '../services/ProgramaEducativoService';
 import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
 const Edificio = () => {
+  //VARIABLES PARA EL REGISTRO
+  const [clave_Edificio, setclave_Edificio] = useState("");
+  const [nombre_Edificio,setnombre_Edificio] = useState("");
+  const [clave_UnidadAcademica, setclave_UnidadAcademica] = useState(null);
+  const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(null);
+  //VARIABLES PARA LA CONSULTA
+  const [edificiosList,setedificiosList] = useState([]);
+  const [filtroEdificio, setfiltroEdificio] = useState([]);
+  const [programasEducativos, setProgramasEducativos] = useState([]);
+  const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
+  //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
+  const [editando,seteditando] = useState(false);
+  //VARIABLES PARA EL ERROR
+  const toast = useRef(null);
+  
+  //MENSAJE DE EXITO
+  const mostrarExito = (mensaje) => {
+    toast.current.show({severity:'success', summary: 'Exito', detail:mensaje, life: 3000});
+  }
+  //MENSAJE DE ADVERTENCIA
+  const mostrarAdvertencia = (mensaje) => {
+      toast.current.show({severity:'warn', summary: 'Advertencia', detail:mensaje, life: 3000});
+  }
+  //MENSAJE DE ERROR
+  const mostrarError = (mensaje) => {
+    toast.current.show({severity:'error', summary: 'Error', detail:mensaje, life: 3000});
+  }  
+
+  //FUNCION PARA REGISTRAR
+  const add = ()=>{
+    //VALIDACION DE CAMPOS VACIOS
+    if (!clave_Edificio || !nombre_Edificio || !clave_UnidadAcademica) {      
+      mostrarAdvertencia("Existen campos vacios");
+      return;
+    }
+    //MANDAR A LLAMAR AL REGISTRO SERVICE
+    EdificioService.registrarEdificio({
+      clave_Edificio:clave_Edificio,
+      nombre_Edificio:nombre_Edificio,
+      clave_UnidadAcademica:clave_UnidadAcademica,
+      clave_ProgramaEducativo:clave_ProgramaEducativo     
+    }).then(response=>{//CASO EXITOSO
+      if (response.status === 200) {
+        mostrarExito("Registro Exitoso");
+        limpiarCampos();
+      }
+    }).catch(error=>{//EXCEPCIONES
+      if (error.response.status === 400) {        
+        mostrarAdvertencia("Clave ya existente");
+      }else if(error.response.status === 401){
+        mostrarAdvertencia("Nombre ya existente");        
+      }else if(error.response.status === 500){  
+        mostrarError("Error interno del servidor");
+      }     
+    });
+  }  
+
+  //FUNCION PARA CONSULTA
+  const get = ()=>{
+    EdificioService.consultarEdificio().then((response)=>{//CASO EXITOSO
+      setedificiosList(response.data);      
+    }).catch(error=>{//EXCEPCIONES
+      if (error.response.status === 500) {
+        //mostrarError("Error del sistema");
+      }
+    });    
+  }
+
+  //FUNCION PARA LA MODIFICACION
+  const put = (rowData) =>{
+    EdificioService.modificarEdificio(rowData).then((response)=>{//CASO EXITOSO
+      if (response.status === 200) {
+        mostrarExito("Modificación Exitosa");        
+      }
+    }).catch(error=>{//EXCEPCIONES
+      if (error.response.status === 401) {
+        mostrarAdvertencia("El nombre ya se encuentra registrado");
+        get();
+      }else if (error.response.status === 500) {
+        mostrarError("Error del sistema");
+      }
+    });
+  }
+
+  //!!!EXTRAS DE REGISTRO
+
+  //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
+  const limpiarCampos = () =>{
+    setclave_Edificio("");
+    setnombre_Edificio("");
+    setclave_UnidadAcademica(null);
+    setclave_ProgramaEducativo(null);
+  } 
+
+  //!!!EXTRAS DE CONSULTA
+  
+  //COLUMNAS PARA LA TABLA
   const columns = [
     {field: 'clave_Edificio', header: 'Clave' },
     {field: 'nombre_Edificio', header: 'Nombre' },
     {field: 'clave_ProgramaEducativo', header: 'Programa Educativo' },
     {field: 'clave_UnidadAcademica', header: 'Unidad Academica' }      
-  ];  
-
-  const [clave_Edificio, setclave_Edificio] = useState("");
-  const [nombre_Edificio,setnombre_Edificio] = useState("");
-  const [clave_UnidadAcademica, setclave_UnidadAcademica] = useState(null);
-  const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(null);
-
-  const [edificiosList,setedificiosList] = useState([]);
-  const [filtroEdificio, setfiltroEdificio] = useState([]);
-  const [programasEducativos, setProgramasEducativos] = useState([]);
-  const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
-  const [original, setOriginal] = useState([]);
-
-  const toast = useRef(null); // Referencia al componente Toast  
-
-
+  ];
+  
+  //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
   useEffect(() => {
     get();
   },[]);
 
+  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
   useEffect(() => {
-    // Ordenar los datos por clave_Edificio al cargar la lista
     setfiltroEdificio([...edificiosList].sort((a, b) => a.clave_Edificio - b.clave_Edificio));
   }, [edificiosList]);
   
-  // Función para mostrar un Toast de error  
-  const showErrorToastVerde = (message) => {
-    toast.current.show({ severity: 'success', summary: 'Exito', detail: message, life: 2000 });
-  };
-
-  const showErrorToastNaranja = (message) => {
-    toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: message, life: 2000 });
-  };
-
-  const showErrorToastRojo = (message) => {
-    toast.current.show({ severity: 'error', summary: 'Error', detail: message, life: 2000 });
-  };
-
-  //BUSQUEDA
+  //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredData = edificiosList.filter((item) => {
     const programaEducativo = item.clave_ProgramaEducativo ? item.clave_ProgramaEducativo.toString() : '';
     const unidadAcademica = item.clave_UnidadAcademica ? item.clave_UnidadAcademica.toString() : '';
     const nombreProgramaEducativo = programasEducativos.find(prog => prog.clave_ProgramaEducativo === item.clave_ProgramaEducativo)?.nombre_ProgramaEducativo || '';
-        const nombre_UnidadAcademica = unidadesAcademicas.find(prog => prog.clave_UnidadAcademica === item.clave_UnidadAcademica)?.nombre_UnidadAcademica || '';
+    const nombre_UnidadAcademica = unidadesAcademicas.find(prog => prog.clave_UnidadAcademica === item.clave_UnidadAcademica)?.nombre_UnidadAcademica || '';
         return (
             item.clave_Edificio.toString().includes(value) ||
             item.nombre_Edificio.toLowerCase().includes(value) ||
@@ -74,11 +145,10 @@ const Edificio = () => {
             nombre_UnidadAcademica.toLowerCase().includes(value)
         );
     });
-    
     setfiltroEdificio(filteredData);
   };  
 
-  //MANDAR A LLAMAR A LA LISTA DE UNIDADES SERVICE
+  //MANDAR A LLAMAR A LA LISTA DE UNIDADES ACADEMICAS
   useEffect(() => {
     UnidadAcademicaService.consultarUnidadAcademica()
       .then(response => {
@@ -88,7 +158,8 @@ const Edificio = () => {
         console.error("Error fetching unidades académicas:", error);
       });
   }, []);
-    
+  
+  //MANDAR A LLAMAR A LA LISTA DE PROGRAMAS EDUCATIVOS
   useEffect(() => {
     ProgramaEducativoService.consultarProgramaEducativo()
       .then(response => {
@@ -99,17 +170,18 @@ const Edificio = () => {
       });
   }, []);
   
-  // Actualizar la unidad académica al cambiar el programa educativo seleccionado (INNECESARIO POR AHORA)
-  useEffect(() => {
+  //ACTUALIZAR LA UNIDAD ACADEMICA AL CAMBIAR EL PROGRAMA EDUCATIVO SELECCIONADO (INNECESARIO POR AHORA)
+  /*useEffect(() => {
     if (clave_ProgramaEducativo) {
       const programaSeleccionado = programasEducativos.find(prog => prog.clave_ProgramaEducativo === clave_ProgramaEducativo);
       if (programaSeleccionado) {
         setclave_UnidadAcademica(programaSeleccionado.clave_UnidadAcademica);
       }
     }
-  }, [clave_ProgramaEducativo, programasEducativos]);
-  // Borrar el programa educativo cuando se elige una Unidad Academica que no coincide con el programa educativo actual
-  useEffect(() => {
+  }, [clave_ProgramaEducativo, programasEducativos]);*/
+
+  //BORRAR EL PROGRAMA EDUCATIVO CUANDO SE ELIGE UNA UNIDAD ACADEMICA QUE NO COINCIDE CON EL PROGRAMA EDUCATIVO ACTUAL
+  /*useEffect(() => {
     if (clave_UnidadAcademica) {
       let claveUAC = -1;
       const programaSeleccionado = programasEducativos.find(prog => prog.clave_ProgramaEducativo === clave_ProgramaEducativo);                
@@ -118,68 +190,26 @@ const Edificio = () => {
         setclave_ProgramaEducativo(null);
       }
     }
-  }, [unidadesAcademicas,clave_UnidadAcademica]);
-  //MANDAR A LLAMAR AL REGISTRO SERVICE
-  const add = ()=>{
-    if (!clave_Edificio || !nombre_Edificio || !clave_UnidadAcademica) {      
-      showErrorToastNaranja("Existen campos vacios");
-      return;
+  }, [unidadesAcademicas,clave_UnidadAcademica]);*/
+  
+  //FUNCION PARA QUE SE MUESTRE LA INFORMACION ESPECIFICA DE LAS LLAVES FORANEAS
+  const renderBody = (rowData, field) => {
+    if (field === 'clave_UnidadAcademica') {
+      const unidad = unidadesAcademicas.find((unidad) => unidad.clave_UnidadAcademica === rowData.clave_UnidadAcademica);
+      return unidad ? `${unidad.clave_UnidadAcademica} - ${unidad.nombre_UnidadAcademica}` : '';
+    } else if (field === 'clave_ProgramaEducativo') {
+      const programa = programasEducativos.find((programa) => programa.clave_ProgramaEducativo === rowData.clave_ProgramaEducativo);
+      return programa ? `${programa.clave_ProgramaEducativo} - ${programa.nombre_ProgramaEducativo}` : '';
+    } else {
+      return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
     }
-    EdificioService.registrarEdificio({
-      clave_Edificio:clave_Edificio,
-      nombre_Edificio:nombre_Edificio,
-      clave_UnidadAcademica:clave_UnidadAcademica,
-      clave_ProgramaEducativo:clave_ProgramaEducativo     
-    }).then(response=>{
-      if (response.status === 200) {
-        showErrorToastVerde("Registro Exitoso");
-        limpiarCampos();
-      }
-    }).catch(error=>{
-      if (error.response.status === 400) {        
-        showErrorToastNaranja("Clave ya existente");
-      }else if(error.response.status === 401){
-        showErrorToastNaranja("Nombre ya existente");        
-      }else if(error.response.status === 500){  
-        showErrorToastRojo("Error interno del servidor");
-      }     
-    });
-  }  
-
-  const get = ()=>{
-    EdificioService.consultarEdificio().then((response)=>{
-      setedificiosList(response.data);      
-    }).catch(error=>{
-      if (error.response.status === 500) {
-        //showErrorToastRojo("Error del sistema");
-      }
-    });    
-  }
-
-  const put = (rowData) =>{
-    EdificioService.modificarEdificio(rowData).then((response)=>{
-      if (response.status === 200) {
-        showErrorToastVerde("Modificación Exitosa");        
-      }
-    }).catch(error=>{
-      get();
-      if (error.response.status === 500) {
-        showErrorToastRojo("Error del sistema");
-      } else if (error.response.status === 401) {
-        showErrorToastRojo("El nombre ya se encuentra registrado");
-      }
-    });
-  }
-
-  const limpiarCampos = () =>{
-    setclave_Edificio("");
-    setnombre_Edificio("");
-    //setclave_UnidadAcademica(null);
-    setclave_ProgramaEducativo(null);
-  }  
+  };
+  
+  //!!!EXTRAS DE MODIFICACION
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
+    seteditando(true);
     switch(options.field){
       case 'nombre_Edificio':
         return textEditor(options);        
@@ -191,11 +221,13 @@ const Edificio = () => {
         return textEditor(options);
     }    
   };
+
   //EDITAR TEXTO
   const textEditor = (options) => {
     return <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={options.value} maxLength={255} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
   };
 
+  //EDITAR DROPDOWN (PROGRAMA EDUCATIVO)
   const ProgramaEducativoEditor = (options) => {
     return (
         <Dropdown
@@ -210,6 +242,7 @@ const Edificio = () => {
     );
   };
 
+  //EDITAR DROPDOWN (UNIDAD ACADEMICA)
   const UnidadAcademicaEditor = (options) => {
     return (
         <Dropdown
@@ -226,62 +259,44 @@ const Edificio = () => {
   
   //COMPLETAR MODIFICACION
   const onCellEditComplete = (e) => {            
-      let { rowData, newValue, field, originalEvent: event } = e;                       
-      console.error("data1: "+original+" data2: "+newValue);      
+      let { rowData, newValue, field, originalEvent: event } = e;                          
       switch (field) {
         //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO        
         case 'nombre_Edificio':
-          if (newValue.trim().length > 0 && newValue !== original){                                    
+          if (newValue.trim().length > 0 && newValue !== rowData[field]){                                    
                 rowData[field] = newValue;               
                 put(rowData);                       
-          }else{        
-            get();                          
+          }else{                             
             event.preventDefault();
           } 
           break;
         case 'clave_ProgramaEducativo':
-          if (newValue !== original){             
+          if (newValue !== rowData[field]){             
             rowData[field] = newValue;
             put(rowData);                       
           }else{
-            get();
             event.preventDefault();
           } 
           break;
         case 'clave_UnidadAcademica':
-            if (newValue > 0 && newValue !== null && newValue !== original){ 
-              rowData[field] = newValue;
-              put(rowData);              
-            }else{
-              get();
-              event.preventDefault();
-            } 
-            break;
+          if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
+            rowData[field] = newValue;
+            put(rowData);              
+          }else{
+            event.preventDefault();
+          } 
+          break;
         default:
           break;
       }
-      setOriginal(null);
+      seteditando(false);
   }; 
 
-  // Define una función independiente para el cuerpo de la columna
-  const renderBody = (rowData, field) => {
-    if (field === 'clave_UnidadAcademica') {
-      const unidad = unidadesAcademicas.find((unidad) => unidad.clave_UnidadAcademica === rowData.clave_UnidadAcademica);
-      return unidad ? `${unidad.clave_UnidadAcademica} - ${unidad.nombre_UnidadAcademica}` : '';
-    } else if (field === 'clave_ProgramaEducativo') {
-      const programa = programasEducativos.find((programa) => programa.clave_ProgramaEducativo === rowData.clave_ProgramaEducativo);
-      return programa ? `${programa.clave_ProgramaEducativo} - ${programa.nombre_ProgramaEducativo}` : '';
-    } else {
-      return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
-    }
-  };
-  const onCellEditInit = (e) => {
-    console.error(""+e);
-    setOriginal(e.rowData[e.field]);
-  }
   return (
     <>
-      <Toast ref={toast} />
+    {/*APARICION DE LOS MENSAJES (TOAST)*/}
+    <Toast ref={toast} />
+      {/*PANEL PARA EL REGISTRO*/}
       <Panel header="Registrar Edificio" className='mt-3' toggleable>        
         <div className="formgrid grid mx-8">
           <div className="field col-2">
@@ -335,17 +350,17 @@ const Edificio = () => {
           </div>                                                                           
         </div>
         <div className="mx-8 mt-4">
-                <Button label="Guardar" onClick={add} className="p-button-success" />
+          <Button label="Guardar" onClick={add} className="p-button-success" />
         </div>                
       </Panel>
+      {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
       <Panel header="Consultar Edificio" className='mt-3' toggleable>
         <div className="mx-8 mb-4">
           <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
         </div>
-        <DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} size='small' tableStyle={{ minWidth: '50rem' }}>
+        <DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_Edificio' ? null : (options) => cellEditor(options)}
-              onCellEditInit={onCellEditInit}
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_Edificio' ? null : (options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
               body={(rowData) => renderBody(rowData, field)} // Llama a la función renderBody para generar el cuerpo de la columna
               />;
