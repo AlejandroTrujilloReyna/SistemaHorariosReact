@@ -168,9 +168,70 @@ const Sala = () => {
       });
   }, []);   
 
+  const cellEditor = (options) => {
+    seteditando(true);
+    switch(options.field){
+      case 'nombre_Sala':
+        return textEditor(options);        
+      case 'capacidad_Sala':
+        return numberEditor(options);
+      case 'validar_Traslape':
+        return textEditor(options);
+      case 'nota_Descriptiva':
+         return textEditor(options);      
+      case 'clave_Edificio':
+        return EdificioEditor(options);    
+      case 'clave_TipoSala':
+        return TipoSalaEditor(options);                     
+      default:
+        return textEditor(options);
+    }    
+  };
+
+  //EDITAR TEXTO
+  const textEditor = (options) => {
+    return <InputText keyfilter={/^[0-9a-zA-Z]*$/} type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+  };
+
+  //EDITAR NUMEROS
+  const numberEditor = (options) => {
+    return <InputText keyfilter="pint"  type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+  };
+
+//EDITAR DROPDOWN (EDIFICIO)
+const EdificioEditor = (options) => {
+  return (
+      <Dropdown
+          value={options.value}
+          options={edificios}
+          onChange={(e) => options.editorCallback(e.value)}            
+          optionLabel = {(option) => `${option.clave_Edificio} - ${option.nombre_Edificio}`}
+          optionValue="clave_Edificio" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+          placeholder="Seleccione un Edificio" 
+      />
+  );
+};
+
+//EDITAR DROPDOWN (TIPOSALA)
+const TipoSalaEditor = (options) => {
+  return (
+      <Dropdown
+          value={options.value}
+          options={tiposalas}
+          onChange={(e) => options.editorCallback(e.value)}            
+          optionLabel = {(option) => `${option.clave_TipoSala} - ${option.nombre_TipoSala}`}
+          optionValue="clave_TipoSala"
+          placeholder="Seleccione un tipo de Sala" 
+      />
+  );
+};
+  
   //COMPLETAR MODIFICACION
   const onCellEditComplete = (e) => {
     let { rowData, newValue, field, originalEvent: event } = e;
+
+    console.error("data: " + rowData[field] + " new data: " + newValue);
+
     switch (field) {
       //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
       case 'nombre_Sala':
@@ -305,7 +366,9 @@ const Sala = () => {
       </div>  
         <DataTable value={filtrosala.length ? filtrosala :salaList} size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }}/>;
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }}
+              editor={field === 'clave_Sala' ? null : (options) => cellEditor(options)}
+              onCellEditComplete={onCellEditComplete}/>;
           })}
         </DataTable>
       </Panel>            
