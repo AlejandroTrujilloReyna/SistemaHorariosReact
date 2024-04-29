@@ -68,7 +68,7 @@ router.put("/modificarUnidadAcademica", (req, res) => {
             return res.status(401).send("El nombre de la Unidad Académica ya existe");
         }
 
-        db.query('UPDATE unidadacademica SET nombre_UnidadAcademica=? WHERE clave_UnidadAcademica=?',[nombre_UnidadAcademica,clave_UnidadAcademica],(err,result) =>{
+        db.query('UPDATE unidadacademica SET nombre_UnidadAcademica = ? WHERE clave_UnidadAcademica = ?',[nombre_UnidadAcademica,clave_UnidadAcademica],(err,result) =>{
             if (err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");

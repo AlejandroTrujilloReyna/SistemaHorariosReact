@@ -6,7 +6,9 @@ const ProgramaEducativoService = {
     },
     consultarProgramaEducativo:() => {
         return Axios.get("http://localhost:3001/programaeducativo/consultarProgramaEducativo");
-    }    
+    },modificarProgramaEducativo: (datos)=>{
+        return Axios.put("http://localhost:3001/programaeducativo/modificarProgramaEducativo", datos);
+    }        
 }
 
 export default ProgramaEducativoService;

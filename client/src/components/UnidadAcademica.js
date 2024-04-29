@@ -78,7 +78,7 @@ const UnidadAcademica = () => {
   const put = (rowData) =>{
     UnidadAcademicaService.modificarUnidadAcademica(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa")
+        mostrarExito("Modificacion exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 401){

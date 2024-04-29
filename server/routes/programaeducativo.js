@@ -58,4 +58,31 @@ router.get("/consultarProgramaEducativo", (req, res) => {
     });
 });
 
+router.put("/modificarProgramaEducativo", (req, res) => {
+    const clave_ProgramaEducativo = req.body.clave_ProgramaEducativo;
+    const nombre_ProgramaEducativo = req.body.nombre_ProgramaEducativo;
+    const banco_Horas = req.body.banco_Horas;
+    const min_Grupo = req.body.min_Grupo;
+    const max_Grupo = req.body.max_Grupo;
+    const clave_UnidadAcademica = req.body.clave_UnidadAcademica;
+    db.query('SELECT * FROM programaeducativo WHERE nombre_ProgramaEducativo = ? AND clave_ProgramaEducativo != ?',[nombre_ProgramaEducativo,clave_ProgramaEducativo], (err, results) => {
+        if(err) {
+            console.log(err);
+            return res.status(500).send("Error interno del servidor");
+        }
+
+        if(results.length > 0) {
+            return res.status(401).send("El Nombre del Programa Educativo ya existe");
+        }
+        db.query('UPDATE programaeducativo SET nombre_ProgramaEducativo = ?, banco_Horas = ?, min_Grupo = ?, max_Grupo = ?, clave_UnidadAcademica = ?  WHERE clave_ProgramaEducativo = ?',
+        [nombre_ProgramaEducativo,banco_Horas,min_Grupo,max_Grupo,clave_UnidadAcademica,clave_ProgramaEducativo],(err,result) =>{
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error interno del servidor");
+            }
+            res.status(200).send("Programa Educativo modificado con exito");        
+        });
+    });    
+});
+
 module.exports = router;

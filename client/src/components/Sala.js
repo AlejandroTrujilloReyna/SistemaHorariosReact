@@ -140,7 +140,7 @@ const Sala = () => {
         <div className="formgrid grid mx-8">
           <div className="field col-3">
               <label>Nombre</label>
-              <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_Sala} maxLength={255}
+              <InputText type="text" keyfilter={ /^[0-9a-zA-Z]*$/} value={nombre_Sala} maxLength={255}
                   onChange={(event)=>{
                     setnombre_Sala(event.target.value);
                     setError(false);
