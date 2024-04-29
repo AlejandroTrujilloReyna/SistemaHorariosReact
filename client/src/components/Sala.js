@@ -85,7 +85,20 @@ const Sala = () => {
   }  
 
   //FUNCION PARA LA MODIFICACION?????????????????????????????????????????
-
+  const put = (rowData) =>{
+    SalaService.modificarSala(rowData).then(response=>{//CASO EXITOSO
+      if(response.status === 200){
+        mostrarExito("Modificacion exitosa");
+      }
+    }).catch(error=>{//EXCEPCIONES
+      if(error.response.status === 401){
+        mostrarAdvertencia("Nombre ya existente");
+        get();
+      }else if(error.response.status === 500){
+        mostrarError("Error del sistema");
+      }
+    })
+  }
   //!!!EXTRAS DE REGISTRO
 
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
@@ -155,6 +168,60 @@ const Sala = () => {
       });
   }, []);   
 
+  //COMPLETAR MODIFICACION
+  const onCellEditComplete = (e) => {
+    let { rowData, newValue, field, originalEvent: event } = e;
+    switch (field) {
+      //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
+      case 'nombre_Sala':
+        if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
+          rowData[field] = newValue; put(rowData);
+        }
+        else{
+          event.preventDefault();
+        } 
+        break;
+      case 'capacidad_Sala':
+        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
+          rowData[field] = newValue; put(rowData);
+        }else{
+          event.preventDefault();
+        }
+        break;
+      case 'validar_Traslape':
+        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
+          rowData[field] = newValue; put(rowData);
+        }else{
+          event.preventDefault();
+        }
+        break;
+      case 'nota_Descriptiva':
+        if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
+          rowData[field] = newValue; put(rowData);
+         }
+        else{
+          event.preventDefault();
+        }           
+        break; 
+      case 'clave_Edificio':
+        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
+          rowData[field] = newValue; put(rowData);
+        }else{
+          event.preventDefault();
+        }
+        break;      
+      case 'clave_TipoSala':
+        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
+          rowData[field] = newValue; put(rowData);
+        }else{
+          event.preventDefault();
+        }          
+        break;
+      default:
+      break;
+    }
+    seteditando(false);
+};
   //!!!EXTRAS DE MODIFICACION
 
   return (

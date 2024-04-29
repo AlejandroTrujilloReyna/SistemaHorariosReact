@@ -9,7 +9,10 @@ const SalaService = {
     },
     consultarSala:()=>{
         return Axios.get("http://localhost:3001/sala/consultarSala");
-    },
+    },    
+    modificarSala: (datos)=>{
+        return Axios.put("http://localhost:3001/sala/modificarSala", datos);
+    }   
 }
 
 export default SalaService;
