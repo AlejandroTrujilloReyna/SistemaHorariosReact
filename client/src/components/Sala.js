@@ -1,20 +1,106 @@
 import React from 'react';
 import { useState } from "react";
 import { useEffect } from "react";
+import { useRef } from 'react';
 import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
 import { ToggleButton } from 'primereact/togglebutton';
+import { Toast } from 'primereact/toast';
 import SalaService from '../services/SalaService';
 import EdificiosService from '../services/EdificioService';
-
-
 const Sala = () => {
+  //VARIABLES PARA EL REGISTRO
+  const [nombre_Sala,setnombre_Sala] = useState("");
+  const [capacidad_Sala,setcapacidad_Sala] = useState(0);
+  const [validar_Traslape,setvalidar_Traslape] = useState(0);
+  const [nota_Descriptiva,setnota_Descriptiva] = useState("");
+  const [clave_Edificio,setclave_Edificio] = useState(0);
+  const [clave_TipoSala,setclave_TipoSala] = useState(0);
+  //VARIABLES PARA LA CONSULTA
+  const [salaList,setsalaList] = useState([]);
+  const [filtrosala, setfiltrosala] = useState([]);
+  const [edificios, setedificios] = useState([]);
+  const [tiposalas, settiposalas] = useState([]);
+  //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
+  const [editando,seteditando] = useState(false);
+  //VARIABLES PARA EL ERROR
+  const toast = useRef(null);
+
+  //MENSAJE DE EXITO
+  const mostrarExito = (mensaje) => {
+    toast.current.show({severity:'success', summary: 'Exito', detail:mensaje, life: 3000});
+  }
+  //MENSAJE DE ADVERTENCIA
+  const mostrarAdvertencia = (mensaje) => {
+      toast.current.show({severity:'warn', summary: 'Advertencia', detail:mensaje, life: 3000});
+  }
+  //MENSAJE DE ERROR
+  const mostrarError = (mensaje) => {
+    toast.current.show({severity:'error', summary: 'Error', detail:mensaje, life: 3000});
+  }   
+
+  //FUNCION PARA REGISTRAR
+  const add = ()=>{
+    if (!nombre_Sala || !capacidad_Sala || !clave_Edificio || !clave_TipoSala) {
+      mostrarAdvertencia("Existen campos vacios");
+      return;
+    }
+    //MANDAR A LLAMAR AL REGISTRO SERVICE
+    SalaService.registrarSala({
+      nombre_Sala:nombre_Sala,
+      capacidad_Sala:capacidad_Sala,
+      validar_Traslape:validar_Traslape,
+      nota_Descriptiva:nota_Descriptiva,
+      clave_Edificio:clave_Edificio,
+      clave_TipoSala:clave_TipoSala
+    }).then(response=>{
+      if(response.status === 200){
+        mostrarExito("Registro exitoso");
+        get();
+        limpiarCampos();
+      }
+    }).catch(error=>{
+      if (error.response.status === 400) {
+        mostrarAdvertencia("Clave ya existente");
+      }else if(error.response.status === 500){          
+        mostrarError("Error interno del servidor");
+      }  
+    })
+  }
+
+  //FUNCION PARA CONSULTA
+  const get = ()=>{
+    SalaService.consultarSala().then((response)=>{
+      setsalaList(response.data);  
+    }).catch(error=>{
+      if (error.response.status === 500) {
+        //mostrarError("Error del sistema");
+      }
+    });    
+  }  
+
+  //FUNCION PARA LA MODIFICACION?????????????????????????????????????????
+
+  //!!!EXTRAS DE REGISTRO
+
+  //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
+  const limpiarCampos = () =>{
+    setnombre_Sala("");
+    setcapacidad_Sala(0);
+    setvalidar_Traslape(0);
+    setnota_Descriptiva("");
+    setclave_Edificio(0);
+    setclave_TipoSala(0);
+  };
+  
+  //!!!EXTRAS DE CONSULTA
+
+  //COLUMNAS PARA LA TABLA
   const columns = [
     {field: 'clave_Sala', header: 'Clave' },
     {field: 'nombre_Sala', header: 'Nombre' },
@@ -24,31 +110,18 @@ const Sala = () => {
     {field: 'clave_Edificio', header: 'Clave Edificio'},    
     {field: 'clave_TipoSala', header: 'Clave Tipo Sala'}    
   ];
-
-  const [nombre_Sala,setnombre_Sala] = useState("");
-  const [capacidad_Sala,setcapacidad_Sala] = useState(0);
-  const [validar_Traslape,setvalidar_Traslape] = useState(0);
-  const [nota_Descriptiva,setnota_Descriptiva] = useState("");
-  const [clave_Edificio,setclave_Edificio] = useState(0);
-  const [clave_TipoSala,setclave_TipoSala] = useState(0);
-
-  const [salaList,setsalaList] = useState([]);
-  const [filtrosala, setfiltrosala] = useState([]);
-  const [edificios, setedificios] = useState([]);
-  const [tiposalas, settiposalas] = useState([]);
-
-  const [error, setError] = useState(false);
-  const [mensajeError, setmensajeError] = useState("");
-
+  
+  //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
   useEffect(() => {
     get();
   }, []); 
   
+  //ORDENAR LOS DATOS POR CLAVE AL INGRESAR A LA PAGINA
   useEffect(() => {
-    // Ordenar los datos por clave_UnidadAcademica al cargar la lista
     setfiltrosala([...salaList].sort((a, b) => a.clave_Sala - b.clave_Sala));
   }, [salaList]);
 
+  //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredData = salaList.filter((item) => {
@@ -61,9 +134,8 @@ const Sala = () => {
           item.clave_TipoSala.toString().includes(value)          
         );
     });
-
     setfiltrosala(filteredData);
-  };  
+  };
   
   //MANDAR A LLAMAR A LA LISTA DE EDIFICIOS SERVICE
   useEffect(() => {
@@ -81,61 +153,15 @@ const Sala = () => {
       .catch(error => {
         console.error("Error fetching edificios:", error);
       });
-  }, []); 
+  }, []);   
 
-  const add = ()=>{
-    if (!nombre_Sala || !capacidad_Sala || !clave_Edificio || !clave_TipoSala) {
-      setmensajeError("Existen campos vacios");
-      setError(true);
-      return;
-    }
-    //MANDAR A LLAMAR AL REGISTRO SERVICE
-    SalaService.registrarSala({
-      nombre_Sala:nombre_Sala,
-      capacidad_Sala:capacidad_Sala,
-      validar_Traslape:validar_Traslape,
-      nota_Descriptiva:nota_Descriptiva,
-      clave_Edificio:clave_Edificio,
-      clave_TipoSala:clave_TipoSala
-    }).then(response=>{
-      if(response.status === 200){
-        get();
-        limpiarCampos();
-        setError(false);
-      }
-    }).catch(error=>{
-      if (error.response.status === 400) {
-        setmensajeError("Clave ya existente");
-        setError(true);
-      }else if(error.response.status === 500){          
-        setmensajeError("Error interno del servidor");
-        setError(true);
-      }  
-    })
-  }
-
-  const get = ()=>{
-    SalaService.consultarSala().then((response)=>{
-      setsalaList(response.data);  
-    }).catch(error=>{
-      if (error.response.status === 500) {
-        setmensajeError("Error del sistema");
-        setError(true);
-      }
-    });    
-  }  
-
-  const limpiarCampos = () =>{
-    setnombre_Sala("");
-    setcapacidad_Sala(0);
-    setvalidar_Traslape(0);
-    setnota_Descriptiva("");
-    setclave_Edificio(0);
-    setclave_TipoSala(0);
-  }  
+  //!!!EXTRAS DE MODIFICACION
 
   return (
     <>
+    {/*APARICION DE LOS MENSAJES (TOAST)*/}
+    <Toast ref={toast} />
+      {/*PANEL PARA EL REGISTRO*/}
       <Panel header="Registrar Sala" className='mt-3' toggleable>
         <div className="formgrid grid mx-8">
           <div className="field col-3">
@@ -143,7 +169,6 @@ const Sala = () => {
               <InputText type="text" keyfilter={ /^[0-9a-zA-Z]*$/} value={nombre_Sala} maxLength={255}
                   onChange={(event)=>{
                     setnombre_Sala(event.target.value);
-                    setError(false);
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>
@@ -152,7 +177,6 @@ const Sala = () => {
               <InputText type="text" keyfilter="pint" value={capacidad_Sala} maxLength={10}
                   onChange={(event)=>{
                     setcapacidad_Sala(event.target.value);
-                    setError(false);
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
@@ -175,7 +199,6 @@ const Sala = () => {
               options={edificios} 
               onChange={(e) => {
                 setclave_Edificio(e.value);
-                setError(false);
               }} 
               optionLabel="nombre_Edificio" 
               optionValue="clave_Edificio" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
@@ -189,7 +212,6 @@ const Sala = () => {
               options={tiposalas} 
               onChange={(e) => {
                 setclave_TipoSala(e.value);
-                setError(false);
               }} 
               optionLabel="nombre_TipoSala" 
               optionValue="clave_TipoSala" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
@@ -201,26 +223,22 @@ const Sala = () => {
               <InputTextarea type="text" value={nota_Descriptiva} maxLength={100}
                   onChange={(event)=>{
                     setnota_Descriptiva(event.target.value);
-                    setError(false);
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>                                                                      
         </div>
         <div className="mx-8 mt-4">
           <Button label="Guardar" onClick={add} className="p-button-success" />
-        </div>
-        <div className="mx-8 mt-4">
-          {error && <Message severity="error" text={mensajeError} />} 
-        </div>         
+        </div>   
       </Panel>
-
+      {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
       <Panel header="Consultar Sala" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
         <DataTable value={filtrosala.length ? filtrosala :salaList} size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable key={field} field={field} header={header} style={{ width: '15%' }}/>;
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }}/>;
           })}
         </DataTable>
       </Panel>            
