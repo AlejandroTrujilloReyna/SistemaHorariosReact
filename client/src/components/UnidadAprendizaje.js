@@ -1,13 +1,14 @@
 import React from 'react';
 import { useState } from "react";
 import { useEffect } from "react";
+import { useRef } from 'react';
 import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-import { Message } from 'primereact/message';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
+import { Toast } from 'primereact/toast';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 
 const UnidadAprendizaje = () => {
@@ -21,17 +22,28 @@ const UnidadAprendizaje = () => {
   const [filtrounidadaprendizaje, setfiltrounidadaprendizaje] = useState([]);
   const [planesdeestudios, setplanesdeestudios] = useState([]);
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
-
+  const [editando,seteditando] = useState(false);
   //VARIABLES PARA EL ERROR
-  const [error, setError] = useState(false);
-  const [mensajeError, setmensajeError] = useState("");
+  const toast = useRef(null);
+
+  //MENSAJE DE EXITO
+  const mostrarExito = (mensaje) => {
+    toast.current.show({severity:'success', summary: 'Exito', detail:mensaje, life: 3000});
+  }
+  //MENSAJE DE ADVERTENCIA
+  const mostrarAdvertencia = (mensaje) => {
+      toast.current.show({severity:'warn', summary: 'Advertencia', detail:mensaje, life: 3000});
+  }
+  //MENSAJE DE ERROR
+  const mostrarError = (mensaje) => {
+    toast.current.show({severity:'error', summary: 'Error', detail:mensaje, life: 3000});
+  }     
 
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_UnidadAprendizaje || !nombre_UnidadAprendizaje || !semestre || !clave_PlanEstudios) {
-      setmensajeError("Existen campos vacios");
-      setError(true);
+      mostrarAdvertencia("Existen campos vacios");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -42,21 +54,18 @@ const UnidadAprendizaje = () => {
       clave_PlanEstudios:clave_PlanEstudios
     }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
+        mostrarExito("Registro exitoso");
+        get();
         limpiarCampos();
-        setError(false);
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
-        setmensajeError("Clave ya existente");
-        setError(true);
-      }else if(error.response.status === 500){
-        setmensajeError("Error interno del servidor");
-        setError(true);
-      }
-      else if(error.response.status === 401){
-        setmensajeError("El nombre de la Unidad de Aprendizaje ya existe");
-        setError(true);
-      }      
+        mostrarAdvertencia("Clave ya existente");
+      } else if(error.response.status === 401){
+        mostrarAdvertencia("Nombre ya existente");
+      } else if(error.response.status === 500){
+        mostrarError("Error en el sistema");   
+      }  
     });
   }
 
@@ -66,8 +75,7 @@ const UnidadAprendizaje = () => {
       setunidadaprendizajeList(response.data);  
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 500) {
-        setmensajeError("Error del sistema");
-        setError(true);
+        //setmensajeError("Error del sistema");
       }
     });    
   }
@@ -76,15 +84,15 @@ const UnidadAprendizaje = () => {
   const put = (rowData) =>{
     UnidadAprendizajeService.modificarUnidadAprendizaje(rowData).then((response)=>{//CASO EXITOSO
       if(response.status === 200){
-        setError(false);
+        mostrarExito("Modificacion exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
-      if (error.response.status === 500) {
-        setmensajeError("Error del sistema");
-        setError(true);
-      }else if (error.response.status === 401) {
-        setmensajeError("Nombre ya registrado");
-        setError(true);
+      if (error.response.status === 401) {
+        mostrarAdvertencia("Nombre ya existente");
+        get();
+      }
+      else if (error.response.status === 500) {
+        mostrarError("Error del sistema");
       }
     });
   }
@@ -148,6 +156,7 @@ const UnidadAprendizaje = () => {
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
+    seteditando(true);
     switch (options.field) {      
       case 'nombre_UnidadAprendizaje':
         return textEditor(options);         
@@ -176,10 +185,7 @@ const UnidadAprendizaje = () => {
       <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
                 value={options.value} 
                 options={planesdeestudios}  
-                onChange={(e) => {
-                setclave_PlanEstudios(e.value);
-                setError(false);
-                }} 
+                onChange={(e) => options.editorCallback(e.value)}
                 optionLabel="nombre_PlanEstudios" 
                 optionValue="clave_PlanEstudios" // Aquí especificamos que la clave del plan de estudios se utilice como el valor de la opción seleccionada
                 placeholder="Selecciona un Plan de Estudios" 
@@ -193,41 +199,47 @@ const UnidadAprendizaje = () => {
   switch (field) {
     //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
     case 'nombre_UnidadAprendizaje':
-      if (newValue.trim().length > 0){ 
+      if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
         rowData[field] = newValue; put(rowData);
-      }
-      else{
-        get();
+      }else{
         event.preventDefault();
       } 
     break;
     case 'semestre':
       if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
         rowData[field] = newValue; put(rowData);
-      }
-      else{
-        get();
+      }else{
         event.preventDefault();          
       } 
     break;
-
     case 'clave_PlanEstudios':
       if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
         rowData[field] = newValue; put(rowData);
-      }
-      else{
-        get();
+      }else{
         event.preventDefault();          
       } 
     break;
-
     default:
     break;
   }
-};
+  seteditando(false);
+  };
+
+  //FUNCION PARA QUE SE MUESTRE INFORMACION ESPECIFICA DE LAS LLAVES FORANEAS
+  const renderBody = (rowData, field) => {
+    if (field === 'clave_PlanEstudios') {
+      const plan = planesdeestudios.find((plan) => plan.clave_PlanEstudios === rowData.clave_PlanEstudios);
+      return plan ? `${plan.nombre_PlanEstudios}` : '';
+    }else {
+      return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
+    }
+  };  
 
   return (
     <>
+    {/*APARICION DE LOS MENSAJES (TOAST)*/}
+    <Toast ref={toast} />
+      {/*PANEL PARA EL REGISTRO*/}
       <Panel header="Registrar Unidad Aprendizaje" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-2">
@@ -235,7 +247,6 @@ const UnidadAprendizaje = () => {
                   <InputText type="text" keyfilter="pint" value={clave_UnidadAprendizaje} maxLength={6}
                       onChange={(event)=>{
                         setclave_UnidadAprendizaje(event.target.value);
-                        setError(false);
                       }}  
                   className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
@@ -244,7 +255,6 @@ const UnidadAprendizaje = () => {
           <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_UnidadAprendizaje} maxLength={255}
               onChange={(event) => {
                   setnombre_UnidadAprendizaje(event.target.value);
-                  setError(false);
               }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
           />              
@@ -254,7 +264,6 @@ const UnidadAprendizaje = () => {
               <InputText type="text" keyfilter="pint" value={semestre} maxLength={2}
                 onChange={(event) => {
                     setsemestre(event.target.value);
-                    setError(false);
                 }}  
                 className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>
@@ -265,7 +274,6 @@ const UnidadAprendizaje = () => {
                 options={planesdeestudios}  
                 onChange={(e) => {
                   setclave_PlanEstudios(e.value);
-                  setError(false);
                 }} 
                 optionLabel="nombre_PlanEstudios" 
                 optionValue="clave_PlanEstudios" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
@@ -275,23 +283,18 @@ const UnidadAprendizaje = () => {
           </div>
         <div className="mx-8 mt-4">
           <Button label="Guardar" onClick={add} className="p-button-success" />
-        </div>
-        <div className="mx-8 mt-4">
-          {error && <Message severity="error" text={mensajeError} />} 
-        </div>         
+        </div>      
       </Panel>
-
+      {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
       <Panel header="Consultar Unidad de Aprendizaje" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
-        <DataTable value={filtrounidadaprendizaje.length ? filtrounidadaprendizaje :unidadaprendizajeList} size='small' tableStyle={{ minWidth: '50rem' }}>
+        <DataTable value={filtrounidadaprendizaje.length ? filtrounidadaprendizaje :unidadaprendizajeList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }} 
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} body={(rowData) => renderBody(rowData, field)}
               editor={field === 'clave_UnidadAprendizaje' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
           })}
-
-
         </DataTable>
       </Panel> 
   </>

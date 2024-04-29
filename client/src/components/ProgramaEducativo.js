@@ -328,7 +328,7 @@ const ProgramaEducativo = () => {
           </div>                                                                           
         </div>
         <div className="mx-8 mt-4">
-                <Button label="Guardar" onClick={add} className="p-button-success" />
+          <Button label="Guardar" onClick={add} className="p-button-success" />
         </div>   
       </Panel>    
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
