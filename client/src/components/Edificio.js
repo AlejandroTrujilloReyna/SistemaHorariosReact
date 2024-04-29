@@ -103,8 +103,7 @@ const Edificio = () => {
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
   const limpiarCampos = () =>{
     setclave_Edificio("");
-    setnombre_Edificio("");
-    setclave_UnidadAcademica(null);
+    setnombre_Edificio("");    
     setclave_ProgramaEducativo(null);
   } 
 
@@ -171,23 +170,25 @@ const Edificio = () => {
   }, []);
   
   //ACTUALIZAR LA UNIDAD ACADEMICA AL CAMBIAR EL PROGRAMA EDUCATIVO SELECCIONADO (INNECESARIO POR AHORA)
-  /*useEffect(() => {
+  useEffect(() => {
     if (clave_ProgramaEducativo) {
-      const programaSeleccionado = programasEducativos.find(prog => prog.clave_ProgramaEducativo === clave_ProgramaEducativo);
+      const programaSeleccionado = programasEducativos.find(prog => prog.clave_ProgramaEducativo === clave_ProgramaEducativo);      
       if (programaSeleccionado) {
+        setclave_UnidadAcademica(null);
         setclave_UnidadAcademica(programaSeleccionado.clave_UnidadAcademica);
       }
     }
-  }, [clave_ProgramaEducativo, programasEducativos]);*/
+  }, [clave_ProgramaEducativo, programasEducativos]);
 
   //BORRAR EL PROGRAMA EDUCATIVO CUANDO SE ELIGE UNA UNIDAD ACADEMICA QUE NO COINCIDE CON EL PROGRAMA EDUCATIVO ACTUAL
   /*useEffect(() => {
     if (clave_UnidadAcademica) {
-      let claveUAC = -1;
-      const programaSeleccionado = programasEducativos.find(prog => prog.clave_ProgramaEducativo === clave_ProgramaEducativo);                
-      console.error("nose: "+programaSeleccionado.clave_UnidadAcademica+" talvez "+claveUAC);  
-      if(programaSeleccionado.clave_UnidadAcademica !== clave_UnidadAcademica){
-        setclave_ProgramaEducativo(null);
+      if(clave_ProgramaEducativo!==null){                    
+        const programaSeleccionado = programasEducativos.find(prog => prog.clave_ProgramaEducativo === clave_ProgramaEducativo);
+        if(programaSeleccionado.clave_UnidadAcademica !== clave_UnidadAcademica){
+          setclave_ProgramaEducativo(null);
+          console.error("holla");
+        }
       }
     }
   }, [unidadesAcademicas,clave_UnidadAcademica]);*/
