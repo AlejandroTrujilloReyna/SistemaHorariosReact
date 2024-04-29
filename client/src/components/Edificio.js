@@ -30,6 +30,7 @@ const Edificio = () => {
   const [filtroEdificio, setfiltroEdificio] = useState([]);
   const [programasEducativos, setProgramasEducativos] = useState([]);
   const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
+  const [original, setOriginal] = useState([]);
 
   const toast = useRef(null); // Referencia al componente Toast  
 
@@ -107,7 +108,17 @@ const Edificio = () => {
       }
     }
   }, [clave_ProgramaEducativo, programasEducativos]);
-
+  // Borrar el programa educativo cuando se elige una Unidad Academica que no coincide con el programa educativo actual
+  useEffect(() => {
+    if (clave_UnidadAcademica) {
+      let claveUAC = -1;
+      const programaSeleccionado = programasEducativos.find(prog => prog.clave_ProgramaEducativo === clave_ProgramaEducativo);                
+      console.error("nose: "+programaSeleccionado.clave_UnidadAcademica+" talvez "+claveUAC);  
+      if(programaSeleccionado.clave_UnidadAcademica !== clave_UnidadAcademica){
+        setclave_ProgramaEducativo(null);
+      }
+    }
+  }, [unidadesAcademicas,clave_UnidadAcademica]);
   //MANDAR A LLAMAR AL REGISTRO SERVICE
   const add = ()=>{
     if (!clave_Edificio || !nombre_Edificio || !clave_UnidadAcademica) {      
@@ -163,7 +174,7 @@ const Edificio = () => {
   const limpiarCampos = () =>{
     setclave_Edificio("");
     setnombre_Edificio("");
-    setclave_UnidadAcademica(null);
+    //setclave_UnidadAcademica(null);
     setclave_ProgramaEducativo(null);
   }  
 
@@ -182,7 +193,7 @@ const Edificio = () => {
   };
   //EDITAR TEXTO
   const textEditor = (options) => {
-    return <InputText type="text" keyfilter={/[a-zA-Z\s]/} value={options.value} maxLength={255} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={options.value} maxLength={255} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   const ProgramaEducativoEditor = (options) => {
@@ -216,19 +227,20 @@ const Edificio = () => {
   //COMPLETAR MODIFICACION
   const onCellEditComplete = (e) => {            
       let { rowData, newValue, field, originalEvent: event } = e;                       
+      console.error("data1: "+original+" data2: "+newValue);      
       switch (field) {
-        //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
+        //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO        
         case 'nombre_Edificio':
-          if (newValue.trim().length > 0 && newValue !== rowData[field]){                                    
+          if (newValue.trim().length > 0 && newValue !== original){                                    
                 rowData[field] = newValue;               
                 put(rowData);                       
           }else{        
-            get();                           
+            get();                          
             event.preventDefault();
           } 
           break;
         case 'clave_ProgramaEducativo':
-          if (newValue > 0 && newValue !== rowData[field]){             
+          if (newValue !== original){             
             rowData[field] = newValue;
             put(rowData);                       
           }else{
@@ -237,7 +249,7 @@ const Edificio = () => {
           } 
           break;
         case 'clave_UnidadAcademica':
-            if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
+            if (newValue > 0 && newValue !== null && newValue !== original){ 
               rowData[field] = newValue;
               put(rowData);              
             }else{
@@ -248,6 +260,7 @@ const Edificio = () => {
         default:
           break;
       }
+      setOriginal(null);
   }; 
 
   // Define una función independiente para el cuerpo de la columna
@@ -262,7 +275,10 @@ const Edificio = () => {
       return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
     }
   };
-  
+  const onCellEditInit = (e) => {
+    console.error(""+e);
+    setOriginal(e.rowData[e.field]);
+  }
   return (
     <>
       <Toast ref={toast} />
@@ -270,7 +286,7 @@ const Edificio = () => {
         <div className="formgrid grid mx-8">
           <div className="field col-2">
               <label>Clave</label>
-              <InputText type="text" keyfilter="pint" value={clave_Edificio} maxLength={10}
+              <InputText type="text" keyfilter={/^[0-9]*$/} value={clave_Edificio} maxLength={10}
                   onChange={(event)=>{
                     setclave_Edificio(event.target.value);
                   }} 
@@ -279,7 +295,7 @@ const Edificio = () => {
           </div>
           <div className="field col-10">
               <label>Nombre</label>
-              <InputText type="text" keyfilter={/[a-zA-Z\s]/} value={nombre_Edificio} maxLength={255}
+              <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={nombre_Edificio} maxLength={255}
                   onChange={(event)=>{
                     setnombre_Edificio(event.target.value);
                   }}  
@@ -328,7 +344,9 @@ const Edificio = () => {
         </div>
         <DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_Edificio' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}
+              return <Column sortable key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_Edificio' ? null : (options) => cellEditor(options)}
+              onCellEditInit={onCellEditInit}
+              onCellEditComplete={onCellEditComplete}
               body={(rowData) => renderBody(rowData, field)} // Llama a la función renderBody para generar el cuerpo de la columna
               />;
           })}
