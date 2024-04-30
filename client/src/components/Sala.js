@@ -46,6 +46,7 @@ const Sala = () => {
 
   //FUNCION PARA REGISTRAR
   const add = ()=>{
+    //VALIDACION DE CAMPOS VACIOS
     if (!nombre_Sala || !capacidad_Sala || !clave_Edificio || !clave_TipoSala) {
       mostrarAdvertencia("Existen campos vacios");
       return;
@@ -58,13 +59,13 @@ const Sala = () => {
       nota_Descriptiva:nota_Descriptiva,
       clave_Edificio:clave_Edificio,
       clave_TipoSala:clave_TipoSala
-    }).then(response=>{
+    }).then(response=>{//CASO EXITOSO
       if(response.status === 200){
         mostrarExito("Registro exitoso");
         get();
         limpiarCampos();
       }
-    }).catch(error=>{
+    }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
         mostrarAdvertencia("Clave ya existente");
       }else if(error.response.status === 500){          
@@ -75,16 +76,16 @@ const Sala = () => {
 
   //FUNCION PARA CONSULTA
   const get = ()=>{
-    SalaService.consultarSala().then((response)=>{
+    SalaService.consultarSala().then((response)=>{//CASO EXITOSO
       setsalaList(response.data);  
-    }).catch(error=>{
+    }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 500) {
         //mostrarError("Error del sistema");
       }
     });    
   }  
 
-  //FUNCION PARA LA MODIFICACION?????????????????????????????????????????
+  //FUNCION PARA LA MODIFICACION
   const put = (rowData) =>{
     SalaService.modificarSala(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
@@ -99,6 +100,7 @@ const Sala = () => {
       }
     })
   }
+
   //!!!EXTRAS DE REGISTRO
 
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
@@ -150,7 +152,7 @@ const Sala = () => {
     setfiltrosala(filteredData);
   };
   
-  //MANDAR A LLAMAR A LA LISTA DE EDIFICIOS SERVICE
+  //MANDAR A LLAMAR A LA LISTA DE TIPOS DE SALA
   useEffect(() => {
     SalaService.consultarTiposala()
     .then(response => {
@@ -159,15 +161,22 @@ const Sala = () => {
     .catch(error => {
       console.error("Error fetching tiposala:", error);
     });
-    EdificiosService.consultarEdificio()
-      .then(response => {
-        setedificios(response.data);
-      })
-      .catch(error => {
-        console.error("Error fetching edificios:", error);
-      });
-  }, []);   
+  }, []);
 
+  //MANDAR A LLAMAR A LA LISTA DE EDIFICIOS
+  useEffect(() => {
+    EdificiosService.consultarEdificio()
+    .then(response => {
+      setedificios(response.data);
+    })
+    .catch(error => {
+      console.error("Error fetching edificios:", error);
+    });
+  }, []);  
+
+  //!!!EXTRAS DE MODIFICACION
+
+  //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
     seteditando(true);
     switch(options.field){
@@ -198,47 +207,43 @@ const Sala = () => {
     return <InputText keyfilter="pint"  type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
   };
 
-//EDITAR DROPDOWN (EDIFICIO)
-const EdificioEditor = (options) => {
-  return (
-      <Dropdown
-          value={options.value}
-          options={edificios}
-          onChange={(e) => options.editorCallback(e.value)}            
-          optionLabel = {(option) => `${option.clave_Edificio} - ${option.nombre_Edificio}`}
-          optionValue="clave_Edificio" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-          placeholder="Seleccione un Edificio" 
-      />
-  );
-};
+  //EDITAR DROPDOWN (EDIFICIO)
+  const EdificioEditor = (options) => {
+    return (
+        <Dropdown
+            value={options.value}
+            options={edificios}
+            onChange={(e) => options.editorCallback(e.value)}            
+            optionLabel = {(option) => `${option.clave_Edificio} - ${option.nombre_Edificio}`}
+            optionValue="clave_Edificio" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            placeholder="Seleccione un Edificio" 
+        />
+    );
+  };
 
-//EDITAR DROPDOWN (TIPOSALA)
-const TipoSalaEditor = (options) => {
-  return (
-      <Dropdown
-          value={options.value}
-          options={tiposalas}
-          onChange={(e) => options.editorCallback(e.value)}            
-          optionLabel = {(option) => `${option.clave_TipoSala} - ${option.nombre_TipoSala}`}
-          optionValue="clave_TipoSala"
-          placeholder="Seleccione un tipo de Sala" 
-      />
-  );
-};
+  //EDITAR DROPDOWN (TIPOSALA)
+  const TipoSalaEditor = (options) => {
+    return (
+        <Dropdown
+            value={options.value}
+            options={tiposalas}
+            onChange={(e) => options.editorCallback(e.value)}            
+            optionLabel = {(option) => `${option.clave_TipoSala} - ${option.nombre_TipoSala}`}
+            optionValue="clave_TipoSala"
+            placeholder="Seleccione un tipo de Sala" 
+        />
+    );
+  };
   
   //COMPLETAR MODIFICACION
   const onCellEditComplete = (e) => {
     let { rowData, newValue, field, originalEvent: event } = e;
-
-    console.error("data: " + rowData[field] + " new data: " + newValue);
-
     switch (field) {
       //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
       case 'nombre_Sala':
         if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
           rowData[field] = newValue; put(rowData);
-        }
-        else{
+        }else{
           event.preventDefault();
         } 
         break;
@@ -259,8 +264,7 @@ const TipoSalaEditor = (options) => {
       case 'nota_Descriptiva':
         if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
           rowData[field] = newValue; put(rowData);
-         }
-        else{
+        }else{
           event.preventDefault();
         }           
         break; 
@@ -282,8 +286,7 @@ const TipoSalaEditor = (options) => {
       break;
     }
     seteditando(false);
-};
-  //!!!EXTRAS DE MODIFICACION
+  };  
 
   return (
     <>
@@ -364,11 +367,10 @@ const TipoSalaEditor = (options) => {
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
-        <DataTable value={filtrosala.length ? filtrosala :salaList} size='small' tableStyle={{ minWidth: '50rem' }}>
+        <DataTable value={filtrosala.length ? filtrosala :salaList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }}
-              editor={field === 'clave_Sala' ? null : (options) => cellEditor(options)}
-              onCellEditComplete={onCellEditComplete}/>;
+              editor={field === 'clave_Sala' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
           })}
         </DataTable>
       </Panel>            

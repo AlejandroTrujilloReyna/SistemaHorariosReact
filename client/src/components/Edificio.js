@@ -58,6 +58,7 @@ const Edificio = () => {
     }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
         mostrarExito("Registro Exitoso");
+        get();
         limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES

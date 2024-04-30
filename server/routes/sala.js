@@ -60,7 +60,7 @@ router.get("/consultarSala", (req, res) => {
     });
 });
 
-router.put("/modificarProgramaEducativo", (req, res) => {
+router.put("/modificarSala", (req, res) => {
     const clave_Sala = req.body.clave_Sala;
     const nombre_Sala = req.body.nombre_Sala;
     const capacidad_Sala = req.body.capacidad_Sala;
@@ -77,8 +77,8 @@ router.put("/modificarProgramaEducativo", (req, res) => {
         if(results.length > 0) {
             return res.status(401).send("El Nombre de la Sala ya existe");
         }
-        db.query('UPDATE sala SET nombre_Sala = ?, capacidad_Sala = ?, validar_Traslape = ?, nota_Descriptiva = ?, clave_TipoSala = ?  WHERE clave_Sala = ?',
-        [nombre_Sala,capacidad_Sala,validar_Traslape,nota_Descriptiva,clave_TipoSala],(err,result) =>{
+        db.query('UPDATE sala SET nombre_Sala = ?, capacidad_Sala = ?, validar_Traslape = ?, nota_Descriptiva = ?, clave_Edificio = ?, clave_TipoSala = ?  WHERE clave_Sala = ?',
+        [nombre_Sala,capacidad_Sala,validar_Traslape,nota_Descriptiva,clave_Edificio,clave_TipoSala,clave_Sala],(err,result) =>{
             if (err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
