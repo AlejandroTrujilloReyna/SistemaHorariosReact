@@ -172,7 +172,20 @@ const Sala = () => {
     .catch(error => {
       console.error("Error fetching edificios:", error);
     });
-  }, []);  
+  }, []);
+  
+  //FUNCION PARA QUE SE MUESTRE INFORMACION ESPECIFICA DE LAS LLAVES FORANEAS
+  const renderBody = (rowData, field) => {
+    if (field === 'clave_Edificio') {
+      const edificio = edificios.find((edificio) => edificio.clave_Edificio === rowData.clave_Edificio);
+      return edificio ? `${edificio.nombre_Edificio}` : '';
+    }else if (field === 'clave_TipoSala'){
+      const tiposala = tiposalas.find((tiposala) => tiposala.clave_TipoSala === rowData.clave_TipoSala);
+      return tiposala ? `${tiposala.nombre_TipoSala}` : '';
+    }else {
+      return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
+    }
+  };  
 
   //!!!EXTRAS DE MODIFICACION
 
@@ -369,7 +382,7 @@ const Sala = () => {
       </div>  
         <DataTable value={filtrosala.length ? filtrosala :salaList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }}
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
               editor={field === 'clave_Sala' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
           })}
         </DataTable>
