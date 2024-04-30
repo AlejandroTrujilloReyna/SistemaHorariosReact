@@ -42,7 +42,12 @@ const Menu = () => {
             label: 'Sala',
             icon: 'pi pi-home',
             command: () => {window.location.href='/Sala';}
-        },                    
+        },
+        {
+            label: 'Tipo Sala',
+            icon: 'pi pi-home',
+            command: () => {window.location.href='/TipoSala';}
+        }                    
     ];
     const start = <img alt="logo" src="https://comunicacioninstitucional.uabc.mx/sites/default/files/inline-images/escudo-actualizado-2022.png" height="40" className="mr-2"></img>;         
   return (
