@@ -20,14 +20,11 @@ app.use("/edificio", edificioRoutes);
 const salaRoutes = require("./routes/sala");
 app.use("/sala", salaRoutes);
 
-
 const tiposalaRoutes = require("./routes/tiposala");
 app.use("/tiposala", tiposalaRoutes);
 
 const plaestudiosRoutes = require("./routes/plaestudios");
 app.use("/plaestudios", plaestudiosRoutes);
-
-
 
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");

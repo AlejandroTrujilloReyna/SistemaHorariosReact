@@ -13,9 +13,9 @@ import PlaEstudiosService from '../services/PlaEstudiosService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
 
 const PlaEstudios = () => {
-     //VARIABLES PARA EL REGISTRO
-    const [nombre_PlanEstudios, setnombre_PlanEstudios] = useState("");
-    const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(0);
+   //VARIABLES PARA EL REGISTRO
+  const [nombre_PlanEstudios, setnombre_PlanEstudios] = useState("");
+  const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(0);
 
      //VARIABLES PARA LA CONSULTA
     const [plaestudiosList, setplaestudiosList] = useState([]);
@@ -147,7 +147,7 @@ const onSearch = (e) => {
 
  //FUNCION PARA QUE SE MUESTRE INFORMACION ESPECIFICA DE LAS LLAVES FORANEAS
  const renderBody = (rowData, field) => {
-    if (field === 'clave_Edificio') {
+    if (field === 'clave_ProgramaEducativo') {
       const programa = ProgramasEducativos.find((programa) => programa.clave_ProgramaEducativo === rowData.clave_ProgramaEducativo);
       return programa ? `${programa.nombre_ProgramaEducativo}` : '';
     }else {
@@ -220,7 +220,7 @@ const TipoProgramaEducativoEditor = (options) => {
             <Toast ref={toast} />
             {/* Panel para el registro */}
             <Panel header="Registrar Plan de Estudios" className='mt-3' toggleable>
-                <div className="formgrid grid mx-8">
+                <div className="formgrid grid mx-8 justify-content-center">
                     <div className="field col-3">
                         <label>Nombre</label>
                         <InputText type="text" keyfilter={/^[0-9a-zA-Z\-/]*$/} value={nombre_PlanEstudios} maxLength={255}
@@ -230,7 +230,6 @@ const TipoProgramaEducativoEditor = (options) => {
                             className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
                         />
                     </div>
-
                     <div className="field col-5">
                         <label>Programa Educativo</label>
                         <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"

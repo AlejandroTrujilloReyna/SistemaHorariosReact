@@ -10,9 +10,7 @@ import UnidadAcademica from './components/UnidadAcademica';
 import ProgramaEducativo from './components/ProgramaEducativo';
 import Edificio from './components/Edificio';
 import Sala from './components/Sala';
-
 import TipoSala from './components/TipoSala';
-
 import UsarEdificio from './components/UsarEdificio';
 import UnidadAprendizaje from './components/UnidadAprendizaje';
 import PlaEstudios from './components/PlaEstudios'
@@ -24,16 +22,12 @@ function App() {
         <Routes>
           <Route path='/UnidadAcademica' element={<UnidadAcademica/>}/>
           <Route path='/ProgramaEducativo' element={<ProgramaEducativo/>}/>
-         <Route path='/UnidadAprendizaje' element={<UnidadAprendizaje/>}/>
+          <Route path='/UnidadAprendizaje' element={<UnidadAprendizaje/>}/>
           <Route path='/Edificio' element={<Edificio/>}/>
           <Route path='/UsarEdificio' element={<UsarEdificio/>}/>
           <Route path='/Sala' element={<Sala/>}/>
-
           <Route path='/TipoSala' element={<TipoSala/>}/>
-
-          
           <Route path='/PlaEstudios' element={<PlaEstudios/>}/>
-
         </Routes>
       </BrowserRouter>
     </div>
