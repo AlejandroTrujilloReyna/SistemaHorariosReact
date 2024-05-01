@@ -10,6 +10,7 @@ import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
+import PlaEstudiosService from '../services/PlaEstudiosService';
 
 const UnidadAprendizaje = () => {
   //VARIABLES PARA EL REGISTRO
@@ -143,7 +144,7 @@ const UnidadAprendizaje = () => {
 
   //MANDAR A LLAMAR A LA LISTA DE PLANES DE ESTUDIOS
   useEffect(() => {
-    UnidadAprendizajeService.consultarPlandeestudios()
+    PlaEstudiosService.consultarPlaestudios()
       .then(response => {
         setplanesdeestudios(response.data);
       })
