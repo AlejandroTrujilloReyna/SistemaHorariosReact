@@ -18,7 +18,7 @@ router.post("/registrarSala",(req,res)=>{
     const clave_Edificio = req.body.clave_Edificio;
     const clave_TipoSala = req.body.clave_TipoSala;
 
-    db.query('SELECT * FROM sala WHERE clave_Sala = ?', [clave_Sala], (err, results)=>{
+    db.query('SELECT * FROM sala WHERE nombre_Sala = ? AND clave_Edificio', [nombre_Sala,clave_Edificio], (err, results)=>{
         if(err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
@@ -27,7 +27,7 @@ router.post("/registrarSala",(req,res)=>{
         if(results.length > 0) {
             return res.status(400).send("La clave de la Sala ya existe");
         }        
-    });
+   
 
     db.query('INSERT INTO sala(clave_Sala,nombre_Sala,capacidad_Sala,validar_Traslape,nota_Descriptiva,clave_Edificio,clave_TipoSala) VALUES (?,?,?,?,?,?,?)',
     [clave_Sala,nombre_Sala,capacidad_Sala,validar_Traslape,nota_Descriptiva,clave_Edificio,clave_TipoSala], (err,result)=>{
@@ -37,6 +37,8 @@ router.post("/registrarSala",(req,res)=>{
         }
         res.status(200).send("Sala registrada con éxito");        
     });
+
+     });
 });
 
 //MOVER CUANDO SE CREE LA PARTE DE TIPOSALA

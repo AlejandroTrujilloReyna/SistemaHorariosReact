@@ -13,6 +13,7 @@ import { ToggleButton } from 'primereact/togglebutton';
 import { Toast } from 'primereact/toast';
 import SalaService from '../services/SalaService';
 import EdificiosService from '../services/EdificioService';
+import TipoSalaService from '../services/TipoSalaService';
 const Sala = () => {
   //VARIABLES PARA EL REGISTRO
   const [nombre_Sala,setnombre_Sala] = useState("");
@@ -67,7 +68,7 @@ const Sala = () => {
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
-        mostrarAdvertencia("Clave ya existente");
+        mostrarAdvertencia("Nombre ya existente en un edificio");
       }else if(error.response.status === 500){          
         mostrarError("Error interno del servidor");
       }  
@@ -154,7 +155,7 @@ const Sala = () => {
   
   //MANDAR A LLAMAR A LA LISTA DE TIPOS DE SALA
   useEffect(() => {
-    SalaService.consultarTiposala()
+    TipoSalaService.consultarTipoSala()
     .then(response => {
       settiposalas(response.data);
     })
@@ -212,12 +213,12 @@ const Sala = () => {
 
   //EDITAR TEXTO
   const textEditor = (options) => {
-    return <InputText keyfilter={/^[0-9a-zA-Z]*$/} type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter={/^[0-9a-zA-Z]*$/} type="text" maxLength={255} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR NUMEROS
   const numberEditor = (options) => {
-    return <InputText keyfilter="pint"  type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter="pint"  type="text" maxLength={11} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR DROPDOWN (EDIFICIO)
