@@ -96,7 +96,7 @@ const UnidadAcademica = () => {
   const limpiarCampos = () =>{
     setclave_UnidadAcademica(0);
     setnombre_UnidadAcademica("");
-  }
+  }  
 
   //!!!EXTRAS DE CONSULTA
 
@@ -158,7 +158,24 @@ const UnidadAcademica = () => {
         break;
       }
       seteditando(false);
-  };    
+  };
+  
+  
+  //!!!EXTRAS CAMPOS
+
+  const validarTexto = (value) => {
+    // Expresión regular para validar caracteres alfabeticos y espacios
+    const regex = /^[a-zA-Z\s]*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };
+
+  const validarNumero = (value) => {
+    // Expresión regular para validar números enteros positivos
+    const regex = /^[1-9]\d*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };
 
   return (
     <>
@@ -170,22 +187,26 @@ const UnidadAcademica = () => {
           <div className="field col-2">
               <label>Clave</label>
               <InputText type="text" keyfilter="pint" value={clave_UnidadAcademica} maxLength={10}
-                  onChange={(event)=>{
+                onChange={(event) => {
+                  if (validarNumero(event.target.value)) {
                     setclave_UnidadAcademica(event.target.value);
-                  }}  
+                  }
+                }}
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
               <label>Nombre</label>
               <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_UnidadAcademica} maxLength={255}
-                  onChange={(event)=>{
+                onChange={(event) => {
+                  if (validarTexto(event.target.value)) {
                     setnombre_UnidadAcademica(event.target.value);
-                  }}  
+                  }
+                }}
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>                             
         </div>
         <div className="mx-8 mt-4">
-          <Button label="Guardar" onClick={add} className="p-button-success" />
+          <Button label="Guardar" onClick={add} severity='success' />
         </div>        
       </Panel>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
