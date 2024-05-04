@@ -106,7 +106,7 @@ const TipoSala = () => {
 
   //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
   useEffect(() => {
-    setfiltroTipoSala([...tipoSalaList].sort((a, b) => a.nombre_TipoSala - b.nombre_TipoSala));
+    setfiltroTipoSala([...tipoSalaList].sort((a, b) => a.clave_TipoSala - b.clave_TipoSala));
   }, [tipoSalaList]);
 
   //FUNCION PARA LA BARRA DE BUSQUEDA
@@ -122,7 +122,8 @@ const TipoSala = () => {
   };  
 
     //ACTIVAR EDICION DE CELDA
-    const cellEditor = (options) => {        
+    const cellEditor = (options) => {
+        seteditando(true);        
         return textEditor(options);        
     };
     
