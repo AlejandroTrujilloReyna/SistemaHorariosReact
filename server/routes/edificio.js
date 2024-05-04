@@ -40,7 +40,7 @@ router.post("/registrarEdificio", (req, res) => {
                         console.log(err);
                         return res.status(500).send("Error interno del servidor");
                     }
-                    res.status(200).send("Programa educativo registrado con éxito");
+                    res.status(200).send("Edificio registrado con éxito");
             });
         });
     });
@@ -77,7 +77,7 @@ router.put("/modificarEdificio", (req, res) => {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
             }
-            res.status(200).send("Unidad Academica modificada con exito");        
+            res.status(200).send("Edificio modificado con exito");        
         });
     });
 });
