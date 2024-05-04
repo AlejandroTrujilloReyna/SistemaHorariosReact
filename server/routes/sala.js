@@ -18,25 +18,25 @@ router.post("/registrarSala",(req,res)=>{
     const clave_Edificio = req.body.clave_Edificio;
     const clave_TipoSala = req.body.clave_TipoSala;
 
-    db.query('SELECT * FROM sala WHERE nombre_Sala = ? AND clave_Edificio', [nombre_Sala,clave_Edificio], (err, results)=>{
+    db.query('SELECT * FROM sala WHERE nombre_Sala = ? AND clave_Edificio = ?', [nombre_Sala,clave_Edificio], (err, results)=>{
         if(err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
         }
         
         if(results.length > 0) {
-            return res.status(400).send("La clave de la Sala ya existe");
+            return res.status(401).send("El nombre del edificio ya se encuentra registrado en el edificio");
         }        
    
 
-    db.query('INSERT INTO sala(clave_Sala,nombre_Sala,capacidad_Sala,validar_Traslape,nota_Descriptiva,clave_Edificio,clave_TipoSala) VALUES (?,?,?,?,?,?,?)',
-    [clave_Sala,nombre_Sala,capacidad_Sala,validar_Traslape,nota_Descriptiva,clave_Edificio,clave_TipoSala], (err,result)=>{
-        if(err) {
-            console.log(err);
-            return res.status(500).send("Error interno del servidor");
-        }
-        res.status(200).send("Sala registrada con éxito");        
-    });
+        db.query('INSERT INTO sala(clave_Sala,nombre_Sala,capacidad_Sala,validar_Traslape,nota_Descriptiva,clave_Edificio,clave_TipoSala) VALUES (?,?,?,?,?,?,?)',
+        [clave_Sala,nombre_Sala,capacidad_Sala,validar_Traslape,nota_Descriptiva,clave_Edificio,clave_TipoSala], (err,result)=>{
+            if(err) {
+                console.log(err);
+                return res.status(500).send("Error interno del servidor");
+            }
+            res.status(200).send("Sala registrada con éxito");        
+        });
 
      });
 });
@@ -70,14 +70,14 @@ router.put("/modificarSala", (req, res) => {
     const nota_Descriptiva = req.body.nota_Descriptiva;
     const clave_Edificio = req.body.clave_Edificio;
     const clave_TipoSala = req.body.clave_TipoSala;
-    db.query('SELECT * FROM sala WHERE nombre_Sala = ? AND clave_Sala != ?',[nombre_Sala,clave_Sala], (err, results) => {
+    db.query('SELECT * FROM sala WHERE nombre_Sala = ? AND clave_Sala != ? AND clave_Edificio = ?',[nombre_Sala,clave_Sala,clave_Edificio], (err, results) => {
         if(err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
         }
 
         if(results.length > 0) {
-            return res.status(401).send("El Nombre de la Sala ya existe");
+            return res.status(401).send("El Nombre de la Sala ya existe en el Edificio");
         }
         db.query('UPDATE sala SET nombre_Sala = ?, capacidad_Sala = ?, validar_Traslape = ?, nota_Descriptiva = ?, clave_Edificio = ?, clave_TipoSala = ?  WHERE clave_Sala = ?',
         [nombre_Sala,capacidad_Sala,validar_Traslape,nota_Descriptiva,clave_Edificio,clave_TipoSala,clave_Sala],(err,result) =>{

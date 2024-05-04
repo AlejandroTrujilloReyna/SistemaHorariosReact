@@ -67,8 +67,8 @@ const Sala = () => {
         limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES
-      if (error.response.status === 400) {
-        mostrarAdvertencia("Nombre ya existente en un edificio");
+      if (error.response.status === 401) {
+        mostrarAdvertencia("Nombre ya existente en el edificio");
       }else if(error.response.status === 500){          
         mostrarError("Error interno del servidor");
       }  
