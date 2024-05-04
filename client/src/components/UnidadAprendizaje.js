@@ -172,12 +172,12 @@ const UnidadAprendizaje = () => {
 
   //EDITAR TEXTO
   const textEditor = (options) => {
-    return <InputText keyfilter={/^[a-zA-Z\s]*$/} type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter={/^[a-zA-Z\s]*$/} type="text"  maxLength={255} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR NUMEROS
   const numberEditor = (options) => {
-    return <InputText keyfilter="pint"  type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter="pint"  type="text"  maxLength={7} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR DROPDOWN (PLAN DE ESTUDIOS)

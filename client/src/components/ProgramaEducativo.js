@@ -202,7 +202,7 @@ const ProgramaEducativo = () => {
 
   //EDITAR NUMEROS
   const numberEditor = (options) => {
-    return <InputText keyfilter="pint"  type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter="pint"  type="text" maxLength={6} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR DROPDOWN (UNIDAD ACADEMICA)
