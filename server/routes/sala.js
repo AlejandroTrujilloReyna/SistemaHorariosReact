@@ -25,7 +25,7 @@ router.post("/registrarSala",(req,res)=>{
         }
         
         if(results.length > 0) {
-            return res.status(401).send("El nombre del edificio ya se encuentra registrado en el edificio");
+            return res.status(401).send("El Nombre de la Sala ya existe en el Edificio");
         }        
    
 
