@@ -129,7 +129,13 @@ const TipoSala = () => {
     
     //EDITAR TEXTO
     const textEditor = (options) => {
-        return <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={options.value} maxLength={255} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+        return <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={options.value} maxLength={255} 
+        onChange={(e) => { 
+          if (validarTexto(e.target.value)) { 
+            options.editorCallback(e.target.value)
+          }
+        }}
+        onKeyDown={(e) => e.stopPropagation()} />;
     };
     //COMPLETAR MODIFICACION
     const onCellEditComplete = (e) => {            
@@ -148,7 +154,17 @@ const TipoSala = () => {
             break;
         }
         seteditando(false);
-    }; 
+    };
+    
+  //!!!EXTRAS CAMPOS
+
+  const validarTexto = (value) => {
+    // Expresión regular para validar caracteres alfabeticos y espacios
+    const regex = /^[a-zA-Z\s]*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };
+
   return (
     <>
         {/*APARICION DE LOS MENSAJES (TOAST)*/}
@@ -159,7 +175,9 @@ const TipoSala = () => {
               <label>Nombre*</label>
               <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={nombre_TipoSala} maxLength={255}
                   onChange={(event)=>{
-                    setnombre_TipoSala(event.target.value);
+                    if (validarTexto(event.target.value)) {  
+                      setnombre_TipoSala(event.target.value);
+                    }
                   }}  
                   placeholder="Ej.Aula Audiovisual" 
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"/>              

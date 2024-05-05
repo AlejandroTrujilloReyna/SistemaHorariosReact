@@ -226,7 +226,13 @@ const Edificio = () => {
 
   //EDITAR TEXTO
   const textEditor = (options) => {
-    return <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={options.value} maxLength={255} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={options.value} maxLength={255} 
+    onChange={(e) => { 
+      if (validarNumero(e.target.value)) { 
+        options.editorCallback(e.target.value)
+      }
+    }}
+    onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR DROPDOWN (PROGRAMA EDUCATIVO)
@@ -294,6 +300,22 @@ const Edificio = () => {
       seteditando(false);
   }; 
 
+  //!!!EXTRAS CAMPOS
+
+  const validarTexto = (value) => {
+    // Expresión regular para validar caracteres alfabeticos y espacios
+    const regex = /^[a-zA-Z\s]*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };
+
+  const validarNumero = (value) => {
+    // Expresión regular para validar números enteros positivos
+    const regex = /^[1-9]\d*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };  
+
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
@@ -305,7 +327,9 @@ const Edificio = () => {
               <label>Clave</label>
               <InputText type="text" keyfilter={/^[0-9]*$/} value={clave_Edificio} maxLength={10}
                   onChange={(event)=>{
-                    setclave_Edificio(event.target.value);
+                    if (validarNumero(event.target.value)) {
+                      setclave_Edificio(event.target.value);
+                    }
                   }} 
                   placeholder="Ej.6" 
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
@@ -314,7 +338,9 @@ const Edificio = () => {
               <label>Nombre</label>
               <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={nombre_Edificio} maxLength={255}
                   onChange={(event)=>{
-                    setnombre_Edificio(event.target.value);
+                    if (validarTexto(event.target.value)) {
+                      setnombre_Edificio(event.target.value);
+                    }
                   }}  
                   placeholder="Ej.Laboratorio de LSC" 
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"/>              

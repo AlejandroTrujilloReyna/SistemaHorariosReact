@@ -172,12 +172,24 @@ const UnidadAprendizaje = () => {
 
   //EDITAR TEXTO
   const textEditor = (options) => {
-    return <InputText keyfilter={/^[a-zA-Z\s]*$/} type="text"  maxLength={255} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter={/^[a-zA-Z\s]*$/} type="text"  maxLength={255} value={options.value} 
+      onChange={(e) => {
+        if (validarTexto(e.target.value)) {
+          options.editorCallback(e.target.value)
+        }
+      }}
+      onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR NUMEROS
   const numberEditor = (options) => {
-    return <InputText keyfilter="pint"  type="text"  maxLength={7} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter="pint"  type="text"  maxLength={7} value={options.value} 
+    onChange={(e) => {
+      if (validarNumero(e.target.value)) {
+        options.editorCallback(e.target.value)
+      }
+    }}
+    onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR DROPDOWN (PLAN DE ESTUDIOS)
@@ -234,7 +246,24 @@ const UnidadAprendizaje = () => {
     }else {
       return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
     }
-  };  
+  };
+  
+  //!!!EXTRAS CAMPOS
+
+  const validarTexto = (value) => {
+    // Expresión regular para validar caracteres alfabeticos y espacios
+    const regex = /^[a-zA-Z\s]*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };
+
+  const validarNumero = (value) => {
+    // Expresión regular para validar números enteros positivos
+    const regex = /^[1-9]\d*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };
+  
 
   return (
     <>
@@ -247,7 +276,9 @@ const UnidadAprendizaje = () => {
                   <label>Clave</label>
                   <InputText type="text" keyfilter="pint" value={clave_UnidadAprendizaje} maxLength={6}
                       onChange={(event)=>{
-                        setclave_UnidadAprendizaje(event.target.value);
+                        if (validarNumero(event.target.value)) {
+                          setclave_UnidadAprendizaje(event.target.value);
+                        }                        
                       }}  
                   className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
@@ -255,7 +286,9 @@ const UnidadAprendizaje = () => {
           <label>Nombre</label>
           <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_UnidadAprendizaje} maxLength={255}
               onChange={(event) => {
+                if (validarTexto(event.target.value)) {
                   setnombre_UnidadAprendizaje(event.target.value);
+                }        
               }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
           />              
@@ -264,7 +297,9 @@ const UnidadAprendizaje = () => {
             <label>Semestre</label>
               <InputText type="text" keyfilter="pint" value={semestre} maxLength={2}
                 onChange={(event) => {
+                  if (validarNumero(event.target.value)) {
                     setsemestre(event.target.value);
+                  }        
                 }}  
                 className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>

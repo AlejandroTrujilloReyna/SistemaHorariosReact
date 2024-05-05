@@ -48,6 +48,9 @@ const ProgramaEducativo = () => {
     if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo || !min_Grupo || !max_Grupo) {
       mostrarAdvertencia("Existen campos vacios");
       return;
+    }else if (min_Grupo>max_Grupo){
+      mostrarAdvertencia("El rango maximo es mayor que el minimo");
+      return;      
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
     ProgramaEducativoService.registrarProgramaEducativo({
@@ -196,13 +199,24 @@ const ProgramaEducativo = () => {
 
   //EDITAR TEXTO
   const textEditor = (options) => {
-    return <InputText keyfilter={/[a-zA-Z\s]/} maxLength={255} type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter={/[a-zA-Z\s]/} maxLength={255} type="text" value={options.value} 
+    onChange={(e) =>{ 
+      if (validarTexto(e.target.value)) { 
+        options.editorCallback(e.target.value)
+      }
+    }}
+    onKeyDown={(e) => e.stopPropagation()} />;
   };
   
 
   //EDITAR NUMEROS
   const numberEditor = (options) => {
-    return <InputText keyfilter="pint"  type="text" maxLength={6} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter="int"  type="text" maxLength={6} value={options.value} 
+    onChange={(e) => {
+      if (validarNumero(e.target.value)) { 
+        options.editorCallback(e.target.value)
+      }
+    }} onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR DROPDOWN (UNIDAD ACADEMICA)
@@ -233,21 +247,21 @@ const ProgramaEducativo = () => {
           } 
           break;
         case 'min_Grupo':
-          if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
+          if(newValue > 0 && newValue !== null && newValue !== rowData[field] && newValue<rowData['max_Grupo']){
             rowData[field] = newValue; put(rowData);
           }else{
             event.preventDefault();
           }
           break;
         case 'max_Grupo':
-          if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
+          if(newValue > 0 && newValue !== null && newValue !== rowData[field] && newValue>rowData['min_Grupo']){
             rowData[field] = newValue; put(rowData);
           }else{
             event.preventDefault();
           }
           break;
         case 'banco_Horas':
-          if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
+          if(newValue >= 0 && newValue !== '' && newValue !== rowData[field]){
             rowData[field] = newValue; put(rowData);
           }else{
             event.preventDefault();
@@ -266,6 +280,22 @@ const ProgramaEducativo = () => {
       seteditando(false);
   };
 
+  //!!!EXTRAS CAMPOS
+
+  const validarTexto = (value) => {
+    // Expresión regular para validar caracteres alfabeticos y espacios
+    const regex = /^[a-zA-Z\s]*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };
+
+  const validarNumero = (value) => {
+    // Expresión regular para validar números enteros positivos
+    const regex = /^[1-9]\d*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };  
+
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
@@ -277,7 +307,9 @@ const ProgramaEducativo = () => {
               <label>Clave</label>
               <InputText type="text" keyfilter="pint" value={clave_ProgramaEducativo} maxLength={10}
                   onChange={(event)=>{
-                    setclave_ProgramaEducativo(event.target.value);
+                    if (validarNumero(event.target.value)) {  
+                      setclave_ProgramaEducativo(event.target.value);
+                    }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
@@ -285,7 +317,9 @@ const ProgramaEducativo = () => {
               <label>Nombre</label>
               <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_ProgramaEducativo} maxLength={255}
                   onChange={(event)=>{
-                    setnombre_ProgramaEducativo(event.target.value);
+                    if (validarTexto(event.target.value)) {  
+                      setnombre_ProgramaEducativo(event.target.value);
+                    }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>
@@ -293,23 +327,29 @@ const ProgramaEducativo = () => {
               <label>Banco de horas</label>
               <InputText type="text" keyfilter="pint" value={banco_Horas} maxLength={10}
                   onChange={(event)=>{
-                    setbanco_Horas(event.target.value);
+                    if (validarNumero(event.target.value)) {    
+                      	setbanco_Horas(event.target.value);
+                    }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-2">
-              <label>Capacidad Minima</label>
+              <label>Rango Minimo</label>
               <InputText type="text" keyfilter="pint" value={min_Grupo} maxLength={10}
                   onChange={(event)=>{
-                    setmin_Grupo(event.target.value);
+                    if (validarNumero(event.target.value)) {    
+                      setmin_Grupo(event.target.value);
+                    }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-2">
-              <label>Capacidad Maxima</label>
+              <label>Rango Maximo</label>
               <InputText type="text" keyfilter="pint" value={max_Grupo} maxLength={10}
                   onChange={(event)=>{
-                    setmax_Grupo(event.target.value);
+                    if (validarNumero(event.target.value)) {    
+                      setmax_Grupo(event.target.value);
+                    }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>

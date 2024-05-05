@@ -138,7 +138,12 @@ const UnidadAcademica = () => {
 
   //EDITAR TEXTO
   const textEditor = (options) => {
-    return <InputText keyfilter={/[a-zA-Z\s]/} maxLength={255} type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter={/[a-zA-Z\s]/} maxLength={255} type="text" value={options.value} 
+    onChange={(e) => { 
+      if (validarTexto(e.target.value)) { 
+        options.editorCallback(e.target.value)
+      }
+    }} onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //COMPLETAR MODIFICACION

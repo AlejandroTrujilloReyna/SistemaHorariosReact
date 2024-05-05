@@ -213,12 +213,24 @@ const Sala = () => {
 
   //EDITAR TEXTO
   const textEditor = (options) => {
-    return <InputText keyfilter={/^[0-9a-zA-Z]*$/} type="text" maxLength={255} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter={/^[0-9a-zA-Z]*$/} type="text" maxLength={255} value={options.value} 
+    onChange={(e) => { 
+      if (validarTexto(e.target.value)) { 
+        options.editorCallback(e.target.value)
+      }
+    }}
+    onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR NUMEROS
   const numberEditor = (options) => {
-    return <InputText keyfilter="pint"  type="text" maxLength={11} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter="pint"  type="text" maxLength={11} value={options.value} 
+    onChange={(e) => { 
+      if (validarNumero(e.target.value)) { 
+        options.editorCallback(e.target.value)
+      }
+    }}
+    onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR DROPDOWN (EDIFICIO)
@@ -276,7 +288,7 @@ const Sala = () => {
         }
         break;
       case 'nota_Descriptiva':
-        if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
+        if (newValue !== rowData[field]){ 
           rowData[field] = newValue; put(rowData);
         }else{
           event.preventDefault();
@@ -300,6 +312,22 @@ const Sala = () => {
       break;
     }
     seteditando(false);
+  };
+  
+  //!!!EXTRAS CAMPOS
+
+  const validarTexto = (value) => {
+    // Expresión regular para validar caracteres alfabeticos y espacios
+    const regex = /^[a-zA-Z\s]*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };
+
+  const validarNumero = (value) => {
+    // Expresión regular para validar números enteros positivos
+    const regex = /^[1-9]\d*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
   };  
 
   return (
@@ -313,7 +341,9 @@ const Sala = () => {
               <label>Nombre</label>
               <InputText type="text" keyfilter={ /^[0-9a-zA-Z]*$/} value={nombre_Sala} maxLength={255}
                   onChange={(event)=>{
-                    setnombre_Sala(event.target.value);
+                    if (validarTexto(event.target.value)) {  
+                      setnombre_Sala(event.target.value);
+                    }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>
@@ -321,7 +351,9 @@ const Sala = () => {
               <label>Capacidad</label>
               <InputText type="text" keyfilter="pint" value={capacidad_Sala} maxLength={10}
                   onChange={(event)=>{
-                    setcapacidad_Sala(event.target.value);
+                    if (validarNumero(event.target.value)) {
+                      setcapacidad_Sala(event.target.value);
+                    }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>

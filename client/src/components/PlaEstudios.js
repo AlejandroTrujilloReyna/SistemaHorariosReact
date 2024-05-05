@@ -173,7 +173,13 @@ const onSearch = (e) => {
 
  //EDITAR TEXTO
  const textEditor = (options) => {
-    return <InputText keyfilter={/^[0-9a-zA-Z\-/]*$/} type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />;
+    return <InputText keyfilter={/^[0-9a-zA-Z\-/]*$/} type="text" value={options.value}
+    onChange={(e) => { 
+      if (validarTexto(e.target.value)) { 
+        options.editorCallback(e.target.value)
+      }
+    }}
+    onKeyDown={(e) => e.stopPropagation()} />;
   };
 
 //EDITAR DROPDOWN (PROGRAMA EDUCATIVO)
@@ -212,7 +218,16 @@ const TipoProgramaEducativoEditor = (options) => {
       break;
     }
     seteditando(false);
-  };  
+  };
+  
+  //!!!EXTRAS CAMPOS
+
+  const validarTexto = (value) => {
+    // Expresión regular para validar caracteres alfabeticos y espacios
+    const regex = /^[0-9a-zA-Z\-/]*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value);
+  };
   
     return (
         <>
@@ -225,7 +240,9 @@ const TipoProgramaEducativoEditor = (options) => {
                         <label>Nombre</label>
                         <InputText type="text" keyfilter={/^[0-9a-zA-Z\-/]*$/} value={nombre_PlanEstudios} maxLength={255}
                             onChange={(event) => {
+                              if (validarTexto(event.target.value)) {
                                 setnombre_PlanEstudios(event.target.value);
+                              }
                             }}
                             className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
                         />
