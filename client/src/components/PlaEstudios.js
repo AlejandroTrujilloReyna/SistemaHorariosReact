@@ -167,7 +167,7 @@ const onSearch = (e) => {
         return TipoProgramaEducativoEditor(options);                     
       default:
         return textEditor(options);
-    }    
+    }
   };
 
 

@@ -261,7 +261,7 @@ const UnidadAprendizaje = () => {
     // Expresión regular para validar números enteros positivos
     const regex = /^[1-9]\d*$/;
     // Verificar si el valor coincide con la expresión regular
-    return regex.test(value);
+    return value==='' || regex.test(value);
   };
   
 

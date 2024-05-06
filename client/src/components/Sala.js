@@ -18,7 +18,7 @@ const Sala = () => {
   //VARIABLES PARA EL REGISTRO
   const [nombre_Sala,setnombre_Sala] = useState("");
   const [capacidad_Sala,setcapacidad_Sala] = useState(0);
-  const [validar_Traslape,setvalidar_Traslape] = useState(0);
+  const [validar_Traslape,setvalidar_Traslape] = useState(1);
   const [nota_Descriptiva,setnota_Descriptiva] = useState("");
   const [clave_Edificio,setclave_Edificio] = useState(0);
   const [clave_TipoSala,setclave_TipoSala] = useState(0);
@@ -327,7 +327,7 @@ const Sala = () => {
     // Expresión regular para validar números enteros positivos
     const regex = /^[1-9]\d*$/;
     // Verificar si el valor coincide con la expresión regular
-    return regex.test(value);
+    return value==='' || regex.test(value);
   };  
 
   return (
