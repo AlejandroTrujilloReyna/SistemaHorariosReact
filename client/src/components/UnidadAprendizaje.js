@@ -17,7 +17,6 @@ const UnidadAprendizaje = () => {
   const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState(0);
   const [nombre_UnidadAprendizaje,setnombre_UnidadAprendizaje] = useState("");
   const [clave_PlanEstudios,setclave_PlanEstudios] = useState(null);
-  const [semestre,setsemestre] = useState(0);
   //VARIABLES PARA LA CONSULTA
   const [unidadaprendizajeList,setunidadaprendizajeList] = useState([]);
   const [filtrounidadaprendizaje, setfiltrounidadaprendizaje] = useState([]);
@@ -43,7 +42,7 @@ const UnidadAprendizaje = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    if (!clave_UnidadAprendizaje || !nombre_UnidadAprendizaje || !semestre || !clave_PlanEstudios) {
+    if (!clave_UnidadAprendizaje || !nombre_UnidadAprendizaje || !clave_PlanEstudios) {
       mostrarAdvertencia("Existen campos vacios");
       return;
     }
@@ -51,7 +50,6 @@ const UnidadAprendizaje = () => {
     UnidadAprendizajeService.registrarUnidadAprendizaje({
       clave_UnidadAprendizaje:clave_UnidadAprendizaje,
       nombre_UnidadAprendizaje:nombre_UnidadAprendizaje,
-      semestre:semestre,
       clave_PlanEstudios:clave_PlanEstudios
     }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
@@ -104,7 +102,6 @@ const UnidadAprendizaje = () => {
   const limpiarCampos = () =>{
     setclave_UnidadAprendizaje(0);
     setnombre_UnidadAprendizaje("");
-    setsemestre(0);
     setclave_PlanEstudios("");
   } 
   
@@ -114,7 +111,6 @@ const UnidadAprendizaje = () => {
   const columns = [
     { field: 'clave_UnidadAprendizaje', header: 'Clave' },
     { field: 'nombre_UnidadAprendizaje', header: 'Nombre' },
-    {field: 'semestre', header: 'Semestre'},
     {field: 'clave_PlanEstudios', header: 'Plan de Estudios'},
   ];
   
@@ -135,8 +131,7 @@ const UnidadAprendizaje = () => {
         return (
             item.clave_PlanEstudios.toString().includes(value) ||
             item.clave_UnidadAprendizaje.toString().includes(value) ||
-            item.nombre_UnidadAprendizaje.toLowerCase().includes(value) ||
-            item.semestre.toString().includes(value)           
+            item.nombre_UnidadAprendizaje.toLowerCase().includes(value)        
         )
     });
     setfiltrounidadaprendizaje(filteredData);
@@ -160,9 +155,7 @@ const UnidadAprendizaje = () => {
     seteditando(true);
     switch (options.field) {      
       case 'nombre_UnidadAprendizaje':
-        return textEditor(options);         
-      case 'semestre':
-        return numberEditor(options);        
+        return textEditor(options);                
       case 'clave_PlanEstudios':
         return PlanEstudiosEditor(options);                  
       default:
@@ -179,17 +172,6 @@ const UnidadAprendizaje = () => {
         }
       }}
       onKeyDown={(e) => e.stopPropagation()} />;
-  };
-
-  //EDITAR NUMEROS
-  const numberEditor = (options) => {
-    return <InputText keyfilter="pint"  type="text"  maxLength={7} value={options.value} 
-    onChange={(e) => {
-      if (validarNumero(e.target.value)) {
-        options.editorCallback(e.target.value)
-      }
-    }}
-    onKeyDown={(e) => e.stopPropagation()} />;
   };
 
   //EDITAR DROPDOWN (PLAN DE ESTUDIOS)
@@ -216,13 +198,6 @@ const UnidadAprendizaje = () => {
         rowData[field] = newValue; put(rowData);
       }else{
         event.preventDefault();
-      } 
-    break;
-    case 'semestre':
-      if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
-        rowData[field] = newValue; put(rowData);
-      }else{
-        event.preventDefault();          
       } 
     break;
     case 'clave_PlanEstudios':
@@ -293,16 +268,6 @@ const UnidadAprendizaje = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
           />              
           </div>                            
-          <div className="field col-2">
-            <label>Semestre</label>
-              <InputText type="text" keyfilter="pint" value={semestre} maxLength={2}
-                onChange={(event) => {
-                  if (validarNumero(event.target.value)) {
-                    setsemestre(event.target.value);
-                  }        
-                }}  
-                className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
-          </div>
           <div className="field col-4">
             <label>Plan de Estudios</label>
               <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"

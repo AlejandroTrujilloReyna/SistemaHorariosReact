@@ -13,62 +13,66 @@ import PlaEstudiosService from '../services/PlaEstudiosService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
 
 const PlaEstudios = () => {
-   //VARIABLES PARA EL REGISTRO
+  //VARIABLES PARA EL REGISTRO
   const [nombre_PlanEstudios, setnombre_PlanEstudios] = useState("");
+  const [cant_semestres, setcant_semestres] = useState(0);
   const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(0);
 
-     //VARIABLES PARA LA CONSULTA
-    const [plaestudiosList, setplaestudiosList] = useState([]);
-    const [filtroplaestudios, setfiltroplaestudios] = useState([]);
-    const [ProgramasEducativos, setProgramasEducativos] = useState([]);
-   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
+  //VARIABLES PARA LA CONSULTA
+  const [plaestudiosList, setplaestudiosList] = useState([]);
+  const [filtroplaestudios, setfiltroplaestudios] = useState([]);
+  const [ProgramasEducativos, setProgramasEducativos] = useState([]);
+  //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
   const [editando,seteditando] = useState(false);
     
-    //VARIABLES PARA EL ERROR
-    const toast = useRef(null);
+  //VARIABLES PARA EL ERROR
+  const toast = useRef(null);
 
-   //MENSAJE DE EXITO
-    const mostrarExito = (mensaje) => {
-        toast.current.show({ severity: 'success', summary: 'Exito', detail: mensaje, life: 3000 });
+  //MENSAJE DE EXITO
+  const mostrarExito = (mensaje) => {
+    toast.current.show({ severity: 'success', summary: 'Exito', detail: mensaje, life: 3000 });
+  }
+
+  //MENSAJE DE ADVERTENCIA
+  const mostrarAdvertencia = (mensaje) => {
+    toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: mensaje, life: 3000 });
+  }
+
+  //MENSAJE DE ERROR
+  const mostrarError = (mensaje) => {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: mensaje, life: 3000 });
+  }
+
+  //FUNCION PARA REGISTRAR
+  const add = () => {
+  //VALIDACION DE CAMPOS VACIOS
+  if (!nombre_PlanEstudios || !clave_ProgramaEducativo || !cant_semestres) {
+    mostrarAdvertencia("Existen campos vacios");
+    return;
+  }
+
+  //MANDAR A LLAMAR AL REGISTRO SERVICE
+  PlaEstudiosService.registrarPlaEstudios({
+    nombre_PlanEstudios: nombre_PlanEstudios,
+    cant_semestres:cant_semestres,
+    clave_ProgramaEducativo: clave_ProgramaEducativo
+    }).then(response => {
+    // Caso exitoso
+    if (response.status === 200) {
+      mostrarExito("Registro exitoso");
+      get();
+      limpiarCampos();
     }
-
-    //MENSAJE DE ADVERTENCIA
-    const mostrarAdvertencia = (mensaje) => {
-        toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: mensaje, life: 3000 });
-    }
-
-      //MENSAJE DE ERROR
-    const mostrarError = (mensaje) => {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: mensaje, life: 3000 });
-    }
-
-    //FUNCION PARA REGISTRAR
-    const add = () => {
-       //VALIDACION DE CAMPOS VACIOS
-        if (!nombre_PlanEstudios || !clave_ProgramaEducativo) {
-            mostrarAdvertencia("Existen campos vacios");
-            return;
+    }).catch(error => {
+        // Excepciones
+        if (error.response.status === 400) {
+            mostrarAdvertencia("nombre ya existente en este programa educativo");
+        } else if (error.response.status === 500) {
+            mostrarError("Error interno del servidor");
         }
-       //MANDAR A LLAMAR AL REGISTRO SERVICE
-        PlaEstudiosService.registrarPlaEstudios({
-            nombre_PlanEstudios: nombre_PlanEstudios,
-            clave_ProgramaEducativo: clave_ProgramaEducativo
-        }).then(response => {
-            // Caso exitoso
-            if (response.status === 200) {
-                mostrarExito("Registro exitoso");
-                get();
-                limpiarCampos();
-            }
-        }).catch(error => {
-            // Excepciones
-            if (error.response.status === 400) {
-                mostrarAdvertencia("nombre ya existente en este programa educativo");
-            } else if (error.response.status === 500) {
-                mostrarError("Error interno del servidor");
-            }
-        })
-    }
+    })
+  }
+
  //FUNCION PARA CONSULTA
  const get = ()=>{
     PlaEstudiosService.consultarPlaestudios().then((response)=>{//CASO EXITOSO
@@ -100,6 +104,7 @@ const put = (rowData) =>{
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
     const limpiarCampos = () => {
         setnombre_PlanEstudios("");
+        setcant_semestres("");
         setclave_ProgramaEducativo(0);
     };
  //!!!EXTRAS DE CONSULTA
@@ -108,8 +113,8 @@ const put = (rowData) =>{
   const columns = [
     {field: 'clave_PlanEstudios', header: 'Clave' },
     {field: 'nombre_PlanEstudios', header: 'Nombre' },
-    {field: 'clave_ProgramaEducativo', header: 'Clave Programa Educativo'},    
-      
+    {field: 'cant_semestres', header: 'Cantidad de semestres'},//ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
+    {field: 'clave_ProgramaEducativo', header: 'Clave Programa Educativo'},          
   ];
 
    //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -128,7 +133,8 @@ const onSearch = (e) => {
     const filteredData = plaestudiosList.filter((item) => {
         return (
           item.nombre_PlanEstudios.toLowerCase().includes(value) ||
-          item.clave_ProgramaEducativo.toString().includes(value)          
+          item.clave_ProgramaEducativo.toString().includes(value) ||
+          item.cant_semestres.toString().includes(value)          
         );
     });
     setfiltroplaestudios(filteredData);
@@ -162,7 +168,9 @@ const onSearch = (e) => {
     seteditando(true);
     switch(options.field){
       case 'nombre_PlanEstudios':
-        return textEditor(options);           
+        return textEditor(options);
+      case 'cant_semestres':
+        return numberEditor(options);           
       case 'clave_ProgramaEducativo':
         return TipoProgramaEducativoEditor(options);                     
       default:
@@ -181,6 +189,16 @@ const onSearch = (e) => {
     }}
     onKeyDown={(e) => e.stopPropagation()} />;
   };
+  
+  //EDITAR NUMEROS
+  const numberEditor = (options) => {
+    return <InputText keyfilter="int"  type="text" maxLength={6} value={options.value} 
+    onChange={(e) => {
+      if (validarNumero(e.target.value)) { 
+        options.editorCallback(e.target.value)
+      }
+    }} onKeyDown={(e) => e.stopPropagation()} />;
+  };  
 
 //EDITAR DROPDOWN (PROGRAMA EDUCATIVO)
 const TipoProgramaEducativoEditor = (options) => {
@@ -206,7 +224,15 @@ const TipoProgramaEducativoEditor = (options) => {
           rowData[field] = newValue; put(rowData);
         }else{
           event.preventDefault();
-        }  break;  
+        }  
+        break;
+      case 'cant_semestres':
+        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
+          rowData[field] = newValue; put(rowData);
+        }else{
+          event.preventDefault();
+        }           
+        break;    
       case 'clave_ProgramaEducativo':
         if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
           rowData[field] = newValue; put(rowData);
@@ -228,6 +254,13 @@ const TipoProgramaEducativoEditor = (options) => {
     // Verificar si el valor coincide con la expresión regular
     return regex.test(value);
   };
+
+  const validarNumero = (value) => {
+    // Expresión regular para validar números enteros positivos
+    const regex = /^[1-9]\d*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return value==='' || regex.test(value);
+  };    
   
     return (
         <>
@@ -260,6 +293,16 @@ const TipoProgramaEducativoEditor = (options) => {
                             placeholder="Seleccione un tipo de Programa Educativo"
                         />
                     </div>
+                    <div className="field col-3">
+                        <label>Cantidad de semestres</label>
+                        <InputText type="text" keyfilter="pint" value={cant_semestres} maxLength={2}
+                            onChange={(event)=>{
+                              if (validarNumero(event.target.value)) {    
+                                setcant_semestres(event.target.value);
+                              }
+                            }}  
+                        className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
+                    </div>                    
                 </div>
                 <div className="mx-8 mt-4">
                     <Button label="Guardar" onClick={add} className="p-button-success" />

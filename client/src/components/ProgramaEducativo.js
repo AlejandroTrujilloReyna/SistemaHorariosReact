@@ -17,8 +17,7 @@ const ProgramaEducativo = () => {
   const [clave_ProgramaEducativo,setclave_ProgramaEducativo] = useState(0);
   const [nombre_ProgramaEducativo,setnombre_ProgramaEducativo] = useState("");
   const [banco_Horas,setbanco_Horas] = useState(0);
-  const [min_Grupo,setmin_Grupo] = useState(0);
-  const [max_Grupo,setmax_Grupo] = useState(0);
+  const [asignaturas_horas,setasignaturas_horas] = useState(0);
   const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState(null);
   //VARIABLES PARA LA CONSULTA
   const [programaeducativoList,setprogramaeducativoList] = useState([]);
@@ -45,12 +44,9 @@ const ProgramaEducativo = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo || !min_Grupo || !max_Grupo) {
+    if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo || !asignaturas_horas) {
       mostrarAdvertencia("Existen campos vacios");
       return;
-    }else if (min_Grupo>max_Grupo){
-      mostrarAdvertencia("El rango maximo es mayor que el minimo");
-      return;      
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
     ProgramaEducativoService.registrarProgramaEducativo({
@@ -58,8 +54,7 @@ const ProgramaEducativo = () => {
       nombre_ProgramaEducativo:nombre_ProgramaEducativo,
       //VALIDACION PARA EL CAMPO NUMERICO NO OBLIGATORIO BANCO DE HORAS
       banco_Horas:banco_Horas.trim() !== '' ? banco_Horas : 0,
-      min_Grupo:min_Grupo,
-      max_Grupo:max_Grupo,
+      asignaturas_horas:asignaturas_horas,
       clave_UnidadAcademica:clave_UnidadAcademica      
     }).then(response=>{
       if (response.status === 200) {//CASO EXITOSO
@@ -112,8 +107,7 @@ const ProgramaEducativo = () => {
     setclave_ProgramaEducativo(0);
     setnombre_ProgramaEducativo("");
     setbanco_Horas(0);
-    setmin_Grupo(0);
-    setmax_Grupo(0);
+    setasignaturas_horas(0);
     setclave_UnidadAcademica(0);
   }
   
@@ -123,8 +117,7 @@ const ProgramaEducativo = () => {
   const columns = [
     {field: 'clave_ProgramaEducativo', header: 'Clave' },
     {field: 'nombre_ProgramaEducativo', header: 'Nombre' },
-    {field: 'min_Grupo', header: 'Capacidad minima'},
-    {field: 'max_Grupo', header: 'Capacidad maxima'},
+    {field: 'asignaturas_horas', header: 'Horas de asignatura'},
     {field: 'banco_Horas', header: 'Banco de Horas'},
     {field: 'clave_UnidadAcademica', header: 'Unidad Academica'}    
   ];
@@ -147,8 +140,7 @@ const ProgramaEducativo = () => {
             item.clave_UnidadAcademica.toString().includes(value) ||
             item.clave_ProgramaEducativo.toString().includes(value) ||
             item.nombre_ProgramaEducativo.toLowerCase().includes(value) ||
-            item.min_Grupo.toString().includes(value) ||
-            item.max_Grupo.toString().includes(value) ||
+            item.asignaturas_horas.toString().includes(value) ||
             item.banco_Horas.toString().includes(value)            
         );
     });
@@ -184,9 +176,7 @@ const ProgramaEducativo = () => {
     switch (options.field) {
       case 'nombre_ProgramaEducativo':
         return textEditor(options);
-      case 'min_Grupo':
-        return numberEditor(options);
-      case 'max_Grupo':
+      case 'asignaturas_horas':
         return numberEditor(options);
       case 'banco_Horas':
         return numberEditor(options);
@@ -246,15 +236,8 @@ const ProgramaEducativo = () => {
             event.preventDefault();
           } 
           break;
-        case 'min_Grupo':
-          if(newValue > 0 && newValue !== null && newValue !== rowData[field] && newValue<rowData['max_Grupo']){
-            rowData[field] = newValue; put(rowData);
-          }else{
-            event.preventDefault();
-          }
-          break;
-        case 'max_Grupo':
-          if(newValue > 0 && newValue !== null && newValue !== rowData[field] && newValue>rowData['min_Grupo']){
+        case 'asignaturas_horas':
+          if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
             rowData[field] = newValue; put(rowData);
           }else{
             event.preventDefault();
@@ -302,7 +285,7 @@ const ProgramaEducativo = () => {
     <Toast ref={toast} />
       {/*PANEL PARA EL REGISTRO*/}
       <Panel header="Registrar Programa Educativo" className='mt-3' toggleable>
-        <div className="formgrid grid mx-8">
+        <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-2">
               <label>Clave</label>
               <InputText type="text" keyfilter="pint" value={clave_ProgramaEducativo} maxLength={10}
@@ -334,21 +317,11 @@ const ProgramaEducativo = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-2">
-              <label>Rango Minimo</label>
-              <InputText type="text" keyfilter="pint" value={min_Grupo} maxLength={10}
+              <label>Horas de asignatura</label>
+              <InputText type="text" keyfilter="pint" value={asignaturas_horas} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
-                      setmin_Grupo(event.target.value);
-                    }
-                  }}  
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
-          </div>
-          <div className="field col-2">
-              <label>Rango Maximo</label>
-              <InputText type="text" keyfilter="pint" value={max_Grupo} maxLength={10}
-                  onChange={(event)=>{
-                    if (validarNumero(event.target.value)) {    
-                      setmax_Grupo(event.target.value);
+                      setasignaturas_horas(event.target.value);
                     }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>

@@ -6,16 +6,17 @@ const db = mysql.createConnection({
     host:"localhost",
     user:"root",
     password:"root",
-    database:"dbsistemahorario"
+    database:"bdsistemahorarios"
 });
 
 router.post("/registrarPlaEstudios", (req, res) => {
     const clave_PlanEstudios = req.body.clave_PlanEstudios;
     const nombre_PlanEstudios = req.body.nombre_PlanEstudios;
+    const cant_semestres = req.body.cant_semestres;
     const clave_ProgramaEducativo = req.body.clave_ProgramaEducativo;
     
 
-    db.query('SELECT * FROM plaestudios WHERE nombre_PlanEstudios = ? AND clave_ProgramaEducativo = ?',[nombre_PlanEstudios,clave_ProgramaEducativo], (err, results) => {
+    db.query('SELECT * FROM planestudios WHERE nombre_PlanEstudios = ? AND clave_ProgramaEducativo = ?',[nombre_PlanEstudios,clave_ProgramaEducativo], (err, results) => {
         if(err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
@@ -26,8 +27,8 @@ router.post("/registrarPlaEstudios", (req, res) => {
         }
         
             
-            db.query('INSERT INTO plaestudios(clave_PlanEstudios, nombre_PlanEstudios, clave_ProgramaEducativo) VALUES (?, ?, ?)',
-            [clave_PlanEstudios, nombre_PlanEstudios, clave_ProgramaEducativo], (err, result) => {
+            db.query('INSERT INTO planestudios(clave_PlanEstudios, nombre_PlanEstudios, cant_semestres, clave_ProgramaEducativo) VALUES (?, ?, ?, ?)',
+            [clave_PlanEstudios, nombre_PlanEstudios, cant_semestres, clave_ProgramaEducativo], (err, result) => {
                 if (err) {
                     console.log(err);
                     return res.status(500).send("Error interno del servidor");
@@ -39,7 +40,7 @@ router.post("/registrarPlaEstudios", (req, res) => {
 });
 //MOVER CUANDO SE CREE LA PARTE DE PLAN DE ESTUDIOS
 router.get("/consultarPlaEstudios", (req, res) => {
-    db.query('SELECT * FROM plaestudios', (err, results) => {
+    db.query('SELECT * FROM planestudios', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");
@@ -51,9 +52,10 @@ router.get("/consultarPlaEstudios", (req, res) => {
 router.put("/modificarPlaEstudios", (req, res) => {
     const clave_PlanEstudios = req.body.clave_PlanEstudios;
     const nombre_PlanEstudios = req.body.nombre_PlanEstudios;
+    const cant_semestres = req.body.cant_semestres;
     const clave_ProgramaEducativo = req.body.clave_ProgramaEducativo;
     
-    db.query('SELECT * FROM plaestudios WHERE nombre_PlanEstudios = ? AND clave_ProgramaEducativo = ? AND clave_PlanEstudios != ?',[nombre_PlanEstudios,clave_ProgramaEducativo,clave_PlanEstudios], (err, results) => {
+    db.query('SELECT * FROM planestudios WHERE nombre_PlanEstudios = ? AND clave_ProgramaEducativo = ? AND clave_PlanEstudios != ?',[nombre_PlanEstudios,clave_ProgramaEducativo,clave_PlanEstudios], (err, results) => {
         if(err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
@@ -62,7 +64,7 @@ router.put("/modificarPlaEstudios", (req, res) => {
         if(results.length > 0) {
             return res.status(401).send("El nombre del Programa educativo ya existe en el Plan de Estudios");
         }
-        db.query('UPDATE plaestudios SET nombre_PlanEstudios = ?, clave_ProgramaEducativo = ? WHERE clave_PlanEstudios= ?',[nombre_PlanEstudios,clave_ProgramaEducativo,clave_PlanEstudios],(err,result) =>{
+        db.query('UPDATE planestudios SET nombre_PlanEstudios = ?, cant_semestres = ?, clave_ProgramaEducativo = ? WHERE clave_PlanEstudios= ?',[nombre_PlanEstudios,cant_semestres,clave_ProgramaEducativo,clave_PlanEstudios],(err,result) =>{
             if (err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");

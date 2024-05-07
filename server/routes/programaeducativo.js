@@ -6,15 +6,14 @@ const db = mysql.createConnection({
     host:"localhost",
     user:"root",
     password:"root",
-    database:"dbsistemahorario"
+    database:"bdsistemahorarios"
 });
 
 router.post("/registrarProgramaEducativo", (req, res) => {
     const clave_ProgramaEducativo = req.body.clave_ProgramaEducativo;
     const nombre_ProgramaEducativo = req.body.nombre_ProgramaEducativo;
     const banco_Horas = req.body.banco_Horas;
-    const min_Grupo = req.body.min_Grupo;
-    const max_Grupo = req.body.max_Grupo;
+    const asignaturas_horas = req.body.asignaturas_horas;
     const clave_UnidadAcademica = req.body.clave_UnidadAcademica;
 
     db.query('SELECT * FROM programaeducativo WHERE clave_ProgramaEducativo = ?',[clave_ProgramaEducativo], (err, results) => {
@@ -36,8 +35,8 @@ router.post("/registrarProgramaEducativo", (req, res) => {
                 return res.status(401).send("El Nombre del Programa Educativo ya existe");
             }
             
-            db.query('INSERT INTO programaeducativo(clave_ProgramaEducativo, nombre_ProgramaEducativo, banco_Horas, min_Grupo, max_Grupo, clave_UnidadAcademica) VALUES (?, ?, ?, ?, ?, ?)',
-            [clave_ProgramaEducativo, nombre_ProgramaEducativo, banco_Horas, min_Grupo, max_Grupo, clave_UnidadAcademica], (err, result) => {
+            db.query('INSERT INTO programaeducativo(clave_ProgramaEducativo, nombre_ProgramaEducativo, banco_Horas, asignaturas_horas, clave_UnidadAcademica) VALUES (?, ?, ?, ?, ?)',
+            [clave_ProgramaEducativo, nombre_ProgramaEducativo, banco_Horas, asignaturas_horas, clave_UnidadAcademica], (err, result) => {
                 if (err) {
                     console.log(err);
                     return res.status(500).send("Error interno del servidor");
@@ -62,8 +61,7 @@ router.put("/modificarProgramaEducativo", (req, res) => {
     const clave_ProgramaEducativo = req.body.clave_ProgramaEducativo;
     const nombre_ProgramaEducativo = req.body.nombre_ProgramaEducativo;
     const banco_Horas = req.body.banco_Horas;
-    const min_Grupo = req.body.min_Grupo;
-    const max_Grupo = req.body.max_Grupo;
+    const asignaturas_horas = req.body.asignaturas_horas;
     const clave_UnidadAcademica = req.body.clave_UnidadAcademica;
     db.query('SELECT * FROM programaeducativo WHERE nombre_ProgramaEducativo = ? AND clave_ProgramaEducativo != ?',[nombre_ProgramaEducativo,clave_ProgramaEducativo], (err, results) => {
         if(err) {
@@ -74,8 +72,8 @@ router.put("/modificarProgramaEducativo", (req, res) => {
         if(results.length > 0) {
             return res.status(401).send("El Nombre del Programa Educativo ya existe");
         }
-        db.query('UPDATE programaeducativo SET nombre_ProgramaEducativo = ?, banco_Horas = ?, min_Grupo = ?, max_Grupo = ?, clave_UnidadAcademica = ?  WHERE clave_ProgramaEducativo = ?',
-        [nombre_ProgramaEducativo,banco_Horas,min_Grupo,max_Grupo,clave_UnidadAcademica,clave_ProgramaEducativo],(err,result) =>{
+        db.query('UPDATE programaeducativo SET nombre_ProgramaEducativo = ?, banco_Horas = ?, asignaturas_horas = ?, clave_UnidadAcademica = ?  WHERE clave_ProgramaEducativo = ?',
+        [nombre_ProgramaEducativo,banco_Horas, asignaturas_horas,clave_UnidadAcademica,clave_ProgramaEducativo],(err,result) =>{
             if (err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");

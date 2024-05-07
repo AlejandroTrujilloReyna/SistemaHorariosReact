@@ -6,7 +6,7 @@ const db = mysql.createConnection({
     host:"localhost",
     user:"root",
     password:"root",
-    database:"dbsistemahorario"
+    database:"bdsistemahorarios"
 });
 
 router.post("/registrarUnidadAcademica",(req,res)=>{
