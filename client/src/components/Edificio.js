@@ -228,7 +228,7 @@ const Edificio = () => {
   const textEditor = (options) => {
     return <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={options.value} maxLength={255} 
     onChange={(e) => { 
-      if (validarNumero(e.target.value)) { 
+      if (validarTexto(e.target.value)) { 
         options.editorCallback(e.target.value)
       }
     }}

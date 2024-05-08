@@ -53,7 +53,7 @@ const ProgramaEducativo = () => {
       clave_ProgramaEducativo:clave_ProgramaEducativo,
       nombre_ProgramaEducativo:nombre_ProgramaEducativo,
       //VALIDACION PARA EL CAMPO NUMERICO NO OBLIGATORIO BANCO DE HORAS
-      banco_Horas:banco_Horas.trim() !== '' ? banco_Horas : 0,
+      banco_Horas:banco_Horas.trim !== '' ? banco_Horas : 0,
       asignaturas_horas:asignaturas_horas,
       clave_UnidadAcademica:clave_UnidadAcademica      
     }).then(response=>{
