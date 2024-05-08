@@ -9,18 +9,18 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
-import PlaEstudiosService from '../services/PlaEstudiosService';
+import PlanEstudiosService from '../services/PlanEstudiosService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
 
-const PlaEstudios = () => {
+const PlanEstudios = () => {
   //VARIABLES PARA EL REGISTRO
   const [nombre_PlanEstudios, setnombre_PlanEstudios] = useState("");
   const [cant_semestres, setcant_semestres] = useState(0);
   const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(0);
 
   //VARIABLES PARA LA CONSULTA
-  const [plaestudiosList, setplaestudiosList] = useState([]);
-  const [filtroplaestudios, setfiltroplaestudios] = useState([]);
+  const [planestudiosList, setplanestudiosList] = useState([]);
+  const [filtroplanestudios, setfiltroplanestudios] = useState([]);
   const [ProgramasEducativos, setProgramasEducativos] = useState([]);
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
   const [editando,seteditando] = useState(false);
@@ -52,7 +52,7 @@ const PlaEstudios = () => {
   }
 
   //MANDAR A LLAMAR AL REGISTRO SERVICE
-  PlaEstudiosService.registrarPlaEstudios({
+  PlanEstudiosService.registrarPlanEstudios({
     nombre_PlanEstudios: nombre_PlanEstudios,
     cant_semestres:cant_semestres,
     clave_ProgramaEducativo: clave_ProgramaEducativo
@@ -75,8 +75,8 @@ const PlaEstudios = () => {
 
  //FUNCION PARA CONSULTA
  const get = ()=>{
-    PlaEstudiosService.consultarPlaestudios().then((response)=>{//CASO EXITOSO
-        setplaestudiosList(response.data);  
+    PlanEstudiosService.consultarPlanestudios().then((response)=>{//CASO EXITOSO
+        setplanestudiosList(response.data);  
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 500) {
         //mostrarError("Error del sistema");
@@ -86,7 +86,7 @@ const PlaEstudios = () => {
 
 //FUNCION PARA LA MODIFICACION
 const put = (rowData) =>{
-    PlaEstudiosService.modificarPlaEstudios(rowData).then(response=>{//CASO EXITOSO
+    PlanEstudiosService.modificarPlanEstudios(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
         mostrarExito("Modificacion exitosa");
       }
@@ -124,20 +124,20 @@ const put = (rowData) =>{
 
    //ORDENAR LOS DATOS POR CLAVE AL INGRESAR A LA PAGINA
    useEffect(() => {
-    setfiltroplaestudios([...plaestudiosList].sort((a, b) => a.clave_PlanEstudios - b.clave_PlanEstudios));
-  }, [plaestudiosList]);
+    setfiltroplanestudios([...planestudiosList].sort((a, b) => a.clave_PlanEstudios - b.clave_PlanEstudios));
+  }, [planestudiosList]);
 
 //FUNCION PARA LA BARRA DE BUSQUEDA
 const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
-    const filteredData = plaestudiosList.filter((item) => {
+    const filteredData = planestudiosList.filter((item) => {
         return (
           item.nombre_PlanEstudios.toLowerCase().includes(value) ||
           item.clave_ProgramaEducativo.toString().includes(value) ||
           item.cant_semestres.toString().includes(value)          
         );
     });
-    setfiltroplaestudios(filteredData);
+    setfiltroplanestudios(filteredData);
   };
 
  //MANDAR A LLAMAR A LA LISTA DE PROGRAMA EDUCATIVO
@@ -257,7 +257,7 @@ const TipoProgramaEducativoEditor = (options) => {
 
   const validarNumero = (value) => {
     // Expresión regular para validar números enteros positivos
-    const regex = /^[1-9]\d*$/;
+    const regex = /^[0-9]\d*$/;
     // Verificar si el valor coincide con la expresión regular
     return value==='' || regex.test(value);
   };    
@@ -313,7 +313,7 @@ const TipoProgramaEducativoEditor = (options) => {
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
-        <DataTable value={filtroplaestudios.length ? filtroplaestudios :plaestudiosList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
+        <DataTable value={filtroplanestudios.length ? filtroplanestudios :planestudiosList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
               editor={field === 'clave_PlanEstudios' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
@@ -325,4 +325,4 @@ const TipoProgramaEducativoEditor = (options) => {
     );
 }
 
-export default PlaEstudios;
+export default PlanEstudios;

@@ -34,7 +34,7 @@ router.post("/registrarUnidadAprendizaje",(req,res)=>{
                 return res.status(401).send("El nombre de la Unidad de Aprendizaje ya existe en el Plan de Estudios");
             }
          
-            db.query('INSERT INTO unidadaprendizaje(clave_UnidadAprendizaje, nombre_UnidadAprendizaje, clave_PlanEstudios) VALUES (?, ?, ?, ?)',
+            db.query('INSERT INTO unidadaprendizaje(clave_UnidadAprendizaje, nombre_UnidadAprendizaje, clave_PlanEstudios) VALUES (?, ?, ?)',
             [clave_UnidadAprendizaje, nombre_UnidadAprendizaje,clave_PlanEstudios], (err, result) => {
                 if(err) {
                     console.log(err);

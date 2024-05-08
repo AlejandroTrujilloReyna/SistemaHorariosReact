@@ -10,7 +10,7 @@ import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
-import PlaEstudiosService from '../services/PlaEstudiosService';
+import PlanEstudiosService from '../services/PlanEstudiosService';
 
 const UnidadAprendizaje = () => {
   //VARIABLES PARA EL REGISTRO
@@ -139,7 +139,7 @@ const UnidadAprendizaje = () => {
 
   //MANDAR A LLAMAR A LA LISTA DE PLANES DE ESTUDIOS
   useEffect(() => {
-    PlaEstudiosService.consultarPlaestudios()
+    PlanEstudiosService.consultarPlanestudios()
       .then(response => {
         setplanesdeestudios(response.data);
       })
@@ -234,7 +234,7 @@ const UnidadAprendizaje = () => {
 
   const validarNumero = (value) => {
     // Expresión regular para validar números enteros positivos
-    const regex = /^[1-9]\d*$/;
+    const regex = /^[0-9]\d*$/;
     // Verificar si el valor coincide con la expresión regular
     return value==='' || regex.test(value);
   };

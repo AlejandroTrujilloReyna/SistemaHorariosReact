@@ -9,7 +9,7 @@ const db = mysql.createConnection({
     database:"bdsistemahorarios"
 });
 
-router.post("/registrarPlaEstudios", (req, res) => {
+router.post("/registrarPlanEstudios", (req, res) => {
     const clave_PlanEstudios = req.body.clave_PlanEstudios;
     const nombre_PlanEstudios = req.body.nombre_PlanEstudios;
     const cant_semestres = req.body.cant_semestres;
@@ -39,7 +39,7 @@ router.post("/registrarPlaEstudios", (req, res) => {
     });
 });
 //MOVER CUANDO SE CREE LA PARTE DE PLAN DE ESTUDIOS
-router.get("/consultarPlaEstudios", (req, res) => {
+router.get("/consultarPlanEstudios", (req, res) => {
     db.query('SELECT * FROM planestudios', (err, results) => {
       if (err) {
         console.log(err);
@@ -49,7 +49,7 @@ router.get("/consultarPlaEstudios", (req, res) => {
     });
 });
 
-router.put("/modificarPlaEstudios", (req, res) => {
+router.put("/modificarPlanEstudios", (req, res) => {
     const clave_PlanEstudios = req.body.clave_PlanEstudios;
     const nombre_PlanEstudios = req.body.nombre_PlanEstudios;
     const cant_semestres = req.body.cant_semestres;

@@ -13,7 +13,7 @@ import Sala from './components/Sala';
 import TipoSala from './components/TipoSala';
 import UsarEdificio from './components/UsarEdificio';
 import UnidadAprendizaje from './components/UnidadAprendizaje';
-import PlaEstudios from './components/PlaEstudios'
+import PlanEstudios from './components/PlanEstudios'
 function App() {
   return (
     <div className="App">
@@ -27,7 +27,7 @@ function App() {
           <Route path='/UsarEdificio' element={<UsarEdificio/>}/>
           <Route path='/Sala' element={<Sala/>}/>
           <Route path='/TipoSala' element={<TipoSala/>}/>
-          <Route path='/PlaEstudios' element={<PlaEstudios/>}/>
+          <Route path='/PlanEstudios' element={<PlanEstudios/>}/>
         </Routes>
       </BrowserRouter>
     </div>

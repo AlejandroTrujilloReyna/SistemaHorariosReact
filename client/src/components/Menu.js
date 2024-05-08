@@ -54,7 +54,7 @@ const Menu = () => {
         {
             label: 'Plan de Estudios',
             icon: 'pi pi-building-columns',
-            command: () => {window.location.href='/PlaEstudios';}
+            command: () => {window.location.href='/PlanEstudios';}
         } 
                          
 
