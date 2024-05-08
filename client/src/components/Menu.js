@@ -6,6 +6,7 @@ const Menu = () => {
         {
             label: 'Sistema de gestion de horarios',
         },
+  
         {
             label: 'Unidad Academica',
             icon: 'pi pi-building-columns',
@@ -38,26 +39,40 @@ const Menu = () => {
                 },
             ]
         },
+     
         {
             label: 'Sala',
             icon: 'pi pi-home',
             command: () => {window.location.href='/Sala';}
 
         },
+     
         {
             label: 'Tipo Sala',
             icon: 'pi pi-home',
             command: () => {window.location.href='/TipoSala';}
         },                    
-
-         
+      
         {
             label: 'Plan de Estudios',
             icon: 'pi pi-building-columns',
             command: () => {window.location.href='/PlanEstudios';}
-        } 
-                         
-
+        },
+        {
+        
+            label: 'Tipo SubGrupo',
+            icon: 'pi pi-building',
+            items: [
+                {
+                    label: 'UA Tipo SubGrupo Horas',
+                    command: () => {window.location.href='/UATipoSubGrupoHoras';}                 
+                },                
+                {
+                    label: 'Tipo SubGrupo',
+                    command: () => {window.location.href='/TipoSubGrupo';}                    
+                },
+            ]
+        }                 
     ];
     const start = <img alt="logo" src="https://comunicacioninstitucional.uabc.mx/sites/default/files/inline-images/escudo-actualizado-2022.png" height="40" className="mr-2"></img>;         
   return (

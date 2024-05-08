@@ -14,6 +14,9 @@ import TipoSala from './components/TipoSala';
 import UsarEdificio from './components/UsarEdificio';
 import UnidadAprendizaje from './components/UnidadAprendizaje';
 import PlanEstudios from './components/PlanEstudios'
+import TipoSubGrupo from './components/TipoSubGrupo'
+import UATipoSubGrupoHoras from './components/UATipoSubGrupoHoras';
+
 function App() {
   return (
     <div className="App">
@@ -28,6 +31,8 @@ function App() {
           <Route path='/Sala' element={<Sala/>}/>
           <Route path='/TipoSala' element={<TipoSala/>}/>
           <Route path='/PlanEstudios' element={<PlanEstudios/>}/>
+          <Route path='UATipoSubGrupoHoras' element={<UATipoSubGrupoHoras/>}/>
+          <Route path='/TipoSubGrupo' element={<TipoSubGrupo/>}/>
         </Routes>
       </BrowserRouter>
     </div>

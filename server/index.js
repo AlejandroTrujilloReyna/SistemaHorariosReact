@@ -26,6 +26,12 @@ app.use("/tiposala", tiposalaRoutes);
 const planestudiosRoutes = require("./routes/planestudios");
 app.use("/planestudios", planestudiosRoutes);
 
+const tiposubgrupoRoutes = require("./routes/tiposubgrupo");
+app.use("/tiposubgrupo", tiposubgrupoRoutes);
+
+const uatiposubgrupohorasRoutes = require("./routes/uatiposubgrupohoras");
+app.use("/uatiposubgrupohoras", uatiposubgrupohorasRoutes);
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });
