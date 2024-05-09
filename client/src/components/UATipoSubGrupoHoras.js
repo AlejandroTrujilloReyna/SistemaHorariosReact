@@ -68,7 +68,7 @@ const UATipoSubGrupoHoras = () => {
       if (error.response.status === 400) {
         mostrarAdvertencia("Clave ya existente");
       } else if (error.response.status === 401) {
-        mostrarAdvertencia("Nombre ya existente");      
+        mostrarAdvertencia("Subgrupo ya existente para esa unidad de aprendizaje");      
       }else if(error.response.status === 500){          
         mostrarError("Error interno del servidor");
       }     
@@ -94,7 +94,7 @@ const UATipoSubGrupoHoras = () => {
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Tipo de subgrupo existente en el programa educativo");
         get();
       }else if(error.response.status === 500){
         mostrarError("Error del sistema");
@@ -146,7 +146,7 @@ const UATipoSubGrupoHoras = () => {
     setfiltrouatiposubgrupohoras(filteredData);
   }; 
 
-  //MANDAR A LLAMAR A LA LISTA DE UNIDADES ACADEMICAS
+  //MANDAR A LLAMAR A LA LISTA DE TIPOS DE SUBGRUPO
   useEffect(() => {
     TipoSubGrupoService.consultarTipoSubGrupo()
       .then(response => {
@@ -157,6 +157,7 @@ const UATipoSubGrupoHoras = () => {
       });
   }, []);
 
+  //MANDAR A LLAMAR A LA LISTA DE UNIDADES DE APRENDIZAJE
   useEffect(() => {
     UnidadAprendizajeService.consultarUnidadAprendizaje()
       .then(response => {
@@ -172,6 +173,9 @@ const UATipoSubGrupoHoras = () => {
     if (field === 'clave_TipoSubGrupo') {
       const unidad = TiposSubgrupos.find((unidad) => unidad.clave_TipoSubGrupo === rowData.clave_TipoSubGrupo);
       return unidad ? `${unidad.nombre_TipoSubGrupo}` : '';
+    }else if(field === 'clave_UnidadAprendizaje'){
+      const unidad = UnidadesAprendizaje.find((unidad) => unidad.clave_UnidadAprendizaje === rowData.clave_UnidadAprendizaje);
+      return unidad ? `${unidad.nombre_UnidadAprendizaje}` : '';      
     }else {
       return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
     }
@@ -261,7 +265,14 @@ const UATipoSubGrupoHoras = () => {
           }else{
             event.preventDefault();
           }
-        break;        
+        break;
+        case 'horas':
+          if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
+            rowData[field] = newValue; put(rowData);
+          }else{
+            event.preventDefault();
+          }
+        break;                
         
         default:
         break;
