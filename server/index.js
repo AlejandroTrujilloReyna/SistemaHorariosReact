@@ -32,6 +32,12 @@ app.use("/tiposubgrupo", tiposubgrupoRoutes);
 const uatiposubgrupohorasRoutes = require("./routes/uatiposubgrupohoras");
 app.use("/uatiposubgrupohoras", uatiposubgrupohorasRoutes);
 
+const usuarioRoutes = require("./routes/usuario");
+app.use("/usuario", usuarioRoutes);
+
+const permisoRoutes = require("./routes/permiso");
+app.use("/permiso", permisoRoutes);
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });
