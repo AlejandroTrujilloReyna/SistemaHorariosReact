@@ -77,6 +77,11 @@ const Menu = () => {
             label: 'Usuario',
             icon: 'pi pi-building-columns',
             command: () => {window.location.href='/Usuario';}
+        },
+        {
+            label: 'Tipo Empleado',
+            icon: 'pi pi-building-columns',
+            command: () => {window.location.href='/TipoEmpleado';}
         }
                          
     ];

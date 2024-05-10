@@ -38,6 +38,9 @@ app.use("/usuario", usuarioRoutes);
 const permisoRoutes = require("./routes/permiso");
 app.use("/permiso", permisoRoutes);
 
+const tipoempleadoRoutes = require("./routes/tipoempleado")
+app.use("/tipoempleado", tipoempleadoRoutes);
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });
