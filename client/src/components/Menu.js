@@ -79,11 +79,15 @@ const Menu = () => {
             command: () => {window.location.href='/Usuario';}
         },
         {
-            label: 'Tipo Empleado',
+            label: 'Tipo de Empleado',
             icon: 'pi pi-building-columns',
             command: () => {window.location.href='/TipoEmpleado';}
-        }
-                         
+        },
+        {
+            label: 'Grado de Estudios',
+            icon: 'pi pi-building-columns',
+            command: () => {window.location.href='/GradoEstudio';}
+        }                
     ];
     const start = <img alt="logo" src="https://comunicacioninstitucional.uabc.mx/sites/default/files/inline-images/escudo-actualizado-2022.png" height="40" className="mr-2"></img>;         
   return (

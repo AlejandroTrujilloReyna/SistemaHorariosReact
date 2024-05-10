@@ -8,23 +8,24 @@ import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import TipoEmpleadoService from '../services/TipoEmpleadoService';
+import GradoEstudioService from '../services/GradoEstudioService';
 
-const TipoEmpleado = () => {
-    const [clave_TipoEmpleado,setclave_TipoEmpleado] = useState(0);
-    const [nombre_TipoEmpleado,setnombre_TipoEmpleado] = useState("");
-    const [horas_MinimasTipoEmpleado,sethoras_MinimasTipoEmpleado] = useState(0);
-    const [horas_MaximasTipoEmpleado,sethoras_MaximasTipoEmpleado] = useState(0);
+const GradoEstudio = () => {
+
+    const [clave_GradoEstudio,setclave_GradoEstudio] = useState(0);
+    const [nombre_GradoEstudio,setnombre_GradoEstudio] = useState("");
+    const [horas_MinimasGradoEstudio,sethoras_MinimasGradoEstudio] = useState(0);
+    const [horas_MaximasGradoEstudio,sethoras_MaximasGradoEstudio] = useState(0);
   
-    const [tipoempleadolist,settipoempleadolist] = useState([]);
-    const [filtrotipoempleado,setfiltrotipoempleado] = useState([]);
+    const [gradoestudiolist,setgradoestudiolist] = useState([]);
+    const [filtrogradoestudio,setfiltrogradoestudio] = useState([]);
   
     const [editando,seteditando] = useState(false);
 
     const toast = useRef(null);
 
-     //MENSAJE DE EXITO
-  const mostrarExito = (mensaje) => {
+//MENSAJE DE EXITO
+const mostrarExito = (mensaje) => {
     toast.current.show({severity:'success', summary: 'Exito', detail:mensaje, life: 3000});
   }
   //MENSAJE DE ADVERTENCIA
@@ -39,22 +40,22 @@ const TipoEmpleado = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    if (!nombre_TipoEmpleado || !horas_MinimasTipoEmpleado || !horas_MaximasTipoEmpleado) {
+    if (!nombre_GradoEstudio || !horas_MinimasGradoEstudio || !horas_MaximasGradoEstudio) {
       mostrarAdvertencia("Existen campos vacios");
       return;
     }
-
-    if(horas_MaximasTipoEmpleado < horas_MinimasTipoEmpleado){
+    //VALIDACION DE HORAS MAXIMAS MENOR A LAS HORAS MINIMAS
+    if(horas_MaximasGradoEstudio <= horas_MinimasGradoEstudio){
         mostrarAdvertencia("Las horas Maximas son menores que las Horas Minimas");
         return;
     }
 
   //MANDAR A LLAMAR AL REGISTRO SERVICE
-  TipoEmpleadoService.registrarTipoEmpleado({
-    clave_TipoEmpleado:clave_TipoEmpleado,
-    nombre_TipoEmpleado:nombre_TipoEmpleado,
-    horas_MinimasTipoEmpleado:horas_MinimasTipoEmpleado,
-    horas_MaximasTipoEmpleado:horas_MaximasTipoEmpleado
+  GradoEstudioService.registrarGradoEstudio({
+    clave_GradoEstudio:clave_GradoEstudio,
+    nombre_GradoEstudio:nombre_GradoEstudio,
+    horas_MinimasGradoEstudio:horas_MinimasGradoEstudio,
+    horas_MaximasGradoEstudio:horas_MaximasGradoEstudio
   }).then(response=>{//CASO EXITOSO
     if (response.status === 200) {
       mostrarExito("Registro exitoso");
@@ -72,10 +73,10 @@ const TipoEmpleado = () => {
   });
   }
 
-  //FUNCION PARA LA CONSULTA
-  const get = ()=>{
-    TipoEmpleadoService.consultarTipoEmpleado().then((response)=>{//CASO EXITOSO
-        settipoempleadolist(response.data);  
+ //FUNCION PARA LA CONSULTA
+ const get = ()=>{
+    GradoEstudioService.consultarGradoEstudio().then((response)=>{//CASO EXITOSO
+        setgradoestudiolist(response.data);  
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 500) {
         //setmensajeError("Error del sistema");
@@ -85,8 +86,16 @@ const TipoEmpleado = () => {
 
 
 //FUNCION PARA LA MODIFICACION
+
+
+
+
 const put = (rowData) =>{
-    TipoEmpleadoService.modificarTipoEmpleado(rowData).then((response)=>{//CASO EXITOSO
+
+
+
+
+    GradoEstudioService.modificarGradoEstudio(rowData).then((response)=>{//CASO EXITOSO
       if(response.status === 200){
         mostrarExito("Modificacion exitosa");
       }
@@ -101,22 +110,22 @@ const put = (rowData) =>{
     });
   }
 
-//!!!EXTRAS DE REGISTRO
+ //!!!EXTRAS DE REGISTRO
 
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
   const limpiarCampos = () =>{
-    setclave_TipoEmpleado(0);
-    setnombre_TipoEmpleado("")
-    sethoras_MinimasTipoEmpleado(0);
-    sethoras_MaximasTipoEmpleado(0)
+    setclave_GradoEstudio(0);
+    setnombre_GradoEstudio("")
+    sethoras_MinimasGradoEstudio(0);
+    sethoras_MaximasGradoEstudio(0)
   } 
 
    //COLUMNAS PARA LA TABLA
    const columns = [
-    { field: 'clave_TipoEmpleado', header: 'Clave' },
-    { field: 'nombre_TipoEmpleado', header: 'Nombre' },
-    {field: 'horas_MinimasTipoEmpleado', header: 'Hora Minima'},
-    {field: 'horas_MaximasTipoEmpleado', header: 'Hora Maxima'}  
+    { field: 'clave_GradoEstudio', header: 'Clave' },
+    { field: 'nombre_GradoEstudio', header: 'Nombre' },
+    {field: 'horas_MinimasGradoEstudio', header: 'Hora Minima'},
+    {field: 'horas_MaximasGradoEstudio', header: 'Hora Maxima'}  
 ];
 
   //MANDAR A LLAMAR LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -125,35 +134,35 @@ const put = (rowData) =>{
   }, []);  
 
   useEffect(() => {
-    setfiltrotipoempleado([...tipoempleadolist].sort((a, b) => a.clave_TipoEmpleado - b.clave_TipoEmpleado));
-  }, [tipoempleadolist]);
+    setfiltrogradoestudio([...gradoestudiolist].sort((a, b) => a.clave_GradoEstudio - b.clave_GradoEstudio));
+  }, [gradoestudiolist]);
   
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
-    const filteredData = tipoempleadolist.filter((item) => {
+    const filteredData = gradoestudiolist.filter((item) => {
         return (
-            item.clave_TipoEmpleado.toString().includes(value) ||          
-            item.nombre_TipoEmpleado.toLowerCase().includes(value) ||
-            item.horas_MinimasTipoEmpleado.toString().includes(value) ||
-            item.horas_MaximasTipoEmpleado.toString().includes(value) 
+            item.clave_GradoEstudio.toString().includes(value) ||          
+            item.nombre_GradoEstudio.toLowerCase().includes(value) ||
+            item.horas_MinimasGradoEstudio.toString().includes(value) ||
+            item.horas_MaximasGradoEstudio.toString().includes(value) 
                     
         )
     });
-    setfiltrotipoempleado(filteredData);
+    setfiltrogradoestudio(filteredData);
   };  
 
-  //!!!EXTRAS DE MODIFICACION
+//!!!EXTRAS DE MODIFICACION
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
     seteditando(true);
     switch (options.field) {      
-      case 'nombre_TipoEmpleado':
+      case 'nombre_GradoEstudio':
         return textEditor(options);                
-      case 'horas_MinimasTipoEmpleado':
+      case 'horas_MinimasGradoEstudio':
         return numberEditor(options);
-        case 'horas_MaximasTipoEmpleado':
+        case 'horas_MaximasGradoEstudio':
         return numberEditor(options);                 
       default:
         return textEditor(options); 
@@ -184,42 +193,35 @@ const put = (rowData) =>{
  //COMPLETAR MODIFICACION
  const onCellEditComplete = (e) => {
     let { rowData, newValue, field, originalEvent: event } = e;
-      // Función para validar y aplicar los cambios en el campo editado
-    
-        
-    
-
     switch (field) {
-        // CADA CAMPO QUE SE PUEDA MODIFICAR ES UN CASO
-        case 'nombre_TipoEmpleado':
-          if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
-            rowData[field] = newValue; put(rowData);
-          }else{
-            event.preventDefault();
-          } 
-            break;
-        case 'horas_MinimasTipoEmpleado':
-            //newValue > 0
-            if (newValue !== null && newValue > 0  && newValue !== rowData[field] && newValue < rowData['horas_MaximasTipoEmpleado']) {
-                rowData[field] = newValue;
-                put(rowData);
-            } else {
-                event.preventDefault()
-            }
-            break;
-        case 'horas_MaximasTipoEmpleado':          
-            if (newValue !== null && newValue > 0 && newValue !== rowData[field] && newValue > rowData['horas_MinimasTipoEmpleado']) {
-                rowData[field] = newValue;
-                put(rowData);
-            } else {
-                event.preventDefault();
-            }
-            break;
-        default:
-            break;
+      //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
+      case 'nombre_GradoEstudio':
+        if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
+          rowData[field] = newValue; put(rowData);
+        }else{
+          event.preventDefault();
+        } 
+      break;
+      case 'horas_MinimasGradoEstudio':
+        if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
+          rowData[field] = newValue; put(rowData);
+        }else{
+          event.preventDefault();          
+        } 
+      break;
+case 'horas_MaximasGradoEstudio':
+    if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
+        rowData[field] = newValue; put(rowData);
+      }else{
+        event.preventDefault();          
+      } 
+    break;
+      default:
+      break;
     }
     seteditando(false);
     };
+
 
  //!!!EXTRAS CAMPOS
 
@@ -237,8 +239,9 @@ const put = (rowData) =>{
     return value==='' || regex.test(value);
   };
 
-    
-    return (
+
+
+return (
 <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
@@ -248,10 +251,10 @@ const put = (rowData) =>{
         
           <div className="field col-10">
           <label>Nombre</label>
-          <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_TipoEmpleado} maxLength={255}
+          <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_GradoEstudio} maxLength={255}
               onChange={(event) => {
                 if (validarTexto(event.target.value)) {
-                  setnombre_TipoEmpleado(event.target.value);
+                  setnombre_GradoEstudio(event.target.value);
                 }        
               }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
@@ -260,10 +263,10 @@ const put = (rowData) =>{
           
           <div className="field col-2">
               <label>Horas Minimas</label>
-              <InputText type="text" keyfilter="pint" value={horas_MinimasTipoEmpleado} maxLength={11}
+              <InputText type="text" keyfilter="pint" value={horas_MinimasGradoEstudio} maxLength={11}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
-                      sethoras_MinimasTipoEmpleado(event.target.value);
+                      sethoras_MinimasGradoEstudio(event.target.value);
                     }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
@@ -271,10 +274,10 @@ const put = (rowData) =>{
 
           <div className="field col-2">
               <label>Horas Maximas</label>
-              <InputText type="text" keyfilter="pint" value={horas_MaximasTipoEmpleado} maxLength={11}
+              <InputText type="text" keyfilter="pint" value={horas_MaximasGradoEstudio} maxLength={11}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
-                      sethoras_MaximasTipoEmpleado(event.target.value);
+                      sethoras_MaximasGradoEstudio(event.target.value);
                     }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
@@ -290,15 +293,16 @@ const put = (rowData) =>{
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
-        <DataTable value={filtrotipoempleado.length ? filtrotipoempleado :tipoempleadolist} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
+        <DataTable value={filtrogradoestudio.length ? filtrogradoestudio :gradoestudiolist} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_TipoEmpleado' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_GradoEstudio' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
           })}
         </DataTable>
       </Panel> 
   </>
-    )
+
+)
 
 }
 
-export default TipoEmpleado
+export default GradoEstudio
