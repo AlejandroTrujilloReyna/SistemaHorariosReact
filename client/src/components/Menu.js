@@ -87,6 +87,11 @@ const Menu = () => {
             label: 'Grado de Estudios',
             icon: 'pi pi-building-columns',
             command: () => {window.location.href='/GradoEstudio';}
+        }, 
+        {
+            label: 'Docente',
+            icon: 'pi pi-building-columns',
+            command: () => {window.location.href='/Docente';}
         }                
     ];
     const start = <img alt="logo" src="https://comunicacioninstitucional.uabc.mx/sites/default/files/inline-images/escudo-actualizado-2022.png" height="40" className="mr-2"></img>;         

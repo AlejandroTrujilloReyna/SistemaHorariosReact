@@ -26,6 +26,9 @@ router.post("/registrarGradoEstudio",(req,res)=>{
             return res.status(400).send("La clave del Grado de Estudio ya existe");
         }
 
+        if(horas_MinimasGradoEstudio > horas_MaximasGradoEstudio){
+            return res.status(403).send("Hay error en las horas");
+        }
        /* db.query('SELECT * FROM tipoempleado WHERE nombre_Un = ? AND clave_PlanEstudios = ?',[nombre_UnidadAprendizaje,clave_PlanEstudios], (err, results) => {
             if(err) {
                 console.log(err);
@@ -74,6 +77,10 @@ router.put("/modificarGradoEstudio", (req, res) => {
 
         if(results.length > 0) {
             return res.status(401).send("El grado de estudio ya existe");
+        }
+
+        if(horas_MinimasGradoEstudio > horas_MaximasGradoEstudio){
+            return res.status(403).send("Hay error en las horas");
         }
         db.query('UPDATE gradoestudio SET nombre_GradoEstudio = ?, horas_MinimasGradoEstudio = ?, horas_MaximasGradoEstudio = ? WHERE clave_GradoEstudio = ?',[ nombre_GradoEstudio, horas_MinimasGradoEstudio, horas_MaximasGradoEstudio, clave_GradoEstudio],(err,result) =>{
             if (err) {

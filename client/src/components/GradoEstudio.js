@@ -67,6 +67,8 @@ const mostrarExito = (mensaje) => {
       mostrarAdvertencia("Clave ya existente");
     } else if(error.response.status === 401){
       mostrarAdvertencia("Nombre ya existente");
+    }else if(error.response.status === 403){
+      mostrarAdvertencia("Favor de Revisar las horas");        
     } else if(error.response.status === 500){
       mostrarError("Error en el sistema");   
     }  

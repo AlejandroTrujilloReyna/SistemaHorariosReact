@@ -44,6 +44,9 @@ app.use("/tipoempleado", tipoempleadoRoutes);
 const gradoestudioRoutes = require("./routes/gradoestudio")
 app.use("/gradoestudio", gradoestudioRoutes);
 
+const docenteRoutes = require("./routes/docente")
+app.use("/docente", docenteRoutes);
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });

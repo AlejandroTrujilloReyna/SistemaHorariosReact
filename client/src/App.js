@@ -19,6 +19,7 @@ import UATipoSubGrupoHoras from './components/UATipoSubGrupoHoras';
 import Usuario from './components/Usuario';
 import TipoEmpleado from './components/TipoEmpleado';
 import GradoEstudio from './components/GradoEstudio';
+import Docente from './components/Docente';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path='/Usuario' element={<Usuario/>}/>
           <Route path='/TipoEmpleado' element={<TipoEmpleado/>}/>
           <Route path='/GradoEstudio' element={<GradoEstudio/>}/>
+          <Route path='/Docente' element={<Docente/>}/>
         </Routes>
       </BrowserRouter>
     </div>

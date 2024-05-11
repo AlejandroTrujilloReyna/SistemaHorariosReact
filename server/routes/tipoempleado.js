@@ -26,6 +26,10 @@ router.post("/registrarTipoEmpleado",(req,res)=>{
             return res.status(400).send("La clave del tipo empleado ya existe");
         }
 
+        if(horas_MaximasTipoEmpleado > horas_MaximasTipoEmpleado){
+            return res.status(403).send("Hay error en las horas");
+        }
+
        /* db.query('SELECT * FROM tipoempleado WHERE nombre_Un = ? AND clave_PlanEstudios = ?',[nombre_UnidadAprendizaje,clave_PlanEstudios], (err, results) => {
             if(err) {
                 console.log(err);
@@ -74,6 +78,11 @@ router.put("/modificarTipoEmpleado", (req, res) => {
         if(results.length > 0) {
             return res.status(401).send("El nombre del Tipo de Empleado ya existe");
         }
+
+        if(horas_MinimasTipoEmpleado > horas_MaximasTipoEmpleado){
+            return res.status(403).send("Hay error en las horas");
+        }
+        
         db.query('UPDATE tipoempleado SET nombre_TipoEmpleado = ?, horas_MinimasTipoEmpleado = ?, horas_MaximasTipoEmpleado = ? WHERE clave_TipoEmpleado = ?',[nombre_TipoEmpleado, horas_MinimasTipoEmpleado, horas_MaximasTipoEmpleado,clave_TipoEmpleado],(err,result) =>{
             if (err) {
                 console.log(err);
