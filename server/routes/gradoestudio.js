@@ -12,8 +12,8 @@ const db = mysql.createConnection({
 router.post("/registrarGradoEstudio",(req,res)=>{
     const clave_GradoEstudio = req.body.clave_GradoEstudio;
     const nombre_GradoEstudio = req.body.nombre_GradoEstudio;
-    const horas_MinimasGradoEstudio = req.body.horas_MinimasGradoEstudio;
-    const horas_MaximasGradoEstudio = req.body.horas_MaximasGradoEstudio;
+    const horas_MinimasGradoEstudio = parseInt(req.body.horas_MinimasGradoEstudio);
+    const horas_MaximasGradoEstudio = parseInt(req.body.horas_MaximasGradoEstudio);
   
 
     db.query('SELECT * FROM gradoestudio WHERE nombre_GradoEstudio = ?',[nombre_GradoEstudio], (err, results) => {
@@ -66,8 +66,8 @@ router.put("/modificarGradoEstudio", (req, res) => {
     
     const clave_GradoEstudio = req.body.clave_GradoEstudio;
     const nombre_GradoEstudio = req.body.nombre_GradoEstudio;
-    const horas_MinimasGradoEstudio = req.body.horas_MinimasGradoEstudio;
-    const horas_MaximasGradoEstudio = req.body.horas_MaximasGradoEstudio;
+    const horas_MinimasGradoEstudio = parseInt(req.body.horas_MinimasGradoEstudio);
+    const horas_MaximasGradoEstudio = parseInt(req.body.horas_MaximasGradoEstudio);
   
     db.query('SELECT * FROM gradoestudio WHERE nombre_GradoEstudio = ? AND clave_GradoEstudio != ?',[nombre_GradoEstudio, clave_GradoEstudio], (err, results) => {
         if(err) {

@@ -43,12 +43,6 @@ const TipoEmpleado = () => {
       mostrarAdvertencia("Existen campos vacios");
       return;
     }
-
-    if(horas_MaximasTipoEmpleado < horas_MinimasTipoEmpleado){
-        mostrarAdvertencia("Las horas Maximas son menores que las Horas Minimas");
-        return;
-    }
-
   //MANDAR A LLAMAR AL REGISTRO SERVICE
   TipoEmpleadoService.registrarTipoEmpleado({
     clave_TipoEmpleado:clave_TipoEmpleado,
@@ -62,9 +56,7 @@ const TipoEmpleado = () => {
       limpiarCampos();
     }
   }).catch(error=>{//EXCEPCIONES
-    if (error.response.status === 400) {
-      mostrarAdvertencia("Clave ya existente");
-    } else if(error.response.status === 401){
+    if(error.response.status === 401){
       mostrarAdvertencia("Nombre ya existente");
     }else if(error.response.status === 403){
       mostrarAdvertencia("Favor de Revisar las horas");        
@@ -96,6 +88,9 @@ const put = (rowData) =>{
       if (error.response.status === 401) {
         mostrarAdvertencia("Nombre ya existente");
         get();
+      }else if(error.response.status === 403){
+        mostrarAdvertencia("Favor de Revisar las horas");
+        get();  
       }
       else if (error.response.status === 500) {
         mostrarError("Error del sistema");
@@ -187,10 +182,6 @@ const put = (rowData) =>{
  const onCellEditComplete = (e) => {
     let { rowData, newValue, field, originalEvent: event } = e;
       // Función para validar y aplicar los cambios en el campo editado
-    
-        
-    
-
     switch (field) {
         // CADA CAMPO QUE SE PUEDA MODIFICAR ES UN CASO
         case 'nombre_TipoEmpleado':
@@ -201,18 +192,15 @@ const put = (rowData) =>{
           } 
             break;
         case 'horas_MinimasTipoEmpleado':
-            //newValue > 0
-            if (newValue !== null && newValue > 0  && newValue !== rowData[field] && newValue < rowData['horas_MaximasTipoEmpleado']) {
-                rowData[field] = newValue;
-                put(rowData);
+            if (newValue !== null && newValue > 0  && newValue !== rowData[field]) {
+                rowData[field] = newValue; put(rowData);
             } else {
                 event.preventDefault()
             }
             break;
         case 'horas_MaximasTipoEmpleado':          
-            if (newValue !== null && newValue > 0 && newValue !== rowData[field] && newValue > rowData['horas_MinimasTipoEmpleado']) {
-                rowData[field] = newValue;
-                put(rowData);
+            if (newValue !== null && newValue > 0 && newValue !== rowData[field]) {
+                rowData[field] = newValue; put(rowData);
             } else {
                 event.preventDefault();
             }
@@ -248,7 +236,7 @@ const put = (rowData) =>{
       <Panel header="Registrar Tipo de Empleado" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
         
-          <div className="field col-10">
+          <div className="field col-8">
           <label>Nombre</label>
           <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_TipoEmpleado} maxLength={255}
               onChange={(event) => {

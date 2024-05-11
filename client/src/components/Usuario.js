@@ -204,17 +204,6 @@ const Usuario = () => {
     onKeyDown={(e) => e.stopPropagation()} />;
   };
 
-  //EDITAR NUMEROS
-  const numberEditor = (options) => {
-    return <InputText keyfilter="pint"  type="text" maxLength={11} value={options.value} 
-    onChange={(e) => { 
-      if (validarNumero(e.target.value)) { 
-        options.editorCallback(e.target.value)
-      }
-    }}
-    onKeyDown={(e) => e.stopPropagation()} />;
-  };
-
   //EDITAR CORREO
   const correoEditor = (options) => {
     return <InputText keyfilter="email"  type="text" maxLength={255} value={options.value} 
@@ -316,13 +305,6 @@ const Usuario = () => {
     // Verificar si el valor coincide con la expresión regular
     return regex.test(value);
   };
-
-  const validarNumero = (value) => {
-    // Expresión regular para validar números enteros positivos
-    const regex = /^[0-9]\d*$/;
-    // Verificar si el valor coincide con la expresión regular
-    return value==='' || regex.test(value);
-  }; 
 
   const validarCorreo = (value) => {
     // Expresión regular para validar el formato de un correo electrónico

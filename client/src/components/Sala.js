@@ -108,7 +108,7 @@ const Sala = () => {
   const limpiarCampos = () =>{
     setnombre_Sala("");
     setcapacidad_Sala(0);
-    setvalidar_Traslape(0);
+    setvalidar_Traslape(1);
     setnota_Descriptiva("");
     setclave_Edificio(0);
     setclave_TipoSala(0);
@@ -341,9 +341,7 @@ const Sala = () => {
               <label>Nombre</label>
               <InputText type="text" keyfilter={ /^[0-9a-zA-Z]*$/} value={nombre_Sala} maxLength={255}
                   onChange={(event)=>{
-                    if (validarTexto(event.target.value)) {  
                       setnombre_Sala(event.target.value);
-                    }
                   }}  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>

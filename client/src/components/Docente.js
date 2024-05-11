@@ -125,8 +125,8 @@ const Docente = () => {
   //COLUMNAS PARA LA TABLA
   const columns = [
     {field: 'no_EmpleadoDocente', header: 'NO.Empleado' },
-    {field: 'horas_MinimasDocente', header: 'Rango Min' },
-    {field: 'horas_MaximasDocente', header: 'Rango Max' },
+    {field: 'horas_MinimasDocente', header: 'Horas minimas' },
+    {field: 'horas_MaximasDocente', header: 'Horas maximas' },
     {field: 'horas_Externas', header: 'Horas Externas' },
     {field: 'clave_TipoEmpleado', header: 'Tipo Empleado' },
     {field: 'clave_GradoEstudio', header: 'Grado Estudio' },
@@ -499,7 +499,7 @@ const Docente = () => {
         </div>
         <DataTable value={filtroDocente.length ? filtroDocente :docentesList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_Edificio' ? null : (options) => cellEditor(options)}
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '5%' }} editor={field === 'clave_Edificio' ? null : (options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
               body={(rowData) => renderBody(rowData, field)} // Llama a la función renderBody para generar el cuerpo de la columna
               />;

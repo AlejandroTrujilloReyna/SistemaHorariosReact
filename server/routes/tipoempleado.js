@@ -12,8 +12,8 @@ const db = mysql.createConnection({
 router.post("/registrarTipoEmpleado",(req,res)=>{
     const clave_TipoEmpleado = req.body.clave_TipoEmpleado;
     const nombre_TipoEmpleado = req.body.nombre_TipoEmpleado;
-    const horas_MinimasTipoEmpleado = req.body.horas_MinimasTipoEmpleado;
-    const horas_MaximasTipoEmpleado = req.body.horas_MaximasTipoEmpleado;
+    const horas_MinimasTipoEmpleado = parseInt(req.body.horas_MinimasTipoEmpleado);
+    const horas_MaximasTipoEmpleado = parseInt(req.body.horas_MaximasTipoEmpleado);
   
 
     db.query('SELECT * FROM tipoempleado WHERE nombre_TipoEmpleado = ?',[nombre_TipoEmpleado], (err, results) => {
@@ -23,34 +23,23 @@ router.post("/registrarTipoEmpleado",(req,res)=>{
         }
 
         if(results.length > 0) {
-            return res.status(400).send("La clave del tipo empleado ya existe");
+            return res.status(401).send("El nombre del tipo empleado ya existe");
         }
 
-        if(horas_MaximasTipoEmpleado > horas_MaximasTipoEmpleado){
+        if(horas_MinimasTipoEmpleado > horas_MaximasTipoEmpleado){
             return res.status(403).send("Hay error en las horas");
         }
 
-       /* db.query('SELECT * FROM tipoempleado WHERE nombre_Un = ? AND clave_PlanEstudios = ?',[nombre_UnidadAprendizaje,clave_PlanEstudios], (err, results) => {
+        db.query('INSERT INTO tipoempleado(clave_TipoEmpleado, nombre_TipoEmpleado, horas_MinimasTipoEmpleado, horas_MaximasTipoEmpleado) VALUES (?, ?, ?, ?)',
+        [clave_TipoEmpleado, nombre_TipoEmpleado, horas_MinimasTipoEmpleado, horas_MaximasTipoEmpleado], (err, result) => {
             if(err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
             }
-    
-            if(results.length > 0) {
-                return res.status(401).send("El nombre de la Unidad de Aprendizaje ya existe en el Plan de Estudios");
-            }
-         */
-            db.query('INSERT INTO tipoempleado(clave_TipoEmpleado, nombre_TipoEmpleado, horas_MinimasTipoEmpleado, horas_MaximasTipoEmpleado) VALUES (?, ?, ?, ?)',
-            [clave_TipoEmpleado, nombre_TipoEmpleado, horas_MinimasTipoEmpleado, horas_MaximasTipoEmpleado], (err, result) => {
-                if(err) {
-                    console.log(err);
-                    return res.status(500).send("Error interno del servidor");
-                }
-                res.status(200).send("Tipo de Empleado registrado con éxito");
-            });
-        });    
-    });
-//});
+            res.status(200).send("Tipo de Empleado registrado con éxito");
+        });
+    });    
+});
 
 
 router.get("/consultarTipoEmpleado", (req, res) => {
@@ -66,10 +55,10 @@ router.get("/consultarTipoEmpleado", (req, res) => {
 router.put("/modificarTipoEmpleado", (req, res) => {
     const clave_TipoEmpleado = req.body.clave_TipoEmpleado;
     const nombre_TipoEmpleado = req.body.nombre_TipoEmpleado;
-    const horas_MinimasTipoEmpleado = req.body.horas_MinimasTipoEmpleado;
-    const horas_MaximasTipoEmpleado = req.body.horas_MaximasTipoEmpleado;
+    const horas_MinimasTipoEmpleado = parseInt(req.body.horas_MinimasTipoEmpleado);
+    const horas_MaximasTipoEmpleado = parseInt(req.body.horas_MaximasTipoEmpleado);
   
-    db.query('SELECT * FROM tipoempleado WHERE nombre_TipoEmpleado = ? AND clave_TipoEmpleado != ?',[clave_TipoEmpleado, nombre_TipoEmpleado], (err, results) => {
+    db.query('SELECT * FROM tipoempleado WHERE nombre_TipoEmpleado = ? AND clave_TipoEmpleado != ?',[nombre_TipoEmpleado, clave_TipoEmpleado], (err, results) => {
         if(err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");

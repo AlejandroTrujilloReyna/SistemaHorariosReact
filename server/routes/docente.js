@@ -11,9 +11,9 @@ const db = mysql.createConnection({
 
 router.post("/registrarDocente", (req, res) => {
     const no_EmpleadoDocente = req.body.no_EmpleadoDocente;
-    const horas_MinimasDocente = req.body.horas_MinimasDocente;
-    const horas_MaximasDocente = req.body.horas_MaximasDocente;    
-    const horas_Externas = req.body.horas_Externas;
+    const horas_MinimasDocente = parseInt(req.body.horas_MinimasDocente);
+    const horas_MaximasDocente = parseInt(req.body.horas_MaximasDocente);    
+    const horas_Externas = parseInt(req.body.horas_Externas);
     const clave_TipoEmpleado = req.body.clave_TipoEmpleado;
     const clave_GradoEstudio = req.body.clave_GradoEstudio;
     const clave_Usuario = req.body.clave_Usuario;
@@ -56,12 +56,11 @@ router.get("/consultarDocente", (req, res) => {
 
 router.put("/modificarDocente", (req, res) => {
     const no_EmpleadoDocente = req.body.no_EmpleadoDocente;
-    const horas_MinimasDocente = req.body.horas_MinimasDocente;
-    const horas_MaximasDocente = req.body.horas_MaximasDocente;    
-    const horas_Externas = req.body.horas_Externas;
+    const horas_MinimasDocente = parseInt(req.body.horas_MinimasDocente);
+    const horas_MaximasDocente = parseInt(req.body.horas_MaximasDocente);    
+    const horas_Externas = parseInt(req.body.horas_Externas);
     const clave_TipoEmpleado = req.body.clave_TipoEmpleado;
     const clave_GradoEstudio = req.body.clave_GradoEstudio;
-    const clave_Usuario = req.body.clave_Usuario;
       
     if(horas_MinimasDocente > horas_MaximasDocente){
         return res.status(403).send("Hay error en las horas");

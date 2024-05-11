@@ -11,18 +11,18 @@ import { Toast } from 'primereact/toast';
 import GradoEstudioService from '../services/GradoEstudioService';
 
 const GradoEstudio = () => {
-
-    const [clave_GradoEstudio,setclave_GradoEstudio] = useState(0);
-    const [nombre_GradoEstudio,setnombre_GradoEstudio] = useState("");
-    const [horas_MinimasGradoEstudio,sethoras_MinimasGradoEstudio] = useState(0);
-    const [horas_MaximasGradoEstudio,sethoras_MaximasGradoEstudio] = useState(0);
-  
-    const [gradoestudiolist,setgradoestudiolist] = useState([]);
-    const [filtrogradoestudio,setfiltrogradoestudio] = useState([]);
-  
-    const [editando,seteditando] = useState(false);
-
-    const toast = useRef(null);
+  //VARIABLES PARA EL REGISTRO
+  const [clave_GradoEstudio,setclave_GradoEstudio] = useState(0);
+  const [nombre_GradoEstudio,setnombre_GradoEstudio] = useState("");
+  const [horas_MinimasGradoEstudio,sethoras_MinimasGradoEstudio] = useState(0);
+  const [horas_MaximasGradoEstudio,sethoras_MaximasGradoEstudio] = useState(0);
+  //VARIABLES PARA LA CONSULTA
+  const [gradoestudiolist,setgradoestudiolist] = useState([]);
+  const [filtrogradoestudio,setfiltrogradoestudio] = useState([]);
+  //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
+  const [editando,seteditando] = useState(false);
+  //VARIABLES PARA EL ERROR
+  const toast = useRef(null);
 
 //MENSAJE DE EXITO
 const mostrarExito = (mensaje) => {
@@ -39,17 +39,11 @@ const mostrarExito = (mensaje) => {
 
   //FUNCION PARA REGISTRAR
   const add = ()=>{
-    //VALIDACION DE CAMPOS VACIOS
-    if (!nombre_GradoEstudio || !horas_MinimasGradoEstudio || !horas_MaximasGradoEstudio) {
-      mostrarAdvertencia("Existen campos vacios");
-      return;
-    }
-    //VALIDACION DE HORAS MAXIMAS MENOR A LAS HORAS MINIMAS
-    if(horas_MaximasGradoEstudio <= horas_MinimasGradoEstudio){
-        mostrarAdvertencia("Las horas Maximas son menores que las Horas Minimas");
-        return;
-    }
-
+  //VALIDACION DE CAMPOS VACIOS
+  if (!nombre_GradoEstudio || !horas_MinimasGradoEstudio || !horas_MaximasGradoEstudio) {
+    mostrarAdvertencia("Existen campos vacios");
+    return;
+  }
   //MANDAR A LLAMAR AL REGISTRO SERVICE
   GradoEstudioService.registrarGradoEstudio({
     clave_GradoEstudio:clave_GradoEstudio,
@@ -88,15 +82,7 @@ const mostrarExito = (mensaje) => {
 
 
 //FUNCION PARA LA MODIFICACION
-
-
-
-
 const put = (rowData) =>{
-
-
-
-
     GradoEstudioService.modificarGradoEstudio(rowData).then((response)=>{//CASO EXITOSO
       if(response.status === 200){
         mostrarExito("Modificacion exitosa");
@@ -105,8 +91,10 @@ const put = (rowData) =>{
       if (error.response.status === 401) {
         mostrarAdvertencia("Nombre ya existente");
         get();
-      }
-      else if (error.response.status === 500) {
+      }else if(error.response.status === 403){
+        mostrarAdvertencia("Favor de Revisar las horas");
+        get();        
+      }else if (error.response.status === 500) {
         mostrarError("Error del sistema");
       }
     });
@@ -122,13 +110,13 @@ const put = (rowData) =>{
     sethoras_MaximasGradoEstudio(0)
   } 
 
-   //COLUMNAS PARA LA TABLA
-   const columns = [
+  //COLUMNAS PARA LA TABLA
+  const columns = [
     { field: 'clave_GradoEstudio', header: 'Clave' },
     { field: 'nombre_GradoEstudio', header: 'Nombre' },
     {field: 'horas_MinimasGradoEstudio', header: 'Hora Minima'},
     {field: 'horas_MaximasGradoEstudio', header: 'Hora Maxima'}  
-];
+  ];
 
   //MANDAR A LLAMAR LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
   useEffect(() => {
@@ -241,17 +229,15 @@ case 'horas_MaximasGradoEstudio':
     return value==='' || regex.test(value);
   };
 
-
-
 return (
 <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
       {/*PANEL PARA EL REGISTRO*/}
-      <Panel header="Registrar Tipo de Empleado" className='mt-3' toggleable>
+      <Panel header="Registrar Grado de Estudios" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
         
-          <div className="field col-10">
+          <div className="field col-8">
           <label>Nombre</label>
           <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_GradoEstudio} maxLength={255}
               onChange={(event) => {
@@ -291,7 +277,7 @@ return (
         </div>      
       </Panel>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Tipos de Empleados" className='mt-3' toggleable>
+      <Panel header="Consultar Grados de Estudio" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
