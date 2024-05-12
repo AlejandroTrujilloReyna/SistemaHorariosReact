@@ -67,7 +67,7 @@ const Usuario = () => {
       if (error.response.status === 400) {        
         mostrarAdvertencia("Clave ya existente");
       }else if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");        
+        mostrarAdvertencia("Correo ya existente");        
       }else if(error.response.status === 500){  
         mostrarError("Error interno del servidor");
       }    

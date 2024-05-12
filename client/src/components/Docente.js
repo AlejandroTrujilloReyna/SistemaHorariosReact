@@ -74,6 +74,8 @@ const Docente = () => {
         mostrarAdvertencia("Clave ya existente");
       }else if(error.response.status === 403){
         mostrarAdvertencia("Favor de Revisar las horas");        
+      }else if(error.response.status === 405){
+        mostrarAdvertencia("Solo puede haber un usuario por docente");        
       }else if(error.response.status === 500){  
         mostrarError("Error interno del servidor");
       }     
@@ -101,6 +103,9 @@ const Docente = () => {
       if (error.response.status === 403) {
         mostrarAdvertencia("Favor de Revisar las horas");
         get();
+      }else if(error.response.status === 405){
+        mostrarAdvertencia("Solo puede haber un usuario por docente");
+        get();        
       }else if (error.response.status === 500) {
         mostrarError("Error del sistema");
       }
@@ -154,8 +159,8 @@ const Docente = () => {
     const nombre_Us = usuarios.find(u => u.clave_Usuario === item.clave_Usuario)?.correo || '';
         return (
             item.no_EmpleadoDocente.toString().includes(value) ||
-            item.horas_MinimasDocente.toLowerCase().includes(value) ||
-            item.horas_MaximasDocente.toLowerCase().includes(value) ||
+            item.horas_MinimasDocente.toString().includes(value) ||
+            item.horas_MaximasDocente.toString().includes(value) ||
             tipoEmpl.toString().includes(value) ||
             gradoEst.toString().includes(value) ||
             nombreTipoEmpl.toLowerCase().includes(value) ||
@@ -499,7 +504,7 @@ const Docente = () => {
         </div>
         <DataTable value={filtroDocente.length ? filtroDocente :docentesList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '5%' }} editor={field === 'clave_Edificio' ? null : (options) => cellEditor(options)}
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '5%' }} editor={field === 'no_EmpleadoDocente' ? null : (options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
               body={(rowData) => renderBody(rowData, field)} // Llama a la función renderBody para generar el cuerpo de la columna
               />;

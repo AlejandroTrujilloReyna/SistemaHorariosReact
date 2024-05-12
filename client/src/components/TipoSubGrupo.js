@@ -125,7 +125,7 @@ const TipoSubGrupo = () => {
       const filteredData = tiposubgrupoList.filter((item) => {
           return (
               item.clave_TipoSubGrupo.toString().includes(value) ||
-              item.nombre_TipoSubGrupo.toString().includes(value)        
+              item.nombre_TipoSubGrupo.toLowerCase().includes(value)    
           );
       });
       setfiltrotiposubgrupo(filteredData);

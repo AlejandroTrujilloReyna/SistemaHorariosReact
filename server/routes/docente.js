@@ -27,19 +27,28 @@ router.post("/registrarDocente", (req, res) => {
         if(results.length > 0) {
             return res.status(400).send("El no.Empleado del Docente ya existe");
         }
+        db.query('SELECT * FROM docente WHERE clave_Usuario = ?',[clave_Usuario], (err, results) => {
+            if(err) {
+                console.log(err);
+                return res.status(500).send("Error interno del servidor");
+            }
 
-        if(horas_MinimasDocente > horas_MaximasDocente){
-            return res.status(403).send("Hay error en las horas");
-        }
-    
-        db.query('INSERT INTO docente (no_EmpleadoDocente, horas_MinimasDocente, horas_MaximasDocente, horas_Externas,clave_TipoEmpleado,clave_GradoEstudio,clave_Usuario) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [no_EmpleadoDocente,horas_MinimasDocente,horas_MaximasDocente,horas_Externas, clave_TipoEmpleado, clave_GradoEstudio, clave_Usuario], (err, result) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).send("Error interno del servidor");
-                }
-                res.status(200).send("Docente registrado con éxito");
-        });        
+            if(results.length > 0) {
+                return res.status(405).send("Solo puede haber un usuario por docente");
+            }
+        
+            if(horas_MinimasDocente > horas_MaximasDocente){
+                return res.status(403).send("Hay error en las horas");
+            }
+            db.query('INSERT INTO docente (no_EmpleadoDocente, horas_MinimasDocente, horas_MaximasDocente, horas_Externas,clave_TipoEmpleado,clave_GradoEstudio,clave_Usuario) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [no_EmpleadoDocente,horas_MinimasDocente,horas_MaximasDocente,horas_Externas, clave_TipoEmpleado, clave_GradoEstudio, clave_Usuario], (err, result) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).send("Error interno del servidor");
+                    }
+                    res.status(200).send("Docente registrado con éxito");
+            });        
+        });
     });
 });
 
@@ -61,19 +70,29 @@ router.put("/modificarDocente", (req, res) => {
     const horas_Externas = parseInt(req.body.horas_Externas);
     const clave_TipoEmpleado = req.body.clave_TipoEmpleado;
     const clave_GradoEstudio = req.body.clave_GradoEstudio;
+    const clave_Usuario = req.body.clave_Usuario;
       
     if(horas_MinimasDocente > horas_MaximasDocente){
         return res.status(403).send("Hay error en las horas");
     }
-
-    db.query('UPDATE docente SET horas_MinimasDocente=?, horas_MaximasDocente=?,horas_Externas=?, clave_TipoEmpleado=?, clave_GradoEstudio=? WHERE no_EmpleadoDocente=?',
-    [horas_MinimasDocente, horas_MaximasDocente, horas_Externas, clave_TipoEmpleado, clave_GradoEstudio, no_EmpleadoDocente],(err,result) =>{
-        if (err) {
+    db.query('SELECT * FROM docente WHERE clave_Usuario = ? AND no_EmpleadoDocente != ?',[clave_Usuario,no_EmpleadoDocente], (err, results) => {
+        if(err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
         }
-        res.status(200).send("Docente modificado con exito");        
-    });    
+
+        if(results.length > 0) {
+            return res.status(405).send("Solo puede haber un usuario por docente");
+        }
+        db.query('UPDATE docente SET horas_MinimasDocente=?, horas_MaximasDocente=?,horas_Externas=?, clave_TipoEmpleado=?, clave_GradoEstudio=? WHERE no_EmpleadoDocente=?',
+        [horas_MinimasDocente, horas_MaximasDocente, horas_Externas, clave_TipoEmpleado, clave_GradoEstudio, no_EmpleadoDocente],(err,result) =>{
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error interno del servidor");
+            }
+            res.status(200).send("Docente modificado con exito");        
+        });
+    });        
 });
 
 module.exports = router;
