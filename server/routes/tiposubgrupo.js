@@ -13,14 +13,14 @@ router.post("/registrarTipoSubGrupo", (req, res) => {
     const clave_TipoSubGrupo = req.body.clave_TipoSubGrupo;
     const nombre_TipoSubGrupo = req.body.nombre_TipoSubGrupo;
 
-    db.query('SELECT * FROM tiposubgrupo WHERE clave_TipoSubGrupo = ?',[clave_TipoSubGrupo], (err, results) => {
+    db.query('SELECT * FROM tiposubgrupo WHERE nombre_TipoSubGrupo= ?',[nombre_TipoSubGrupo], (err, results) => {
         if(err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
         }
 
         if(results.length > 0) {
-            return res.status(400).send("La clave del Tipo SubGrupo ya existe");
+            return res.status(401).send("El nombre del Tipo SubGrupo ya existe");
         }
         db.query('SELECT * FROM tiposubgrupo WHERE nombre_TipoSubGrupo = ?',[nombre_TipoSubGrupo], (err, results) => {
             if(err) {

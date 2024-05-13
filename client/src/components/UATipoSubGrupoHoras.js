@@ -15,7 +15,6 @@ import UATipoSubGrupoHorasService from '../services/UATipoSubGrupoHorasService'
 
 const UATipoSubGrupoHoras = () => {
   //VARIABLES PARA EL REGISTRO
-  const [clave_UATipoSubGrupoHoras,setclave_UATipoSubGrupoHoras] = useState(0);
   const [horas,sethoras] = useState(0);
   const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState(null);
   const [clave_TipoSubGrupo,setclave_TipoSubGrupo] = useState(null);
@@ -47,13 +46,12 @@ const UATipoSubGrupoHoras = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    if (!clave_UATipoSubGrupoHoras || !clave_TipoSubGrupo || !clave_UnidadAprendizaje || !horas) {
+    if (!clave_TipoSubGrupo || !clave_UnidadAprendizaje || !horas) {
       mostrarAdvertencia("Existen campos vacios");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
     UATipoSubGrupoHorasService.registrarUATipoSubGrupoHoras({
-      clave_UATipoSubGrupoHoras:clave_UATipoSubGrupoHoras,
       horas:horas,
       clave_TipoSubGrupo:clave_TipoSubGrupo,
       clave_UnidadAprendizaje:clave_UnidadAprendizaje,
@@ -65,9 +63,7 @@ const UATipoSubGrupoHoras = () => {
         limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES
-      if (error.response.status === 400) {
-        mostrarAdvertencia("Clave ya existente");
-      } else if (error.response.status === 401) {
+      if (error.response.status === 401) {
         mostrarAdvertencia("Subgrupo ya existente para esa unidad de aprendizaje");      
       }else if(error.response.status === 500){          
         mostrarError("Error interno del servidor");
@@ -107,7 +103,6 @@ const UATipoSubGrupoHoras = () => {
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
   const limpiarCampos = () =>{
     setclave_TipoSubGrupo(0);
-    setclave_UATipoSubGrupoHoras(0);
     setclave_UnidadAprendizaje(0);
     sethoras(0);
   }
@@ -145,6 +140,7 @@ const UATipoSubGrupoHoras = () => {
     });
     setfiltrouatiposubgrupohoras(filteredData);
   }; 
+
 
   //MANDAR A LLAMAR A LA LISTA DE TIPOS DE SUBGRUPO
   useEffect(() => {
@@ -303,16 +299,6 @@ const UATipoSubGrupoHoras = () => {
       {/*PANEL PARA EL REGISTRO*/}
       <Panel header="Registrar UA Tipo SubGrupo" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
-          <div className="field col-2">
-              <label>Clave</label>
-              <InputText type="text" keyfilter="pint" value={clave_UATipoSubGrupoHoras} maxLength={10}
-                  onChange={(event)=>{
-                    if (validarNumero(event.target.value)) {  
-                      setclave_UATipoSubGrupoHoras(event.target.value);
-                    }
-                  }}  
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
-          </div>
           <div className="field col-2">
               <label>Horas</label>
               <InputText type="text" keyfilter="pint" value={horas} maxLength={10}

@@ -15,15 +15,7 @@ router.post("/registrarUATipoSubGrupoHoras", (req, res) => {
     const clave_UnidadAprendizaje = req.body.clave_UnidadAprendizaje;
     const clave_TipoSubGrupo = req.body.clave_TipoSubGrupo;
 
-    db.query('SELECT * FROM uatiposubgrupohoras WHERE clave_UATipoSubGrupoHoras = ?',[clave_UATipoSubGrupoHoras], (err, results) => {
-        if(err) {
-            console.log(err);
-            return res.status(500).send("Error interno del servidor");
-        }
-
-        if(results.length > 0) {
-            return res.status(400).send("La clave del SubGrupo ya existe");
-        }
+    
         db.query('SELECT * FROM uatiposubgrupohoras WHERE clave_UnidadAprendizaje = ? AND clave_TipoSubGrupo = ?',[clave_UnidadAprendizaje, clave_TipoSubGrupo], (err, results) => {
             if(err) {
                 console.log(err);
@@ -31,7 +23,7 @@ router.post("/registrarUATipoSubGrupoHoras", (req, res) => {
             }
     
             if(results.length > 0) {
-                return res.status(401).send("Tipo de subgrupo existente en el programa educativo");
+                return res.status(401).send("Tipo de subgrupo existente en la Unidad de Aprendizaje");
             }
             db.query('INSERT INTO uatiposubgrupohoras(clave_UATipoSubGrupoHoras, horas, clave_UnidadAprendizaje, clave_TipoSubGrupo) VALUES (?, ?, ?, ?)',
             [clave_UATipoSubGrupoHoras, horas, clave_UnidadAprendizaje, clave_TipoSubGrupo], (err, result) => {
@@ -42,7 +34,7 @@ router.post("/registrarUATipoSubGrupoHoras", (req, res) => {
                 res.status(200).send("SubGrupo registrado con éxito");
             });
         });      
-    });
+    
 });
 
 router.get("/consultarUATipoSubGrupoHoras", (req, res) => {

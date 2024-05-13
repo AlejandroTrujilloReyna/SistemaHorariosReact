@@ -23,22 +23,13 @@ router.post("/registrarGradoEstudio",(req,res)=>{
         }
 
         if(results.length > 0) {
-            return res.status(400).send("La clave del Grado de Estudio ya existe");
+            return res.status(401).send("El nombre del Grado de Estudio ya existe");
         }
 
         if(horas_MinimasGradoEstudio > horas_MaximasGradoEstudio){
             return res.status(403).send("Hay error en las horas");
         }
-       /* db.query('SELECT * FROM tipoempleado WHERE nombre_Un = ? AND clave_PlanEstudios = ?',[nombre_UnidadAprendizaje,clave_PlanEstudios], (err, results) => {
-            if(err) {
-                console.log(err);
-                return res.status(500).send("Error interno del servidor");
-            }
-    
-            if(results.length > 0) {
-                return res.status(401).send("El nombre de la Unidad de Aprendizaje ya existe en el Plan de Estudios");
-            }
-         */
+      
             db.query('INSERT INTO gradoestudio(clave_GradoEstudio, nombre_GradoEstudio, horas_MinimasGradoEstudio, horas_MaximasGradoEstudio) VALUES (?, ?, ?, ?)',
             [clave_GradoEstudio, nombre_GradoEstudio, horas_MinimasGradoEstudio, horas_MaximasGradoEstudio], (err, result) => {
                 if(err) {
@@ -49,7 +40,7 @@ router.post("/registrarGradoEstudio",(req,res)=>{
             });
         });    
     });
-//});
+
 
 
 router.get("/consultarGradoEstudio", (req, res) => {

@@ -12,7 +12,6 @@ import TipoSubGrupoService from '../services/TipoSubGrupoService';
 
 const TipoSubGrupo = () => {
     //VARIABLES PARA EL REGISTRO
-    const [clave_TipoSubGrupo,setclave_TipoSubGrupo] = useState(0);
     const [nombre_TipoSubGrupo,setnombre_TipoSubGrupo] = useState("");
 
     //VARIABLES PARA LA CONSULTA
@@ -40,13 +39,12 @@ const TipoSubGrupo = () => {
     //FUNCION PARA REGISTRAR
     const add = ()=>{
       //VALIDACION DE CAMPOS VACIOS
-      if (!clave_TipoSubGrupo || !nombre_TipoSubGrupo) {
+      if (!nombre_TipoSubGrupo) {
         mostrarAdvertencia("Existen campos vacios");
         return;
       }
       //MANDAR A LLAMAR AL REGISTRO SERVICE
         TipoSubGrupoService.registrarTipoSubGrupo({
-        clave_TipoSubGrupo:clave_TipoSubGrupo,
         nombre_TipoSubGrupo:nombre_TipoSubGrupo,
    
       }).then(response=>{
@@ -56,9 +54,7 @@ const TipoSubGrupo = () => {
           limpiarCampos();
         }
       }).catch(error=>{//EXCEPCIONES
-        if (error.response.status === 400) {
-          mostrarAdvertencia("Clave ya existente");
-        } else if (error.response.status === 401) {
+        if (error.response.status === 401) {
           mostrarAdvertencia("Nombre ya existente");      
         }else if(error.response.status === 500){          
           mostrarError("Error interno del servidor");
@@ -97,7 +93,6 @@ const TipoSubGrupo = () => {
   
     //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
     const limpiarCampos = () =>{
-      setclave_TipoSubGrupo(0);
       setnombre_TipoSubGrupo("");
     }
     
@@ -206,12 +201,7 @@ const TipoSubGrupo = () => {
       return regex.test(value);
     };
   
-    const validarNumero = (value) => {
-      // Expresión regular para validar números enteros positivos
-      const regex = /^[0-9]\d*$/;
-      // Verificar si el valor coincide con la expresión regular
-      return value==='' || regex.test(value);
-    };  
+  
   
     return (
       <>
@@ -220,16 +210,7 @@ const TipoSubGrupo = () => {
         {/*PANEL PARA EL REGISTRO*/}
         <Panel header="Registrar Tipo SubGrupo" className='mt-3' toggleable>
           <div className="formgrid grid mx-8 justify-content-center">
-            <div className="field col-2">
-                <label>Clave</label>
-                <InputText type="text" keyfilter="pint" value={clave_TipoSubGrupo} maxLength={10}
-                    onChange={(event)=>{
-                      if (validarNumero(event.target.value)) {  
-                        setclave_TipoSubGrupo(event.target.value);
-                      }
-                    }}  
-                className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
-            </div>
+            
             <div className="field col-10">
                 <label>Nombre</label>
                 <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_TipoSubGrupo} maxLength={255}
