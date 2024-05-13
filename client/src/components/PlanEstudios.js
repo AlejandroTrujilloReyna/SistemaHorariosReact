@@ -122,11 +122,6 @@ const put = (rowData) =>{
     get();
   }, []); 
 
-   //ORDENAR LOS DATOS POR CLAVE AL INGRESAR A LA PAGINA
-   useEffect(() => {
-    setfiltroplanestudios([...planestudiosList].sort((a, b) => a.clave_PlanEstudios - b.clave_PlanEstudios));
-  }, [planestudiosList]);
-
 //FUNCION PARA LA BARRA DE BUSQUEDA
 const onSearch = (e) => {
     const value = e.target.value.toLowerCase();

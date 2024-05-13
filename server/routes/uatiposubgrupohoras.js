@@ -38,7 +38,7 @@ router.post("/registrarUATipoSubGrupoHoras", (req, res) => {
 });
 
 router.get("/consultarUATipoSubGrupoHoras", (req, res) => {
-    db.query('SELECT * FROM uatiposubgrupohoras', (err, results) => {
+    db.query('SELECT * FROM uatiposubgrupohoras ORDER BY clave_UATipoSubGrupoHoras', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

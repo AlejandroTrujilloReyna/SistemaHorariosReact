@@ -142,11 +142,6 @@ const Docente = () => {
   useEffect(() => {
     get();
   },[]);
-
-  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltroDocente([...docentesList].sort((a, b) => a.no_EmpleadoDocente - b.no_EmpleadoDocente));
-  }, [docentesList]);
   
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
@@ -330,7 +325,7 @@ const Docente = () => {
       switch (field) {
         //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO        
         case 'horas_MinimasDocente':
-          if (newValue.trim().length > 0 && newValue !== rowData[field]){                                    
+          if (newValue > 0 && newValue !== null && newValue !== rowData[field]){                                    
                 rowData[field] = newValue;               
                 put(rowData);                       
           }else{                             
@@ -338,7 +333,7 @@ const Docente = () => {
           } 
           break;
         case 'horas_MaximasDocente':
-          if (newValue !== rowData[field]){             
+          if (newValue > 0 && newValue !== null && newValue !== rowData[field]){             
             rowData[field] = newValue;
             put(rowData);                       
           }else{

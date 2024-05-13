@@ -58,7 +58,7 @@ router.get("/consultarPlandeestudios", (req, res) => {
 });
 
 router.get("/consultarUnidadAprendizaje", (req, res) => {
-    db.query('SELECT * FROM unidadaprendizaje', (err, results) => {
+    db.query('SELECT * FROM unidadaprendizaje ORDER BY clave_UnidadAprendizaje', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

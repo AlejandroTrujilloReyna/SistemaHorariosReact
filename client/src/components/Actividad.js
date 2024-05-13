@@ -49,7 +49,7 @@ const Actividad = () => {
     }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
         mostrarExito("Registro exitoso");
-        //get();
+        get();
         limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES
@@ -114,11 +114,6 @@ const Actividad = () => {
   useEffect(() => {
     get();
   }, []);
-  
-  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltroActividad([...actividadList].sort((a, b) => a.id_Actividad - b.id_Actividad));
-  }, [actividadList]);
   
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {

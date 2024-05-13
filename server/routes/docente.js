@@ -53,7 +53,7 @@ router.post("/registrarDocente", (req, res) => {
 });
 
 router.get("/consultarDocente", (req, res) => {
-    db.query('SELECT * FROM docente', (err, results) => {
+    db.query('SELECT * FROM docente ORDER BY no_EmpleadoDocente', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

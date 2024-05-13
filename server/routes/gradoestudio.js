@@ -44,7 +44,7 @@ router.post("/registrarGradoEstudio",(req,res)=>{
 
 
 router.get("/consultarGradoEstudio", (req, res) => {
-    db.query('SELECT * FROM gradoestudio', (err, results) => {
+    db.query('SELECT * FROM gradoestudio ORDER BY clave_GradoEstudio', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

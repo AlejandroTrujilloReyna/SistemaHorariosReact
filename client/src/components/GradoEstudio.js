@@ -122,10 +122,6 @@ const put = (rowData) =>{
   useEffect(() => {
     get();
   }, []);  
-
-  useEffect(() => {
-    setfiltrogradoestudio([...gradoestudiolist].sort((a, b) => a.clave_GradoEstudio - b.clave_GradoEstudio));
-  }, [gradoestudiolist]);
   
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {

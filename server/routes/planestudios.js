@@ -40,7 +40,7 @@ router.post("/registrarPlanEstudios", (req, res) => {
 });
 //MOVER CUANDO SE CREE LA PARTE DE PLAN DE ESTUDIOS
 router.get("/consultarPlanEstudios", (req, res) => {
-    db.query('SELECT * FROM planestudios', (err, results) => {
+    db.query('SELECT * FROM planestudios ORDER BY clave_PlanEstudios', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

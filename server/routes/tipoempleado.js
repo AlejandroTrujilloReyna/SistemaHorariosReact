@@ -43,7 +43,7 @@ router.post("/registrarTipoEmpleado",(req,res)=>{
 
 
 router.get("/consultarTipoEmpleado", (req, res) => {
-    db.query('SELECT * FROM tipoempleado', (err, results) => {
+    db.query('SELECT * FROM tipoempleado ORDER BY clave_TipoEmpleado', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

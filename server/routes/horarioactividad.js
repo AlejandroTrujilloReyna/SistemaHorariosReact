@@ -41,7 +41,7 @@ router.post("/registrarHorarioActividad", (req, res) => {
 });
 
 router.get("/consultarHorarioActividad", (req, res) => {
-    db.query('SELECT * FROM horarioactividad', (err, results) => {
+    db.query('SELECT * FROM horarioactividad ORDER BY clave_HorarioActividad', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

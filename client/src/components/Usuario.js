@@ -130,11 +130,6 @@ const Usuario = () => {
   useEffect(() => {
     get();
   },[]);
-
-  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltroUsuario([...usuariosList].sort((a, b) => a.clave_Usuario - b.clave_Usuario));
-  }, [usuariosList]);
   
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {

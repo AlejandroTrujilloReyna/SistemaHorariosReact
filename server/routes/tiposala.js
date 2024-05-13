@@ -33,7 +33,7 @@ router.post("/registrarTipoSala", (req, res) => {
 });
 
 router.get("/consultarTipoSala", (req, res) => {
-    db.query('SELECT * FROM tiposala', (err, results) => {
+    db.query('SELECT * FROM tiposala ORDER BY clave_TipoSala', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

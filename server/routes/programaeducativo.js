@@ -48,7 +48,7 @@ router.post("/registrarProgramaEducativo", (req, res) => {
 });
 
 router.get("/consultarProgramaEducativo", (req, res) => {
-    db.query('SELECT * FROM programaeducativo', (err, results) => {
+    db.query('SELECT * FROM programaeducativo ORDER BY clave_ProgramaEducativo', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

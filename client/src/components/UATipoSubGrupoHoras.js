@@ -122,11 +122,6 @@ const UATipoSubGrupoHoras = () => {
     get();
   }, []);
 
-  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltrouatiposubgrupohoras([...uatiposubgrupohorasList].sort((a, b) => a.clave_UATipoSubGrupoHoras - b.clave_UATipoSubGrupoHoras));
-  }, [uatiposubgrupohorasList]);
-
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();

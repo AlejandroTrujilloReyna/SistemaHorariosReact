@@ -118,11 +118,6 @@ const UnidadAprendizaje = () => {
   useEffect(() => {
     get();
   }, []);  
-
-  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltrounidadaprendizaje([...unidadaprendizajeList].sort((a, b) => a.clave_UnidadAprendizaje - b.clave_UnidadAprendizaje));
-  }, [unidadaprendizajeList]);
   
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {

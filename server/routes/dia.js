@@ -10,7 +10,7 @@ const db = mysql.createConnection({
 });
 
 router.get("/consultarDia", (req, res) => {
-    db.query('SELECT * FROM dia', (err, results) => {
+    db.query('SELECT * FROM dia ORDER BY clave_Dia', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

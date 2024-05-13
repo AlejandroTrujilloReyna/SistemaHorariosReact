@@ -131,11 +131,6 @@ const Sala = () => {
   useEffect(() => {
     get();
   }, []); 
-  
-  //ORDENAR LOS DATOS POR CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltrosala([...salaList].sort((a, b) => a.clave_Sala - b.clave_Sala));
-  }, [salaList]);
 
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {

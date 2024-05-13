@@ -127,11 +127,6 @@ const ProgramaEducativo = () => {
     get();
   }, []);
 
-  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltroprogramaeducativo([...programaeducativoList].sort((a, b) => a.clave_ProgramaEducativo - b.clave_ProgramaEducativo));
-  }, [programaeducativoList]);
-
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();

@@ -111,11 +111,6 @@ const UnidadAcademica = () => {
     get();
   }, []);
 
-  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltrounidadacademica([...unidadacademicaList].sort((a, b) => a.clave_UnidadAcademica - b.clave_UnidadAcademica));
-  }, [unidadacademicaList]);
-
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();

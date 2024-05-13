@@ -104,11 +104,6 @@ const TipoSala = () => {
     get();
   },[]);
 
-  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltroTipoSala([...tipoSalaList].sort((a, b) => a.clave_TipoSala - b.clave_TipoSala));
-  }, [tipoSalaList]);
-
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();

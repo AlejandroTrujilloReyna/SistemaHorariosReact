@@ -53,7 +53,7 @@ router.get("/consultarTiposala", (req, res) => {
 });
 
 router.get("/consultarSala", (req, res) => {
-    db.query('SELECT * FROM sala', (err, results) => {
+    db.query('SELECT * FROM sala ORDER BY clave_Sala', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

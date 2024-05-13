@@ -41,7 +41,7 @@ router.post("/registrarUsuario",(req,res)=>{
 });
 
 router.get("/consultarUsuario", (req, res) => {
-    db.query('SELECT * FROM usuario', (err, results) => {
+    db.query('SELECT * FROM usuario ORDER BY clave_Usuario', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

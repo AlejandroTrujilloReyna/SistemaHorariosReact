@@ -45,7 +45,7 @@ router.post("/registrarTipoSubGrupo", (req, res) => {
 });
 
 router.get("/consultarTipoSubGrupo", (req, res) => {
-    db.query('SELECT * FROM tiposubgrupo', (err, results) => {
+    db.query('SELECT * FROM tiposubgrupo ORDER BY clave_TipoSubGrupo', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

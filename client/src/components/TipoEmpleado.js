@@ -120,10 +120,6 @@ const put = (rowData) =>{
   useEffect(() => {
     get();
   }, []);  
-
-  useEffect(() => {
-    setfiltrotipoempleado([...tipoempleadolist].sort((a, b) => a.clave_TipoEmpleado - b.clave_TipoEmpleado));
-  }, [tipoempleadolist]);
   
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {

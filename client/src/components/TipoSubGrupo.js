@@ -109,11 +109,6 @@ const TipoSubGrupo = () => {
       get();
     }, []);
   
-    //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-    useEffect(() => {
-      setfiltrotiposubgrupo([...tiposubgrupoList].sort((a, b) => a.clave_TipoSubGrupo - b.clave_TipoSubGrupo));
-    }, [tiposubgrupoList]);
-  
     //FUNCION PARA LA BARRA DE BUSQUEDA
     const onSearch = (e) => {
       const value = e.target.value.toLowerCase();

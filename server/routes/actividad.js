@@ -42,7 +42,7 @@ router.post("/registrarActividad",(req,res)=>{
 });
 
 router.get("/consultarActividad", (req, res) => {
-    db.query('SELECT * FROM actividad', (err, results) => {
+    db.query('SELECT * FROM actividad ORDER BY id_Actividad', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

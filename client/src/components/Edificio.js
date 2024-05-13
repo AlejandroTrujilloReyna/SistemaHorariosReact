@@ -122,11 +122,6 @@ const Edificio = () => {
   useEffect(() => {
     get();
   },[]);
-
-  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltroEdificio([...edificiosList].sort((a, b) => a.clave_Edificio - b.clave_Edificio));
-  }, [edificiosList]);
   
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {

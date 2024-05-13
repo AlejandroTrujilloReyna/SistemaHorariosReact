@@ -134,11 +134,6 @@ const HorarioActividad = () => {
     get();
   }, []);
   
-  //ORDENAR LOS DATOS POR LA CLAVE AL INGRESAR A LA PAGINA
-  useEffect(() => {
-    setfiltrohorarioactividad([...horarioactividadList].sort((a, b) => a.clave_HorarioActividad - b.clave_HorarioActividad));
-  }, [horarioactividadList]); 
-  
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
