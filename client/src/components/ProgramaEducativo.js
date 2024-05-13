@@ -198,7 +198,6 @@ const ProgramaEducativo = () => {
     onKeyDown={(e) => e.stopPropagation()} />;
   };
   
-
   //EDITAR NUMEROS
   const numberEditor = (options) => {
     return <InputText keyfilter="int"  type="text" maxLength={6} value={options.value} 

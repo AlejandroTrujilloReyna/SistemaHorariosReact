@@ -20,6 +20,8 @@ import Usuario from './components/Usuario';
 import TipoEmpleado from './components/TipoEmpleado';
 import GradoEstudio from './components/GradoEstudio';
 import Docente from './components/Docente';
+import Actividad from './components/Actividad';
+import HorarioActividad from './components/HorarioActividad';
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
           <Route path='/TipoEmpleado' element={<TipoEmpleado/>}/>
           <Route path='/GradoEstudio' element={<GradoEstudio/>}/>
           <Route path='/Docente' element={<Docente/>}/>
+          <Route path='/Actividad' element={<Actividad/>}/>
+          <Route path='/HorarioActividad' element={<HorarioActividad/>}/>
         </Routes>
       </BrowserRouter>
     </div>

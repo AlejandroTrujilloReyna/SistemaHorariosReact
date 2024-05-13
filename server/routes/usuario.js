@@ -27,7 +27,6 @@ router.post("/registrarUsuario",(req,res)=>{
         if(results.length > 0) {
             return res.status(401).send("El Correo ya existe");
         }        
-   
 
         db.query('INSERT INTO usuario(clave_Usuario,nombre_Usuario,apellidoP_Usuario,apellidoM_Usuario,correo, contrasena,clave_Permiso) VALUES (?,?,?,?,?,?,?)',
         [clave_Usuario, nombre_Usuario, apellidoP_Usuario, apellidoM_Usuario, correo, contrasena, clave_Permiso], (err,result)=>{

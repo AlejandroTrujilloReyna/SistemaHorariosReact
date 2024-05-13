@@ -113,7 +113,7 @@ const put = (rowData) =>{
   const columns = [
     {field: 'clave_PlanEstudios', header: 'Clave' },
     {field: 'nombre_PlanEstudios', header: 'Nombre' },
-    {field: 'cant_semestres', header: 'Cantidad de semestres'},//ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
+    {field: 'cant_semestres', header: 'Cantidad de semestres'},
     {field: 'clave_ProgramaEducativo', header: 'Clave Programa Educativo'},          
   ];
 
