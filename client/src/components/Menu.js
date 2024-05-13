@@ -5,104 +5,60 @@ const Menu = () => {
     const items = [
         {
             label: 'Sistema de gestion de horarios',
+            command: () => {window.location.href='/';}
         },
   
         {
-            label: 'Unidad Academica',
+            label: 'Entidades Básicas',
             icon: 'pi pi-building-columns',
-            command: () => {window.location.href='/UnidadAcademica';}
-        }, 
-        
-        {
-            label: 'Programa Educativo',
-            icon: 'pi pi-briefcase',
-            command: () => {window.location.href='/ProgramaEducativo';}
-        },
-
-        {
-            label: 'Unidad de Aprendizaje',
-            icon: 'pi pi-building-columns',
-            command: () => {window.location.href='/UnidadAprendizaje';}
-        }, 
-
-        {
-            label: 'Edificio',
-            icon: 'pi pi-building',
             items: [
-                {
-                    label: 'Edificios',
-                    command: () => {window.location.href='/Edificio';}                 
-                },                
-                {
-                    label: 'Uso de Edificios',
-                    command: () => {window.location.href='/UsarEdificio';}                    
-                },
-            ]
-        },
-     
-        {
-            label: 'Sala',
-            icon: 'pi pi-home',
-            command: () => {window.location.href='/Sala';}
-
-        },
-     
-        {
-            label: 'Tipo Sala',
-            icon: 'pi pi-home',
-            command: () => {window.location.href='/TipoSala';}
-        },                    
-      
-        {
-            label: 'Plan de Estudios',
-            icon: 'pi pi-building-columns',
-            command: () => {window.location.href='/PlanEstudios';}
-        },
-        {
-        
-            label: 'Tipo SubGrupo',
-            icon: 'pi pi-building',
-            items: [
-                {
-                    label: 'UA Tipo SubGrupo Horas',
-                    command: () => {window.location.href='/UATipoSubGrupoHoras';}                 
-                },                
-                {
-                    label: 'Tipo SubGrupo',
-                    command: () => {window.location.href='/TipoSubGrupo';}                    
-                },
+                { label: 'Unidad Académica', command: () => {window.location.href='/UnidadAcademica';} },
+                { label: 'Programa Educativo', command: () => {window.location.href='/ProgramaEducativo';} },
+                { label: 'Plan de Estudios', command: () => {window.location.href='/PlanEstudios';} }
             ]
         },
         {
-            label: 'Usuario',
-            icon: 'pi pi-building-columns',
-            command: () => {window.location.href='/Usuario';}
+            label: 'Infraestructura',
+            icon: 'pi pi-building',
+            items: [
+                {
+                    label: 'Edificio',
+                    items: [
+                        { label: 'Edificios', command: () => {window.location.href='/Edificio';} },
+                        { label: 'Uso de Edificios', command: () => {window.location.href='/UsarEdificio';} }
+                    ]
+                },
+                { label: 'Sala', command: () => {window.location.href='/Sala';} },
+                { label: 'Tipo Sala', command: () => {window.location.href='/TipoSala';} }
+            ]
         },
         {
-            label: 'Tipo de Empleado',
-            icon: 'pi pi-building-columns',
-            command: () => {window.location.href='/TipoEmpleado';}
+            label: 'Gestión de Personal',
+            icon: 'pi pi-home',
+            items: [
+                { label: 'Usuario', command: () => {window.location.href='/Usuario';} },
+                { label: 'Tipo de Empleado', command: () => {window.location.href='/TipoEmpleado';} },
+                { label: 'Docente', command: () => {window.location.href='/Docente';} }
+            ]
         },
         {
-            label: 'Grado de Estudios',
+            label: 'Gestión de Actividades',
             icon: 'pi pi-building-columns',
-            command: () => {window.location.href='/GradoEstudio';}
-        }, 
-        {
-            label: 'Docente',
-            icon: 'pi pi-building-columns',
-            command: () => {window.location.href='/Docente';}
+            items: [
+                { label: 'Unidad de Aprendizaje', command: () => {window.location.href='/UnidadAprendizaje';} },
+                { label: 'Actividad', command: () => {window.location.href='/Actividad';} },
+                { label: 'Horario de Actividad', command: () => {window.location.href='/HorarioActividad';} }
+            ]
         },
         {
-            label: 'Actividad',
-            icon: 'pi pi-building-columns',
-            command: () => {window.location.href='/Actividad';}
-        },
-        {
-            label: 'Horario de Actividad',
-            icon: 'pi pi-building-columns',
-            command: () => {window.location.href='/HorarioActividad';}
-        }                
+            label: 'Otros',
+            icon: 'pi pi-building',
+            items: [
+                { label: 'UA Tipo SubGrupo Horas', command: () => {window.location.href='/UATipoSubGrupoHoras';} },
+                { label: 'Tipo SubGrupo', command: () => {window.location.href='/TipoSubGrupo';} },
+                { label: 'Grado de Estudios', command: () => {window.location.href='/GradoEstudio';} }
+            ]
+        }           
     ];
     const start = <img alt="logo" src="https://comunicacioninstitucional.uabc.mx/sites/default/files/inline-images/escudo-actualizado-2022.png" height="40" className="mr-2"></img>;         
   return (

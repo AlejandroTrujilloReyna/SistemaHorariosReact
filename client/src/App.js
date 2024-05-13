@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route} from 'react-router-dom';
-import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/themes/saga-green/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import '/node_modules/primeflex/primeflex.css';
@@ -22,6 +22,7 @@ import GradoEstudio from './components/GradoEstudio';
 import Docente from './components/Docente';
 import Actividad from './components/Actividad';
 import HorarioActividad from './components/HorarioActividad';
+import Inicio from './components/Inicio';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
       <Menu/>
       <BrowserRouter>
         <Routes>
+          <Route path='/' element={<Inicio/>}/>
           <Route path='/UnidadAcademica' element={<UnidadAcademica/>}/>
           <Route path='/ProgramaEducativo' element={<ProgramaEducativo/>}/>
           <Route path='/UnidadAprendizaje' element={<UnidadAprendizaje/>}/>
@@ -45,8 +47,9 @@ function App() {
           <Route path='/Docente' element={<Docente/>}/>
           <Route path='/Actividad' element={<Actividad/>}/>
           <Route path='/HorarioActividad' element={<HorarioActividad/>}/>
+          <Route path='/Inicio' element={<Inicio/>}/>
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter>    
     </div>
   );
 }
