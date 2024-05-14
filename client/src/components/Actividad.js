@@ -131,7 +131,6 @@ const Actividad = () => {
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
-    seteditando(true);
     switch (options.field) {
       case 'clave_Actividad':
         return numberEditor(options);
@@ -246,7 +245,7 @@ const Actividad = () => {
         <DataTable value={filtroActividad.length ? filtroActividad :actividadList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} 
-              editor={field === 'id_Actividad' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
+              editor={field === 'id_Actividad' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
           })}
         </DataTable>
       </Panel>                      

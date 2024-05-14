@@ -8,7 +8,6 @@ import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { Paginator } from 'primereact/paginator';
 import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
 
@@ -134,7 +133,6 @@ const UnidadAcademica = () => {
   
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
-    seteditando(true);
     return textEditor(options);
   };
 
@@ -225,7 +223,8 @@ const UnidadAcademica = () => {
       <DataTable value={filtrounidadacademica.length ? filtrounidadacademica :unidadacademicaList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
       
          {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} editor={field === 'nombre_UnidadAcademica' ? (options) => cellEditor(options): null} onCellEditComplete={onCellEditComplete}/>;
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} 
+              editor={field === 'nombre_UnidadAcademica' ? (options) => cellEditor(options): null} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
           })}
         </DataTable>
       </Panel>              

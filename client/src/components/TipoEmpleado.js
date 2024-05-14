@@ -140,7 +140,6 @@ const put = (rowData) =>{
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
-    seteditando(true);
     switch (options.field) {      
       case 'nombre_TipoEmpleado':
         return textEditor(options);                
@@ -278,7 +277,8 @@ const put = (rowData) =>{
       </div>  
         <DataTable value={filtrotipoempleado.length ? filtrotipoempleado :tipoempleadolist} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_TipoEmpleado' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} 
+              editor={field === 'clave_TipoEmpleado' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
           })}
         </DataTable>
       </Panel> 

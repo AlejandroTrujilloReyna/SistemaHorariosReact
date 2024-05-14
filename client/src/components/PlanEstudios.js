@@ -160,7 +160,6 @@ const onSearch = (e) => {
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
-    seteditando(true);
     switch(options.field){
       case 'nombre_PlanEstudios':
         return textEditor(options);
@@ -311,7 +310,7 @@ const TipoProgramaEducativoEditor = (options) => {
         <DataTable value={filtroplanestudios.length ? filtroplanestudios :planestudiosList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
-              editor={field === 'clave_PlanEstudios' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
+              editor={field === 'clave_PlanEstudios' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
           })}
         </DataTable>
       </Panel>            

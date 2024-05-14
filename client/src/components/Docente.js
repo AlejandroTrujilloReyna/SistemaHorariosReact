@@ -243,7 +243,6 @@ const Docente = () => {
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
-    seteditando(true);
     switch(options.field){  
       case 'clave_Usuario':
         return UsuarioEditor(options);
@@ -502,7 +501,7 @@ const Docente = () => {
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '5%' }} editor={field === 'no_EmpleadoDocente' ? null : (options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
               body={(rowData) => renderBody(rowData, field)} // Llama a la función renderBody para generar el cuerpo de la columna
-              />;
+              onCellEditInit={(e) => seteditando(true)}/>;
           })}
         </DataTable>          
       </Panel>     

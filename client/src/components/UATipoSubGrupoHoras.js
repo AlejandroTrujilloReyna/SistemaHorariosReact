@@ -176,7 +176,6 @@ const UATipoSubGrupoHoras = () => {
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
-    seteditando(true);
     switch (options.field) {
       case 'clave_TipoSubGrupo':
         return TipoSubGrupoEditor(options);
@@ -344,7 +343,7 @@ const UATipoSubGrupoHoras = () => {
         <DataTable value={filtrouatiposubgrupohoras.length ? filtrouatiposubgrupohoras :uatiposubgrupohorasList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
-              editor={field === 'clave_UATipoSubGrupoHoras' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
+              editor={field === 'clave_UATipoSubGrupoHoras' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
           })}
         </DataTable>
       </Panel>  

@@ -198,7 +198,6 @@ const Sala = () => {
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
-    seteditando(true);
     switch(options.field){
       case 'nombre_Sala':
         return textEditor(options);        
@@ -433,7 +432,7 @@ const Sala = () => {
         <DataTable value={filtrosala.length ? filtrosala :salaList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
-              editor={field === 'clave_Sala' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
+              editor={field === 'clave_Sala' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
           })}
         </DataTable>
       </Panel>            

@@ -175,7 +175,6 @@ const Usuario = () => {
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
-    seteditando(true);
     switch(options.field){
       case 'correo':
         return correoEditor(options);
@@ -394,8 +393,9 @@ const Usuario = () => {
         </div>
         <DataTable value={filtroUsuario.length ? filtroUsuario :usuariosList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '25rem' }}>
           {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '10%' }} editor={field === 'clave_Usuario' ? null : (options) => cellEditor(options)}
-              onCellEditComplete={onCellEditComplete}
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '10%' }} 
+              editor={field === 'clave_Usuario' ? null : (options) => cellEditor(options)}
+              onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}
               body={(rowData) => renderBody(rowData, field)} // Llama a la función renderBody para generar el cuerpo de la columna
               />;
           })}

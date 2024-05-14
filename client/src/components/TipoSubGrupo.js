@@ -146,7 +146,6 @@ const TipoSubGrupo = () => {
   
     //ACTIVAR EDICION DE CELDA
     const cellEditor = (options) => {
-      seteditando(true);
       switch (options.field) {
         case 'nombre_TipoSubGrupo':
           return textEditor(options); 
@@ -229,7 +228,8 @@ const TipoSubGrupo = () => {
         </div>  
           <DataTable value={filtrotiposubgrupo.length ? filtrotiposubgrupo :tiposubgrupoList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
             {columns.map(({ field, header }) => {
-                return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} editor={field === 'clave_TipoSubGrupo' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
+                return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} 
+                editor={field === 'clave_TipoSubGrupo' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
             })}
           </DataTable>
         </Panel>  
