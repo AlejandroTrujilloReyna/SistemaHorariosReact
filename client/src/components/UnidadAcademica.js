@@ -8,7 +8,9 @@ import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
+import { Paginator } from 'primereact/paginator';
 import UnidadAcademicaService from '../services/UnidadAcademicaService';
+
 
 const UnidadAcademica = () => {
   //VARIABLES PARA EL REGISTRO
@@ -19,8 +21,12 @@ const UnidadAcademica = () => {
   const [filtrounidadacademica, setfiltrounidadacademica] = useState([]);
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
   const [editando, seteditando] = useState(false);
+  
+  
+
   //VARIABLES PARA EL ERROR
   const toast = useRef(null);
+
 
   //MENSAJE DE EXITO
   const mostrarExito = (mensaje) => {
@@ -35,6 +41,7 @@ const UnidadAcademica = () => {
     toast.current.show({severity:'error', summary: 'Error', detail:mensaje, life: 3000});
   }    
 
+  
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
@@ -215,9 +222,10 @@ const UnidadAcademica = () => {
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} 
         className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
-        <DataTable value={filtrounidadacademica.length ? filtrounidadacademica :unidadacademicaList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
-          {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'nombre_UnidadAcademica' ? (options) => cellEditor(options): null} onCellEditComplete={onCellEditComplete}/>;
+      <DataTable value={filtrounidadacademica.length ? filtrounidadacademica :unidadacademicaList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
+      
+         {columns.map(({ field, header }) => {
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} editor={field === 'nombre_UnidadAcademica' ? (options) => cellEditor(options): null} onCellEditComplete={onCellEditComplete}/>;
           })}
         </DataTable>
       </Panel>              

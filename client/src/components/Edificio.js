@@ -381,7 +381,7 @@ const Edificio = () => {
         <div className="mx-8 mb-4">
           <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
         </div>
-        <DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
+        <DataTable value={filtroEdificio.length ? filtroEdificio :edificiosList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} editor={field === 'clave_Edificio' ? null : (options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
