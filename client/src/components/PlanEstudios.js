@@ -15,7 +15,7 @@ import ProgramaEducativoService from '../services/ProgramaEducativoService';
 const PlanEstudios = () => {
   //VARIABLES PARA EL REGISTRO
   const [nombre_PlanEstudios, setnombre_PlanEstudios] = useState("");
-  const [cant_semestres, setcant_semestres] = useState(0);
+  const [cant_semestres, setcant_semestres] = useState("");
   const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(0);
 
   //VARIABLES PARA LA CONSULTA
@@ -47,7 +47,7 @@ const PlanEstudios = () => {
   const add = () => {
   //VALIDACION DE CAMPOS VACIOS
   if (!nombre_PlanEstudios || !clave_ProgramaEducativo || !cant_semestres) {
-    mostrarAdvertencia("Existen campos vacíos");
+    mostrarAdvertencia("Existen campos Obligatorios vacíos");
     return;
   }
 
@@ -271,6 +271,7 @@ const TipoProgramaEducativoEditor = (options) => {
                                 setnombre_PlanEstudios(event.target.value);
                               }
                             }}
+                            placeholder="Ej.2023-2"
                             className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
                         />
                     </div>
@@ -295,6 +296,7 @@ const TipoProgramaEducativoEditor = (options) => {
                                 setcant_semestres(event.target.value);
                               }
                             }}  
+                            placeholder="Ej.8"
                         className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
                     </div>                    
                 </div>

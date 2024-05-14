@@ -13,7 +13,7 @@ import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
 const UnidadAcademica = () => {
   //VARIABLES PARA EL REGISTRO
-  const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState(0);
+  const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState("");
   const [nombre_UnidadAcademica,setnombre_UnidadAcademica] = useState("");
   //VARIABLES PARA LA CONSULTA
   const [unidadacademicaList,setunidadacademicaList] = useState([]);
@@ -45,7 +45,7 @@ const UnidadAcademica = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_UnidadAcademica || !nombre_UnidadAcademica) {
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -197,6 +197,7 @@ const UnidadAcademica = () => {
                     setclave_UnidadAcademica(event.target.value);
                   }
                 }}
+                placeholder="Ej.105"
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
@@ -207,6 +208,7 @@ const UnidadAcademica = () => {
                     setnombre_UnidadAcademica(event.target.value);
                   }
                 }}
+                placeholder="Ej.Facultad de Ingeniería Mxl"
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>                             
         </div>

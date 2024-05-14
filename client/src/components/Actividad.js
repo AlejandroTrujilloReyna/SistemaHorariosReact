@@ -12,7 +12,7 @@ import ActividadService from '../services/ActividadService';
 
 const Actividad = () => {
   //VARIABLES PARA EL REGISTRO
-  const [clave_Actividad,setclave_Actividad] = useState(0);
+  const [clave_Actividad,setclave_Actividad] = useState("");
   const [nombre_Actividad,setnnombre_Actividad] = useState("");
   //VARIABLES PARA LA CONSULTA
   const [actividadList,setactividadList] = useState([]);
@@ -39,7 +39,7 @@ const Actividad = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_Actividad || !nombre_Actividad) {
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -219,6 +219,7 @@ const Actividad = () => {
                     setclave_Actividad(event.target.value);
                   }
                 }}
+                placeholder="Ej.1"
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
@@ -229,6 +230,7 @@ const Actividad = () => {
                     setnnombre_Actividad(event.target.value);
                   }
                 }}
+                placeholder="Ej.Horas de Investigacion"
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>                             
         </div>

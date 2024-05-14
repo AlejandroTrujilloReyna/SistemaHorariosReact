@@ -38,7 +38,7 @@ const TipoSala = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!nombre_TipoSala) {      
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE

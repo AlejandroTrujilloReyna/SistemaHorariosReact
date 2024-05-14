@@ -46,7 +46,7 @@ const Usuario = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!correo || !contrasena || !nombre_Usuario || !apellidoP_Usuario || !apellidoM_Usuario || !clave_Permiso) {      
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE

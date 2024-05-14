@@ -18,6 +18,9 @@ router.post("/registrarDocente", (req, res) => {
     const clave_GradoEstudio = req.body.clave_GradoEstudio;
     const clave_Usuario = req.body.clave_Usuario;
 
+    if(horas_MinimasDocente >= horas_MaximasDocente){
+        return res.status(403).send("Hay error en las horas");
+    }
     db.query('SELECT * FROM docente WHERE no_EmpleadoDocente = ?',[no_EmpleadoDocente], (err, results) => {
         if(err) {
             console.log(err);
@@ -36,10 +39,7 @@ router.post("/registrarDocente", (req, res) => {
             if(results.length > 0) {
                 return res.status(405).send("Solo puede haber un usuario por docente");
             }
-        
-            if(horas_MinimasDocente > horas_MaximasDocente){
-                return res.status(403).send("Hay error en las horas");
-            }
+                    
             db.query('INSERT INTO docente (no_EmpleadoDocente, horas_MinimasDocente, horas_MaximasDocente, horas_Externas,clave_TipoEmpleado,clave_GradoEstudio,clave_Usuario) VALUES (?, ?, ?, ?, ?, ?, ?)',
                 [no_EmpleadoDocente,horas_MinimasDocente,horas_MaximasDocente,horas_Externas, clave_TipoEmpleado, clave_GradoEstudio, clave_Usuario], (err, result) => {
                     if (err) {
@@ -72,7 +72,7 @@ router.put("/modificarDocente", (req, res) => {
     const clave_GradoEstudio = req.body.clave_GradoEstudio;
     const clave_Usuario = req.body.clave_Usuario;
       
-    if(horas_MinimasDocente > horas_MaximasDocente){
+    if(horas_MinimasDocente >= horas_MaximasDocente){
         return res.status(403).send("Hay error en las horas");
     }
     db.query('SELECT * FROM docente WHERE clave_Usuario = ? AND no_EmpleadoDocente != ?',[clave_Usuario,no_EmpleadoDocente], (err, results) => {

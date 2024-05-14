@@ -51,7 +51,7 @@ const Docente = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!no_EmpleadoDocente || !horas_MinimasDocente || !horas_MaximasDocente || !horas_Externas || !clave_TipoEmpleado || !clave_GradoEstudio || !clave_Usuario) {      
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -75,7 +75,7 @@ const Docente = () => {
       }else if(error.response.status === 403){
         mostrarAdvertencia("Favor de Revisar las Horas");        
       }else if(error.response.status === 405){
-        mostrarAdvertencia("Solo puede haber un Usuario por Docente");        
+        mostrarAdvertencia("El Usuario ya esta en uso");        
       }else if(error.response.status === 500){  
         mostrarError("Error interno del servidor");
       }     
@@ -104,7 +104,7 @@ const Docente = () => {
         mostrarAdvertencia("Favor de Revisar las horas");
         get();
       }else if(error.response.status === 405){
-        mostrarAdvertencia("Solo puede haber un Usuario por Docente");
+        mostrarAdvertencia("El Usuario ya esta en uso");
         get();        
       }else if (error.response.status === 500) {
         mostrarError("Error del sistema");
@@ -257,7 +257,7 @@ const Docente = () => {
 
   //EDITAR NUMEROS
   const numberEditor = (options) => {
-    return <InputText keyfilter="int"  type="text" maxLength={6} value={options.value} 
+    return <InputText keyfilter="int"  type="text" maxLength={2} value={options.value} 
     onChange={(e) => {
       if (validarNumero(e.target.value)) { 
         options.editorCallback(e.target.value)
@@ -472,12 +472,12 @@ const Docente = () => {
                       sethoras_MaximasDocente(event.target.value);
                     }
                   }} 
-                  placeholder="Ej.40" 
+                  placeholder="Ej.20" 
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>   
           <div className="field col-2">
               <label>Horas Externas*</label>
-              <InputText type="text" keyfilter={/^[0-9]*$/} value={horas_Externas} maxLength={10}
+              <InputText type="text" keyfilter={/^[0-9]*$/} value={horas_Externas} maxLength={2}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
                       sethoras_Externas(event.target.value);

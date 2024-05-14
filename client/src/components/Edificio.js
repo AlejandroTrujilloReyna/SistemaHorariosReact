@@ -46,7 +46,7 @@ const Edificio = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_Edificio || !nombre_Edificio || !clave_UnidadAcademica) {      
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE

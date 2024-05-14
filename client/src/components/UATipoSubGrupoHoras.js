@@ -15,7 +15,7 @@ import UATipoSubGrupoHorasService from '../services/UATipoSubGrupoHorasService'
 
 const UATipoSubGrupoHoras = () => {
   //VARIABLES PARA EL REGISTRO
-  const [horas,sethoras] = useState(0);
+  const [horas,sethoras] = useState("");
   const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState(null);
   const [clave_TipoSubGrupo,setclave_TipoSubGrupo] = useState(null);
   
@@ -47,7 +47,7 @@ const UATipoSubGrupoHoras = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_TipoSubGrupo || !clave_UnidadAprendizaje || !horas) {
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -301,6 +301,7 @@ const UATipoSubGrupoHoras = () => {
                       	sethoras(event.target.value);
                     }
                   }}  
+                  placeholder="Ej.3"
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-6">

@@ -49,7 +49,7 @@ const HorarioActividad = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!hora_EntradaHActividad || !hora_SalidaHActividad || !clave_Dia || !no_Empleado || !id_Actividad) {
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE

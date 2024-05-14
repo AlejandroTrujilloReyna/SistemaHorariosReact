@@ -14,7 +14,7 @@ import PlanEstudiosService from '../services/PlanEstudiosService';
 
 const UnidadAprendizaje = () => {
   //VARIABLES PARA EL REGISTRO
-  const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState(0);
+  const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState("");
   const [nombre_UnidadAprendizaje,setnombre_UnidadAprendizaje] = useState("");
   const [clave_PlanEstudios,setclave_PlanEstudios] = useState(null);
   //VARIABLES PARA LA CONSULTA
@@ -43,7 +43,7 @@ const UnidadAprendizaje = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_UnidadAprendizaje || !nombre_UnidadAprendizaje || !clave_PlanEstudios) {
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -248,7 +248,8 @@ const UnidadAprendizaje = () => {
                         if (validarNumero(event.target.value)) {
                           setclave_UnidadAprendizaje(event.target.value);
                         }                        
-                      }}  
+                      }}
+                      placeholder="Ej.33556"  
                   className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
@@ -258,7 +259,8 @@ const UnidadAprendizaje = () => {
                 if (validarTexto(event.target.value)) {
                   setnombre_UnidadAprendizaje(event.target.value);
                 }        
-              }}  
+              }}
+              placeholder="Ej.Ingeniería Económica"  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
           />              
           </div>                            

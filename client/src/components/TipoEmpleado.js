@@ -13,8 +13,8 @@ import TipoEmpleadoService from '../services/TipoEmpleadoService';
 const TipoEmpleado = () => {
     const [clave_TipoEmpleado,setclave_TipoEmpleado] = useState(0);
     const [nombre_TipoEmpleado,setnombre_TipoEmpleado] = useState("");
-    const [horas_MinimasTipoEmpleado,sethoras_MinimasTipoEmpleado] = useState(0);
-    const [horas_MaximasTipoEmpleado,sethoras_MaximasTipoEmpleado] = useState(0);
+    const [horas_MinimasTipoEmpleado,sethoras_MinimasTipoEmpleado] = useState("");
+    const [horas_MaximasTipoEmpleado,sethoras_MaximasTipoEmpleado] = useState("");
   
     const [tipoempleadolist,settipoempleadolist] = useState([]);
     const [filtrotipoempleado,setfiltrotipoempleado] = useState([]);
@@ -40,7 +40,7 @@ const TipoEmpleado = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!nombre_TipoEmpleado || !horas_MinimasTipoEmpleado || !horas_MaximasTipoEmpleado) {
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
   //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -238,7 +238,8 @@ const put = (rowData) =>{
                 if (validarTexto(event.target.value)) {
                   setnombre_TipoEmpleado(event.target.value);
                 }        
-              }}  
+              }}
+              placeholder="Ej.Tiempo Completo"  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
           />              
           </div>                            
@@ -250,7 +251,8 @@ const put = (rowData) =>{
                     if (validarNumero(event.target.value)) {
                       sethoras_MinimasTipoEmpleado(event.target.value);
                     }
-                  }}  
+                  }} 
+                  placeholder="Ej.18" 
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>  
 
@@ -261,7 +263,8 @@ const put = (rowData) =>{
                     if (validarNumero(event.target.value)) {
                       sethoras_MaximasTipoEmpleado(event.target.value);
                     }
-                  }}  
+                  }}
+                  placeholder="Ej.20"  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
 

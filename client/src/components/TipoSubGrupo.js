@@ -40,7 +40,7 @@ const TipoSubGrupo = () => {
     const add = ()=>{
       //VALIDACION DE CAMPOS VACIOS
       if (!nombre_TipoSubGrupo) {
-        mostrarAdvertencia("Existen campos vacíos");
+        mostrarAdvertencia("Existen campos Obligatorios vacíos");
         return;
       }
       //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -213,6 +213,7 @@ const TipoSubGrupo = () => {
                         setnombre_TipoSubGrupo(event.target.value);
                       }
                     }}  
+                    placeholder="Ej.Taller"
                 className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
             </div>                                                                           
           </div>

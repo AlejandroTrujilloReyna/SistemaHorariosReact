@@ -17,7 +17,7 @@ import TipoSalaService from '../services/TipoSalaService';
 const Sala = () => {
   //VARIABLES PARA EL REGISTRO
   const [nombre_Sala,setnombre_Sala] = useState("");
-  const [capacidad_Sala,setcapacidad_Sala] = useState(0);
+  const [capacidad_Sala,setcapacidad_Sala] = useState("");
   const [validar_Traslape,setvalidar_Traslape] = useState(1);
   const [nota_Descriptiva,setnota_Descriptiva] = useState("");
   const [clave_Edificio,setclave_Edificio] = useState(0);
@@ -49,7 +49,7 @@ const Sala = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!nombre_Sala || !capacidad_Sala || !clave_Edificio || !clave_TipoSala) {
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -361,7 +361,8 @@ const Sala = () => {
               <InputText type="text" keyfilter={ /^[0-9a-zA-Z]*$/} value={nombre_Sala} maxLength={255}
                   onChange={(event)=>{
                       setnombre_Sala(event.target.value);
-                  }}  
+                  }}
+                  placeholder="Ej.205"  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>
           <div className="field col-2">
@@ -372,6 +373,7 @@ const Sala = () => {
                       setcapacidad_Sala(event.target.value);
                     }
                   }}  
+                  placeholder="Ej.40"
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-2">
@@ -416,7 +418,8 @@ const Sala = () => {
               <InputTextarea type="text" value={nota_Descriptiva} maxLength={100}
                   onChange={(event)=>{
                     setnota_Descriptiva(event.target.value);
-                  }}  
+                  }}
+                  placeholder="Ej.Espacio para impartir clase teóricas"  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>                                                                      
         </div>

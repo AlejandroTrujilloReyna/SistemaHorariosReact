@@ -11,11 +11,10 @@ import { Toast } from 'primereact/toast';
 import GradoEstudioService from '../services/GradoEstudioService';
 
 const GradoEstudio = () => {
-  //VARIABLES PARA EL REGISTRO
-  const [clave_GradoEstudio,setclave_GradoEstudio] = useState(0);
+  //VARIABLES PARA EL REGISTRO  
   const [nombre_GradoEstudio,setnombre_GradoEstudio] = useState("");
-  const [horas_MinimasGradoEstudio,sethoras_MinimasGradoEstudio] = useState(0);
-  const [horas_MaximasGradoEstudio,sethoras_MaximasGradoEstudio] = useState(0);
+  const [horas_MinimasGradoEstudio,sethoras_MinimasGradoEstudio] = useState("");
+  const [horas_MaximasGradoEstudio,sethoras_MaximasGradoEstudio] = useState("");
   //VARIABLES PARA LA CONSULTA
   const [gradoestudiolist,setgradoestudiolist] = useState([]);
   const [filtrogradoestudio,setfiltrogradoestudio] = useState([]);
@@ -41,12 +40,11 @@ const mostrarExito = (mensaje) => {
   const add = ()=>{
   //VALIDACION DE CAMPOS VACIOS
   if (!nombre_GradoEstudio || !horas_MinimasGradoEstudio || !horas_MaximasGradoEstudio) {
-    mostrarAdvertencia("Existen campos vacíos");
+    mostrarAdvertencia("Existen campos Obligatorios vacíos");
     return;
   }
   //MANDAR A LLAMAR AL REGISTRO SERVICE
-  GradoEstudioService.registrarGradoEstudio({
-    clave_GradoEstudio:clave_GradoEstudio,
+  GradoEstudioService.registrarGradoEstudio({    
     nombre_GradoEstudio:nombre_GradoEstudio,
     horas_MinimasGradoEstudio:horas_MinimasGradoEstudio,
     horas_MaximasGradoEstudio:horas_MaximasGradoEstudio
@@ -103,8 +101,7 @@ const put = (rowData) =>{
  //!!!EXTRAS DE REGISTRO
 
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
-  const limpiarCampos = () =>{
-    setclave_GradoEstudio(0);
+  const limpiarCampos = () =>{    
     setnombre_GradoEstudio("")
     sethoras_MinimasGradoEstudio(0);
     sethoras_MaximasGradoEstudio(0)
@@ -240,6 +237,7 @@ return (
                   setnombre_GradoEstudio(event.target.value);
                 }        
               }}  
+              placeholder="Ej.Doctorado"
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
           />              
           </div>                            
@@ -252,6 +250,7 @@ return (
                       sethoras_MinimasGradoEstudio(event.target.value);
                     }
                   }}  
+                  placeholder="Ej.12"
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>  
 
@@ -263,6 +262,7 @@ return (
                       sethoras_MaximasGradoEstudio(event.target.value);
                     }
                   }}  
+                  placeholder="Ej.16"
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
 

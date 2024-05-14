@@ -14,10 +14,10 @@ import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
 const ProgramaEducativo = () => {
   //VARIABLES PARA EL REGISTRO
-  const [clave_ProgramaEducativo,setclave_ProgramaEducativo] = useState(0);
+  const [clave_ProgramaEducativo,setclave_ProgramaEducativo] = useState("");
   const [nombre_ProgramaEducativo,setnombre_ProgramaEducativo] = useState("");
-  const [banco_Horas,setbanco_Horas] = useState(0);
-  const [asignaturas_horas,setasignaturas_horas] = useState(0);
+  const [banco_Horas,setbanco_Horas] = useState("");
+  const [asignaturas_horas,setasignaturas_horas] = useState("");
   const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState(null);
   //VARIABLES PARA LA CONSULTA
   const [programaeducativoList,setprogramaeducativoList] = useState([]);
@@ -45,7 +45,7 @@ const ProgramaEducativo = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo || !asignaturas_horas) {
-      mostrarAdvertencia("Existen campos vacíos");
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -287,6 +287,7 @@ const ProgramaEducativo = () => {
                       setclave_ProgramaEducativo(event.target.value);
                     }
                   }}  
+                  placeholder="Ej.6"
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
@@ -297,6 +298,7 @@ const ProgramaEducativo = () => {
                       setnombre_ProgramaEducativo(event.target.value);
                     }
                   }}  
+                  placeholder="Ej.Licenciatura en Sistemas Computacionales" 
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>
           <div className="field col-2">
@@ -306,7 +308,8 @@ const ProgramaEducativo = () => {
                     if (validarNumero(event.target.value)) {    
                       	setbanco_Horas(event.target.value);
                     }
-                  }}  
+                  }}
+                  placeholder="Ej.120"  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-2">
@@ -316,7 +319,8 @@ const ProgramaEducativo = () => {
                     if (validarNumero(event.target.value)) {    
                       setasignaturas_horas(event.target.value);
                     }
-                  }}  
+                  }} 
+                  placeholder="N/A esto no se registra" 
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-6">
