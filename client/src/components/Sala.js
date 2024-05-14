@@ -49,7 +49,7 @@ const Sala = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!nombre_Sala || !capacidad_Sala || !clave_Edificio || !clave_TipoSala) {
-      mostrarAdvertencia("Existen campos vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -62,13 +62,13 @@ const Sala = () => {
       clave_TipoSala:clave_TipoSala
     }).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Registro exitoso");
+        mostrarExito("Registro Exitoso");
         get();
         limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
-        mostrarAdvertencia("Nombre ya existente en el edificio");
+        mostrarAdvertencia("Nombre ya existente en el Edificio");
       }else if(error.response.status === 500){          
         mostrarError("Error interno del servidor");
       }  
@@ -90,11 +90,11 @@ const Sala = () => {
   const put = (rowData) =>{
     SalaService.modificarSala(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa");
+        mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Nombre ya Existente en el Edificio");
         get();
       }else if(error.response.status === 500){
         mostrarError("Error del sistema");
@@ -251,7 +251,7 @@ const Sala = () => {
             onChange={(e) => options.editorCallback(e.value)}            
             optionLabel = {(option) => `${option.clave_TipoSala} - ${option.nombre_TipoSala}`}
             optionValue="clave_TipoSala"
-            placeholder="Seleccione un tipo de Sala" 
+            placeholder="Seleccione un Tipo de Sala" 
         />
     );
   };
@@ -333,7 +333,7 @@ const Sala = () => {
       <Panel header="Registrar Sala" className='mt-3' toggleable>
         <div className="formgrid grid mx-8">
           <div className="field col-3">
-              <label>Nombre</label>
+              <label>Nombre*</label>
               <InputText type="text" keyfilter={ /^[0-9a-zA-Z]*$/} value={nombre_Sala} maxLength={255}
                   onChange={(event)=>{
                       setnombre_Sala(event.target.value);
@@ -341,7 +341,7 @@ const Sala = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>
           <div className="field col-2">
-              <label>Capacidad</label>
+              <label>Capacidad*</label>
               <InputText type="text" keyfilter="pint" value={capacidad_Sala} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
@@ -351,7 +351,7 @@ const Sala = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-2">
-              <label>Validar Traslape</label>
+              <label>Validar Traslape*</label>
               <ToggleButton
                 invalid
                 onLabel="Si"
@@ -363,7 +363,7 @@ const Sala = () => {
             />
           </div>
           <div className="field col-5">
-            <label>Edificio</label>
+            <label>Edificio*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
               value={clave_Edificio} 
               options={edificios} 
@@ -372,11 +372,11 @@ const Sala = () => {
               }} 
               optionLabel="nombre_Edificio" 
               optionValue="clave_Edificio" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-              placeholder="Seleccione un edificio" 
+              placeholder="Seleccione un Edificio" 
             />
           </div>
           <div className="field col-5">
-            <label>Tipo de Sala</label>
+            <label>Tipo de Sala*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
               value={clave_TipoSala} 
               options={tiposalas} 
@@ -385,7 +385,7 @@ const Sala = () => {
               }} 
               optionLabel="nombre_TipoSala" 
               optionValue="clave_TipoSala" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-              placeholder="Seleccione un tipo de sala" 
+              placeholder="Seleccione un Tipo de Sala" 
             />
           </div>          
           <div className="field col">
@@ -402,7 +402,7 @@ const Sala = () => {
         </div>   
       </Panel>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Sala" className='mt-3' toggleable>
+      <Panel header="Consultar Salas" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  

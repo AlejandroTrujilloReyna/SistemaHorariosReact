@@ -39,7 +39,7 @@ const UnidadAcademica = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_UnidadAcademica || !nombre_UnidadAcademica) {
-      mostrarAdvertencia("Existen campos vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -48,15 +48,15 @@ const UnidadAcademica = () => {
       nombre_UnidadAcademica:nombre_UnidadAcademica
     }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
-        mostrarExito("Registro exitoso");
+        mostrarExito("Registro Exitoso");
         get();
         limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
-        mostrarAdvertencia("Clave ya existente");
+        mostrarAdvertencia("Clave ya Existente");
       }else if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Nombre ya Existente");
       }else if(error.response.status === 500){
         mostrarError("Error interno del servidor");
       }     
@@ -78,11 +78,11 @@ const UnidadAcademica = () => {
   const put = (rowData) =>{
     UnidadAcademicaService.modificarUnidadAcademica(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa");
+        mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Nombre ya Existente");
         get();
       }else if(error.response.status === 401){
         mostrarError("Error del sistema");
@@ -182,10 +182,10 @@ const UnidadAcademica = () => {
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
       {/*PANEL PARA EL REGISTRO*/}
-      <Panel header="Registrar Unidad Academica" className='mt-3' toggleable>
+      <Panel header="Registrar Unidad Académica" className='mt-3' toggleable>
         <div className="formgrid grid mx-8">
           <div className="field col-2">
-              <label>Clave</label>
+              <label>Clave*</label>
               <InputText type="text" keyfilter="pint" value={clave_UnidadAcademica} maxLength={10}
                 onChange={(event) => {
                   if (validarNumero(event.target.value)) {
@@ -195,7 +195,7 @@ const UnidadAcademica = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
-              <label>Nombre</label>
+              <label>Nombre*</label>
               <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_UnidadAcademica} maxLength={255}
                 onChange={(event) => {
                   if (validarTexto(event.target.value)) {
@@ -210,7 +210,7 @@ const UnidadAcademica = () => {
         </div>        
       </Panel>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Unidad Academica" className='mt-3' toggleable>
+      <Panel header="Consultar Unidades Académicas" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} 
         className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  

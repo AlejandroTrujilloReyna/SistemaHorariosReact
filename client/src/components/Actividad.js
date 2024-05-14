@@ -39,7 +39,7 @@ const Actividad = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_Actividad || !nombre_Actividad) {
-      mostrarAdvertencia("Existen campos vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -48,15 +48,15 @@ const Actividad = () => {
         nombre_Actividad:nombre_Actividad
     }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
-        mostrarExito("Registro exitoso");
+        mostrarExito("Registro Exitoso");
         get();
         limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
-        mostrarAdvertencia("Clave ya existente");
+        mostrarAdvertencia("Clave ya Existente");
       }else if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Nombre ya Existente");
       }else if(error.response.status === 500){
         mostrarError("Error interno del servidor");
       }     
@@ -78,14 +78,14 @@ const Actividad = () => {
   const put = (rowData) =>{
     ActividadService.modificarActividad(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa");
+        mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
-        mostrarAdvertencia("Clave ya existente");
+        mostrarAdvertencia("Clave ya Existente");
         get();
       }else if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Nombre ya Existente");
         get();
       }else if(error.response.status === 500){
         mostrarError("Error interno del servidor");
@@ -213,7 +213,7 @@ const Actividad = () => {
       <Panel header="Registrar Actividad" className='mt-3' toggleable>
         <div className="formgrid grid mx-8">
           <div className="field col-2">
-              <label>Clave</label>
+              <label>Clave*</label>
               <InputText type="text" keyfilter="pint" value={clave_Actividad} maxLength={10}
                 onChange={(event) => {
                   if (validarNumero(event.target.value)) {
@@ -223,7 +223,7 @@ const Actividad = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
-              <label>Nombre</label>
+              <label>Nombre*</label>
               <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_Actividad} maxLength={255}
                 onChange={(event) => {
                   if (validarTexto(event.target.value)) {

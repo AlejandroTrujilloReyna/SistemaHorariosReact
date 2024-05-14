@@ -47,7 +47,7 @@ const UATipoSubGrupoHoras = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_TipoSubGrupo || !clave_UnidadAprendizaje || !horas) {
-      mostrarAdvertencia("Existen campos vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -58,13 +58,13 @@ const UATipoSubGrupoHoras = () => {
     
     }).then(response=>{
       if (response.status === 200) {//CASO EXITOSO
-        mostrarExito("Registro exitoso");
+        mostrarExito("Registro Exitoso");
         get();
         limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
-        mostrarAdvertencia("Subgrupo ya existente para esa unidad de aprendizaje");      
+        mostrarAdvertencia("Subgrupo ya existente para esa Unidad de Aprendizaje");      
       }else if(error.response.status === 500){          
         mostrarError("Error interno del servidor");
       }     
@@ -86,11 +86,11 @@ const UATipoSubGrupoHoras = () => {
   const put = (rowData) =>{
     UATipoSubGrupoHorasService.modificarUATipoSubGrupoHoras(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa");
+        mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 401){
-        mostrarAdvertencia("Tipo de subgrupo existente en el programa educativo");
+        mostrarAdvertencia("Tipo de subgrupo existente en la Unidad de Aprendizaje");
         get();
       }else if(error.response.status === 500){
         mostrarError("Error del sistema");
@@ -113,7 +113,7 @@ const UATipoSubGrupoHoras = () => {
   const columns = [
     {field: 'clave_UATipoSubGrupoHoras', header: 'Clave' },
     {field: 'horas', header: 'Horas' },
-    {field: 'clave_UnidadAprendizaje', header: 'Unidad Aprendizaje'},
+    {field: 'clave_UnidadAprendizaje', header: 'Unidad de Aprendizaje'},
     {field: 'clave_TipoSubGrupo', header: 'Tipo SubGrupo'},
   ];
   
@@ -233,7 +233,7 @@ const UATipoSubGrupoHoras = () => {
                 onChange={(e) => options.editorCallback(e.value)}
                 optionLabel="nombre_UnidadAprendizaje" 
                 optionValue="clave_UnidadAprendizaje" 
-                placeholder="Selecciona una unidad de aprendizaje" 
+                placeholder="Selecciona una Unidad de Aprendizaje" 
       />
     );
   };    
@@ -292,10 +292,10 @@ const UATipoSubGrupoHoras = () => {
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
       {/*PANEL PARA EL REGISTRO*/}
-      <Panel header="Registrar UA Tipo SubGrupo" className='mt-3' toggleable>
+      <Panel header="Registrar Tipos de SubGrupo de Unidades de Aprendizaje" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-2">
-              <label>Horas</label>
+              <label>Horas*</label>
               <InputText type="text" keyfilter="pint" value={horas} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
@@ -305,7 +305,7 @@ const UATipoSubGrupoHoras = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-6">
-              <label>Tipo SubGrupo</label>
+              <label>Tipo SubGrupo*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
               value={clave_TipoSubGrupo} 
               options={TiposSubgrupos} 
@@ -314,11 +314,11 @@ const UATipoSubGrupoHoras = () => {
               }} 
               optionLabel="nombre_TipoSubGrupo" 
               optionValue="clave_TipoSubGrupo" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-              placeholder="Seleccione un tipo de Sub Grupo" 
+              placeholder="Seleccione un Tipo de Sub Grupo" 
             />
           </div>                                                                           
           <div className="field col-6">
-              <label>Unidad Aprendizaje</label>
+              <label>Unidad Aprendizaje*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
               value={clave_UnidadAprendizaje} 
               options={UnidadesAprendizaje} 
@@ -327,7 +327,7 @@ const UATipoSubGrupoHoras = () => {
               }} 
               optionLabel="nombre_UnidadAprendizaje" 
               optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-              placeholder="Seleccione una unidad de aprendizaje" 
+              placeholder="Seleccione una Unidad de Aprendizaje" 
             />
           </div> 
         </div>
@@ -336,7 +336,7 @@ const UATipoSubGrupoHoras = () => {
         </div>   
       </Panel>    
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar UA Tipo SubGrupo" className='mt-3' toggleable>
+      <Panel header="Consultar Tipos de SubGrupo de Unidades de Aprendizaje" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} 
         className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  

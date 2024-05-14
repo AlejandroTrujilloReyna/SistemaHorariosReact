@@ -45,7 +45,7 @@ const ProgramaEducativo = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo || !asignaturas_horas) {
-      mostrarAdvertencia("Existen campos vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -58,15 +58,15 @@ const ProgramaEducativo = () => {
       clave_UnidadAcademica:clave_UnidadAcademica      
     }).then(response=>{
       if (response.status === 200) {//CASO EXITOSO
-        mostrarExito("Registro exitoso");
+        mostrarExito("Registro Exitoso");
         get();
         limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
-        mostrarAdvertencia("Clave ya existente");
+        mostrarAdvertencia("Clave ya Existente");
       } else if (error.response.status === 401) {
-        mostrarAdvertencia("Nombre ya existente");      
+        mostrarAdvertencia("Nombre ya Existente");      
       }else if(error.response.status === 500){          
         mostrarError("Error interno del servidor");
       }     
@@ -88,11 +88,11 @@ const ProgramaEducativo = () => {
   const put = (rowData) =>{
     ProgramaEducativoService.modificarProgramaEducativo(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa");
+        mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Nombre ya Existente");
         get();
       }else if(error.response.status === 500){
         mostrarError("Error del sistema");
@@ -117,9 +117,9 @@ const ProgramaEducativo = () => {
   const columns = [
     {field: 'clave_ProgramaEducativo', header: 'Clave' },
     {field: 'nombre_ProgramaEducativo', header: 'Nombre' },
-    {field: 'asignaturas_horas', header: 'Horas de asignatura'},
+    {field: 'asignaturas_horas', header: 'Horas de Asignatura'},
     {field: 'banco_Horas', header: 'Banco de Horas'},
-    {field: 'clave_UnidadAcademica', header: 'Unidad Academica'}    
+    {field: 'clave_UnidadAcademica', header: 'Unidad Académica'}    
   ];
   
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -212,7 +212,7 @@ const ProgramaEducativo = () => {
                 onChange={(e) => options.editorCallback(e.value)}
                 optionLabel="nombre_UnidadAcademica" 
                 optionValue="clave_UnidadAcademica" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-                placeholder="Selecciona una Unidad Academica" 
+                placeholder="Selecciona una Unidad Académica" 
       />
     );
   };    
@@ -281,7 +281,7 @@ const ProgramaEducativo = () => {
       <Panel header="Registrar Programa Educativo" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-2">
-              <label>Clave</label>
+              <label>Clave*</label>
               <InputText type="text" keyfilter="pint" value={clave_ProgramaEducativo} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {  
@@ -291,7 +291,7 @@ const ProgramaEducativo = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
-              <label>Nombre</label>
+              <label>Nombre*</label>
               <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_ProgramaEducativo} maxLength={255}
                   onChange={(event)=>{
                     if (validarTexto(event.target.value)) {  
@@ -311,7 +311,7 @@ const ProgramaEducativo = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-2">
-              <label>Horas de asignatura</label>
+              <label>Horas de asignatura*</label>
               <InputText type="text" keyfilter="pint" value={asignaturas_horas} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
@@ -321,7 +321,7 @@ const ProgramaEducativo = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-6">
-              <label>Unidad Academica</label>
+              <label>Unidad Académica*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
               value={clave_UnidadAcademica} 
               options={unidadesAcademicas} 
@@ -330,7 +330,7 @@ const ProgramaEducativo = () => {
               }} 
               optionLabel="nombre_UnidadAcademica" 
               optionValue="clave_UnidadAcademica" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-              placeholder="Seleccione una unidad académica" 
+              placeholder="Seleccione una Unidad Académica" 
             />
           </div>                                                                           
         </div>
@@ -339,7 +339,7 @@ const ProgramaEducativo = () => {
         </div>   
       </Panel>    
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Programa Educativo" className='mt-3' toggleable>
+      <Panel header="Consultar Programas Educativos" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} 
         className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  

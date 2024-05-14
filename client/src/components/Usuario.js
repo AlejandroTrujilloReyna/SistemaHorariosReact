@@ -46,7 +46,7 @@ const Usuario = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!correo || !contrasena || !nombre_Usuario || !apellidoP_Usuario || !apellidoM_Usuario || !clave_Permiso) {      
-      mostrarAdvertencia("Existen campos vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -316,7 +316,7 @@ const Usuario = () => {
       <Panel header="Registrar Usuario" className='mt-3' toggleable>        
         <div className="formgrid grid mx-8">
           <div className="field col-5">
-              <label>Correo</label>
+              <label>Correo*</label>
               <InputText type="text" keyfilter={/^[a-zA-Z0-9\s@.]*$/} value={correo} maxLength={255}
                   onChange={(event)=>{
                     if (validarCorreo(event.target.value)) {
@@ -327,7 +327,7 @@ const Usuario = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-3">
-              <label>Contraseña</label>
+              <label>Contraseña*</label>
               <InputText type="text" value={contrasena} maxLength={255}
                   onChange={(event)=>{                    
                       setcontrasena(event.target.value);                    
@@ -336,7 +336,7 @@ const Usuario = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"/>              
           </div> 
           <div className="field col-3">
-              <label>Permiso</label>
+              <label>Permiso*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"
               value={clave_Permiso} 
               options={permisos} 
@@ -350,7 +350,7 @@ const Usuario = () => {
             />
           </div>
           <div className="field col-5">
-              <label>Nombre</label>
+              <label>Nombre*</label>
               <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={nombre_Usuario} maxLength={255}
                   onChange={(event)=>{
                     if (validarTexto(event.target.value)) {
@@ -361,18 +361,18 @@ const Usuario = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"/>              
           </div> 
           <div className="field col-3">
-              <label>Apellido Paterno</label>
+              <label>Apellido Paterno*</label>
               <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={apellidoP_Usuario} maxLength={255}
                   onChange={(event)=>{
                     if (validarTexto(event.target.value)) {
                       setapellidoP_Usuario(event.target.value);
                     }
                   }}  
-                  placeholder="Ej.Ramirez" 
+                  placeholder="Ej.Ramírez" 
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"/>              
           </div> 
           <div className="field col-3">
-              <label>Apellido Materno</label>
+              <label>Apellido Materno*</label>
               <InputText type="text" keyfilter={/[a-zA-ZñÑ\s]/} value={apellidoM_Usuario} maxLength={255}
                   onChange={(event)=>{
                     if (validarTexto(event.target.value)) {
@@ -388,7 +388,7 @@ const Usuario = () => {
         </div>                
       </Panel>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Usuario" className='mt-3' toggleable>
+      <Panel header="Consultar Usuarios" className='mt-3' toggleable>
         <div className="mx-8 mb-4">
           <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
         </div>

@@ -38,7 +38,7 @@ const TipoSala = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!nombre_TipoSala) {      
-      mostrarAdvertencia("Existen campos obligatorios vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -52,7 +52,7 @@ const TipoSala = () => {
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");        
+        mostrarAdvertencia("Nombre ya Existente");        
       }else if(error.response.status === 500){  
         mostrarError("Error interno del servidor");
       }     
@@ -77,7 +77,7 @@ const TipoSala = () => {
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
-        mostrarAdvertencia("El nombre ya se encuentra registrado");
+        mostrarAdvertencia("El Nombre ya se encuentra registrado");
         get();
       }else if (error.response.status === 500) {
         mostrarError("Error del sistema");
@@ -183,7 +183,7 @@ const TipoSala = () => {
         </div>                
       </Panel>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Tipo Sala" className='mt-3' toggleable>
+      <Panel header="Consultar Tipos de Salas" className='mt-3' toggleable>
         <div className="mx-8 mb-4">
           <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
         </div>

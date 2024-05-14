@@ -40,7 +40,7 @@ const TipoSubGrupo = () => {
     const add = ()=>{
       //VALIDACION DE CAMPOS VACIOS
       if (!nombre_TipoSubGrupo) {
-        mostrarAdvertencia("Existen campos vacios");
+        mostrarAdvertencia("Existen campos vacíos");
         return;
       }
       //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -49,13 +49,13 @@ const TipoSubGrupo = () => {
    
       }).then(response=>{
         if (response.status === 200) {//CASO EXITOSO
-          mostrarExito("Registro exitoso");
+          mostrarExito("Registro Exitoso");
           get();
           limpiarCampos();
         }
       }).catch(error=>{//EXCEPCIONES
         if (error.response.status === 401) {
-          mostrarAdvertencia("Nombre ya existente");      
+          mostrarAdvertencia("Nombre ya Existente");      
         }else if(error.response.status === 500){          
           mostrarError("Error interno del servidor");
         }     
@@ -77,11 +77,11 @@ const TipoSubGrupo = () => {
     const put = (rowData) =>{
       TipoSubGrupoService.modificarTipoSubGrupo(rowData).then(response=>{//CASO EXITOSO
         if(response.status === 200){
-          mostrarExito("Modificacion exitosa");
+          mostrarExito("Modificación Exitosa");
         }
       }).catch(error=>{//EXCEPCIONES
         if(error.response.status === 401){
-          mostrarAdvertencia("Nombre ya existente");
+          mostrarAdvertencia("Nombre ya Existente");
           get();
         }else if(error.response.status === 500){
           mostrarError("Error del sistema");
@@ -207,7 +207,7 @@ const TipoSubGrupo = () => {
           <div className="formgrid grid mx-8 justify-content-center">
             
             <div className="field col-10">
-                <label>Nombre</label>
+                <label>Nombre*</label>
                 <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_TipoSubGrupo} maxLength={255}
                     onChange={(event)=>{
                       if (validarTexto(event.target.value)) {  
@@ -222,7 +222,7 @@ const TipoSubGrupo = () => {
           </div>   
         </Panel>    
         {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-        <Panel header="Consultar Tipo SubGrupo" className='mt-3' toggleable>
+        <Panel header="Consultar Tipos de SubGrupos" className='mt-3' toggleable>
         <div className="mx-8 mb-4">
           <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} 
           className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  

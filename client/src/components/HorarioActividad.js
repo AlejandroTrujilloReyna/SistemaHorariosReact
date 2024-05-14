@@ -49,7 +49,7 @@ const HorarioActividad = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!hora_EntradaHActividad || !hora_SalidaHActividad || !clave_Dia || !no_Empleado || !id_Actividad) {
-      mostrarAdvertencia("Existen campos vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -67,9 +67,9 @@ const HorarioActividad = () => {
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
-        mostrarAdvertencia("La hora de salida debe ser posterior a la hora de entrada");
+        mostrarAdvertencia("La hora de Salida debe ser posterior a la hora de Entrada");
       } else if (error.response.status === 402) {
-        mostrarAdvertencia("Ya existe un registro en ese horario");      
+        mostrarAdvertencia("Ya existe un Registro en ese Horario");      
       }else if(error.response.status === 500){          
         mostrarError("Error interno del servidor");
       }     
@@ -91,14 +91,14 @@ const HorarioActividad = () => {
   const put = (rowData) =>{
     HorarioActividadService.modificarHorarioActividad(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa");
+        mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
-        mostrarAdvertencia("La hora de salida debe ser posterior a la hora de entrada");
+        mostrarAdvertencia("La hora de Salida debe ser posterior a la hora de Entrada");
         get();
       } else if (error.response.status === 402) {
-        mostrarAdvertencia("Ya existe un registro en ese horario");
+        mostrarAdvertencia("Ya existe un Registro en ese Horario");
         get();      
       }else if(error.response.status === 500){          
         mostrarError("Error interno del servidor");
@@ -124,7 +124,7 @@ const HorarioActividad = () => {
     {field: 'clave_HorarioActividad', header: 'Clave' },
     {field: 'hora_EntradaHActividad', header: 'Entrada' },
     {field: 'hora_SalidaHActividad', header: 'Salida'},
-    {field: 'clave_Dia', header: 'Dia'},
+    {field: 'clave_Dia', header: 'Día'},
     {field: 'no_Empleado', header: 'Empleado'},
     {field: 'id_Actividad', header: 'Actividad'}         
   ];
@@ -235,7 +235,7 @@ const timeEditor = (options) => {
                 onChange={(e) => options.editorCallback(e.value)}
                 optionLabel="nombre_Dia" 
                 optionValue="clave_Dia"
-                placeholder="Selecciona un dia" 
+                placeholder="Selecciona un Día" 
       />
     );
   };
@@ -249,7 +249,7 @@ const timeEditor = (options) => {
                 onChange={(e) => options.editorCallback(e.value)}
                 optionLabel="no_EmpleadoDocente" 
                 optionValue="no_EmpleadoDocente"
-                placeholder="Selecciona un empleado" 
+                placeholder="Selecciona un Empleado" 
       />
     );
   };  
@@ -263,7 +263,7 @@ const timeEditor = (options) => {
                 onChange={(e) => options.editorCallback(e.value)}
                 optionLabel="nombre_Actividad" 
                 optionValue="id_Actividad"
-                placeholder="Selecciona una actividad" 
+                placeholder="Selecciona una Actividad" 
       />
     );
   };
@@ -322,7 +322,7 @@ const timeEditor = (options) => {
       <Panel header="Registrar Horario de Actividad" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-2">            
-              <label>Hora de entrada</label>
+              <label>Hora de entrada*</label>
               <InputText type="time" value={hora_EntradaHActividad} maxLength={10}
                   onChange={(event)=>{
                       sethora_EntradaHActividad(event.target.value);
@@ -330,7 +330,7 @@ const timeEditor = (options) => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>          
           </div>
           <div className="field col-2">
-              <label>Hora de salida</label>
+              <label>Hora de salida*</label>
               <InputText type="time" value={hora_SalidaHActividad} maxLength={10}
                   onChange={(event)=>{
                       sethora_SalidaHActividad(event.target.value);
@@ -338,7 +338,7 @@ const timeEditor = (options) => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
           </div>
           <div className="field col-3">
-            <label>Dia</label>
+            <label>Día*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
               value={clave_Dia} 
               options={dias} 
@@ -347,11 +347,11 @@ const timeEditor = (options) => {
               }} 
               optionLabel="nombre_Dia" 
               optionValue="clave_Dia" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-              placeholder="Seleccione un dia" 
+              placeholder="Seleccione un Día" 
             />
           </div>
           <div className="field col-3">
-            <label>Empleado</label>
+            <label>Empleado*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
               value={no_Empleado} 
               options={empleados} 
@@ -360,11 +360,11 @@ const timeEditor = (options) => {
               }} 
               optionLabel="no_EmpleadoDocente" 
               optionValue="no_EmpleadoDocente" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-              placeholder="Seleccione un empleado" 
+              placeholder="Seleccione un Empleado" 
             />
           </div>
           <div className="field col-3">
-            <label>Actividad</label>
+            <label>Actividad*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
               value={id_Actividad} 
               options={actividades} 
@@ -373,7 +373,7 @@ const timeEditor = (options) => {
               }} 
               optionLabel="nombre_Actividad" 
               optionValue="id_Actividad" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-              placeholder="Seleccione una actividad" 
+              placeholder="Seleccione una Actividad" 
             />
           </div>                                                                                               
         </div>
@@ -382,7 +382,7 @@ const timeEditor = (options) => {
         </div>   
       </Panel>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Programa Educativo" className='mt-3' toggleable>
+      <Panel header="Consultar Horarios de Actividades" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} 
         className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  

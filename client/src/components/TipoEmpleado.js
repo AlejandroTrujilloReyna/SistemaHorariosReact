@@ -40,7 +40,7 @@ const TipoEmpleado = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!nombre_TipoEmpleado || !horas_MinimasTipoEmpleado || !horas_MaximasTipoEmpleado) {
-      mostrarAdvertencia("Existen campos vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
   //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -51,15 +51,15 @@ const TipoEmpleado = () => {
     horas_MaximasTipoEmpleado:horas_MaximasTipoEmpleado
   }).then(response=>{//CASO EXITOSO
     if (response.status === 200) {
-      mostrarExito("Registro exitoso");
+      mostrarExito("Registro Exitoso");
       get();
       limpiarCampos();
     }
   }).catch(error=>{//EXCEPCIONES
     if(error.response.status === 401){
-      mostrarAdvertencia("Nombre ya existente");
+      mostrarAdvertencia("Nombre ya Existente");
     }else if(error.response.status === 403){
-      mostrarAdvertencia("Favor de Revisar las horas");        
+      mostrarAdvertencia("Favor de Revisar las Horas");        
     } else if(error.response.status === 500){
       mostrarError("Error en el sistema");   
     }  
@@ -82,14 +82,14 @@ const TipoEmpleado = () => {
 const put = (rowData) =>{
     TipoEmpleadoService.modificarTipoEmpleado(rowData).then((response)=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa");
+        mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Nombre ya Existente");
         get();
       }else if(error.response.status === 403){
-        mostrarAdvertencia("Favor de Revisar las horas");
+        mostrarAdvertencia("Favor de Revisar las Horas");
         get();  
       }
       else if (error.response.status === 500) {
@@ -112,8 +112,8 @@ const put = (rowData) =>{
    const columns = [
     { field: 'clave_TipoEmpleado', header: 'Clave' },
     { field: 'nombre_TipoEmpleado', header: 'Nombre' },
-    {field: 'horas_MinimasTipoEmpleado', header: 'Hora Minima'},
-    {field: 'horas_MaximasTipoEmpleado', header: 'Hora Maxima'}  
+    {field: 'horas_MinimasTipoEmpleado', header: 'Horas Mínimas'},
+    {field: 'horas_MaximasTipoEmpleado', header: 'Horas Máximas'}  
 ];
 
   //MANDAR A LLAMAR LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -233,7 +233,7 @@ const put = (rowData) =>{
         <div className="formgrid grid mx-8 justify-content-center">
         
           <div className="field col-8">
-          <label>Nombre</label>
+          <label>Nombre*</label>
           <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_TipoEmpleado} maxLength={255}
               onChange={(event) => {
                 if (validarTexto(event.target.value)) {
@@ -245,7 +245,7 @@ const put = (rowData) =>{
           </div>                            
           
           <div className="field col-2">
-              <label>Horas Minimas</label>
+              <label>Horas Mínimas</label>
               <InputText type="text" keyfilter="pint" value={horas_MinimasTipoEmpleado} maxLength={11}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
@@ -256,7 +256,7 @@ const put = (rowData) =>{
           </div>  
 
           <div className="field col-2">
-              <label>Horas Maximas</label>
+              <label>Horas Máximas</label>
               <InputText type="text" keyfilter="pint" value={horas_MaximasTipoEmpleado} maxLength={11}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {

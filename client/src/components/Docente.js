@@ -51,7 +51,7 @@ const Docente = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!no_EmpleadoDocente || !horas_MinimasDocente || !horas_MaximasDocente || !horas_Externas || !clave_TipoEmpleado || !clave_GradoEstudio || !clave_Usuario) {      
-      mostrarAdvertencia("Existen campos vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -71,11 +71,11 @@ const Docente = () => {
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {        
-        mostrarAdvertencia("Clave ya existente");
+        mostrarAdvertencia("Clave ya Existente");
       }else if(error.response.status === 403){
-        mostrarAdvertencia("Favor de Revisar las horas");        
+        mostrarAdvertencia("Favor de Revisar las Horas");        
       }else if(error.response.status === 405){
-        mostrarAdvertencia("Solo puede haber un usuario por docente");        
+        mostrarAdvertencia("Solo puede haber un Usuario por Docente");        
       }else if(error.response.status === 500){  
         mostrarError("Error interno del servidor");
       }     
@@ -104,7 +104,7 @@ const Docente = () => {
         mostrarAdvertencia("Favor de Revisar las horas");
         get();
       }else if(error.response.status === 405){
-        mostrarAdvertencia("Solo puede haber un usuario por docente");
+        mostrarAdvertencia("Solo puede haber un Usuario por Docente");
         get();        
       }else if (error.response.status === 500) {
         mostrarError("Error del sistema");
@@ -130,8 +130,8 @@ const Docente = () => {
   //COLUMNAS PARA LA TABLA
   const columns = [
     {field: 'no_EmpleadoDocente', header: 'NO.Empleado' },
-    {field: 'horas_MinimasDocente', header: 'Horas minimas' },
-    {field: 'horas_MaximasDocente', header: 'Horas maximas' },
+    {field: 'horas_MinimasDocente', header: 'Horas Mínimas' },
+    {field: 'horas_MaximasDocente', header: 'Horas Máximas"' },
     {field: 'horas_Externas', header: 'Horas Externas' },
     {field: 'clave_TipoEmpleado', header: 'Tipo Empleado' },
     {field: 'clave_GradoEstudio', header: 'Grado Estudio' },
@@ -402,7 +402,7 @@ const Docente = () => {
       <Panel header="Registrar Docente" className='mt-3' toggleable>        
         <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-2">
-              <label>No.Empleado</label>
+              <label>No.Empleado*</label>
               <InputText type="text" keyfilter={/^[0-9]*$/} value={no_EmpleadoDocente} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
@@ -413,7 +413,7 @@ const Docente = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-5">
-            <label>Usuario</label>
+            <label>Usuario*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"
               value={clave_Usuario} 
               options={usuarios} 
@@ -427,7 +427,7 @@ const Docente = () => {
             />
           </div>
           <div className="field col-3">
-            <label>Tipo Empleado</label>
+            <label>Tipo Empleado*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"
               value={clave_TipoEmpleado} 
               options={tiposEmpleados} 
@@ -441,7 +441,7 @@ const Docente = () => {
             />
           </div>
           <div className="field col-3">
-            <label>Grado de Estudio</label>
+            <label>Grado de Estudio*</label>
             <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"
               value={clave_GradoEstudio} 
               options={gradosEstudio} 
@@ -455,7 +455,7 @@ const Docente = () => {
             />
           </div>
           <div className="field col-2">
-              <label>Horas Minimas</label>
+              <label>Horas Mínimas*</label>
               <InputText type="text" keyfilter={/^[0-9]*$/} value={horas_MinimasDocente} maxLength={2}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
@@ -466,7 +466,7 @@ const Docente = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-2">
-              <label>Horas Maximas</label>
+              <label>Horas Máximas*</label>
               <InputText type="text" keyfilter={/^[0-9]*$/} value={horas_MaximasDocente} maxLength={2}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
@@ -477,7 +477,7 @@ const Docente = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>   
           <div className="field col-2">
-              <label>Horas Externas</label>
+              <label>Horas Externas*</label>
               <InputText type="text" keyfilter={/^[0-9]*$/} value={horas_Externas} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
@@ -493,7 +493,7 @@ const Docente = () => {
         </div>                
       </Panel>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Edificio" className='mt-3' toggleable>
+      <Panel header="Consultar Docentes" className='mt-3' toggleable>
         <div className="mx-8 mb-4">
           <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
         </div>

@@ -43,7 +43,7 @@ const UnidadAprendizaje = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_UnidadAprendizaje || !nombre_UnidadAprendizaje || !clave_PlanEstudios) {
-      mostrarAdvertencia("Existen campos vacios");
+      mostrarAdvertencia("Existen campos vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -59,9 +59,9 @@ const UnidadAprendizaje = () => {
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
-        mostrarAdvertencia("Clave ya existente");
+        mostrarAdvertencia("Clave ya Existente");
       } else if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Nombre ya Existente");
       } else if(error.response.status === 500){
         mostrarError("Error en el sistema");   
       }  
@@ -83,11 +83,11 @@ const UnidadAprendizaje = () => {
   const put = (rowData) =>{
     UnidadAprendizajeService.modificarUnidadAprendizaje(rowData).then((response)=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa");
+        mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Nombre ya Existente");
         get();
       }
       else if (error.response.status === 500) {
@@ -243,7 +243,7 @@ const UnidadAprendizaje = () => {
       <Panel header="Registrar Unidad Aprendizaje" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-2">
-                  <label>Clave</label>
+                  <label>Clave*</label>
                   <InputText type="text" keyfilter="pint" value={clave_UnidadAprendizaje} maxLength={6}
                       onChange={(event)=>{
                         if (validarNumero(event.target.value)) {
@@ -253,7 +253,7 @@ const UnidadAprendizaje = () => {
                   className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
-          <label>Nombre</label>
+          <label>Nombre*</label>
           <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_UnidadAprendizaje} maxLength={255}
               onChange={(event) => {
                 if (validarTexto(event.target.value)) {
@@ -264,7 +264,7 @@ const UnidadAprendizaje = () => {
           />              
           </div>                            
           <div className="field col-4">
-            <label>Plan de Estudios</label>
+            <label>Plan de Estudios*</label>
               <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
                 value={clave_PlanEstudios} 
                 options={planesdeestudios}  
@@ -282,7 +282,7 @@ const UnidadAprendizaje = () => {
         </div>      
       </Panel>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Unidad de Aprendizaje" className='mt-3' toggleable>
+      <Panel header="Consultar Unidades de Aprendizaje" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  

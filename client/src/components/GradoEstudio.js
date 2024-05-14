@@ -41,7 +41,7 @@ const mostrarExito = (mensaje) => {
   const add = ()=>{
   //VALIDACION DE CAMPOS VACIOS
   if (!nombre_GradoEstudio || !horas_MinimasGradoEstudio || !horas_MaximasGradoEstudio) {
-    mostrarAdvertencia("Existen campos vacios");
+    mostrarAdvertencia("Existen campos vacíos");
     return;
   }
   //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -52,17 +52,17 @@ const mostrarExito = (mensaje) => {
     horas_MaximasGradoEstudio:horas_MaximasGradoEstudio
   }).then(response=>{//CASO EXITOSO
     if (response.status === 200) {
-      mostrarExito("Registro exitoso");
+      mostrarExito("Registro Exitoso");
       get();
       limpiarCampos();
     }
   }).catch(error=>{//EXCEPCIONES
     if (error.response.status === 400) {
-      mostrarAdvertencia("Clave ya existente");
+      mostrarAdvertencia("Clave ya Existente");
     } else if(error.response.status === 401){
-      mostrarAdvertencia("Nombre ya existente");
+      mostrarAdvertencia("Nombre ya Existente");
     }else if(error.response.status === 403){
-      mostrarAdvertencia("Favor de Revisar las horas");        
+      mostrarAdvertencia("Favor de Revisar las Horas");        
     } else if(error.response.status === 500){
       mostrarError("Error en el sistema");   
     }  
@@ -85,14 +85,14 @@ const mostrarExito = (mensaje) => {
 const put = (rowData) =>{
     GradoEstudioService.modificarGradoEstudio(rowData).then((response)=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa");
+        mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
-        mostrarAdvertencia("Nombre ya existente");
+        mostrarAdvertencia("Nombre ya Existente");
         get();
       }else if(error.response.status === 403){
-        mostrarAdvertencia("Favor de Revisar las horas");
+        mostrarAdvertencia("Favor de Revisar las Horas");
         get();        
       }else if (error.response.status === 500) {
         mostrarError("Error del sistema");
@@ -114,8 +114,8 @@ const put = (rowData) =>{
   const columns = [
     { field: 'clave_GradoEstudio', header: 'Clave' },
     { field: 'nombre_GradoEstudio', header: 'Nombre' },
-    {field: 'horas_MinimasGradoEstudio', header: 'Hora Minima'},
-    {field: 'horas_MaximasGradoEstudio', header: 'Hora Maxima'}  
+    {field: 'horas_MinimasGradoEstudio', header: 'Hora Mínimas'},
+    {field: 'horas_MaximasGradoEstudio', header: 'Hora Máximas'}  
   ];
 
   //MANDAR A LLAMAR LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -230,11 +230,11 @@ return (
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
       {/*PANEL PARA EL REGISTRO*/}
-      <Panel header="Registrar Grado de Estudios" className='mt-3' toggleable>
+      <Panel header="Registrar Grado de Estudio" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
         
           <div className="field col-8">
-          <label>Nombre</label>
+          <label>Nombre*</label>
           <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_GradoEstudio} maxLength={255}
               onChange={(event) => {
                 if (validarTexto(event.target.value)) {
@@ -246,7 +246,7 @@ return (
           </div>                            
           
           <div className="field col-2">
-              <label>Horas Minimas</label>
+              <label>Horas Mínimas*</label>
               <InputText type="text" keyfilter="pint" value={horas_MinimasGradoEstudio} maxLength={11}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
@@ -257,7 +257,7 @@ return (
           </div>  
 
           <div className="field col-2">
-              <label>Horas Maximas</label>
+              <label>Horas Máximas*</label>
               <InputText type="text" keyfilter="pint" value={horas_MaximasGradoEstudio} maxLength={11}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
@@ -273,7 +273,7 @@ return (
         </div>      
       </Panel>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Grados de Estudio" className='mt-3' toggleable>
+      <Panel header="Consultar Grados de Estudios" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  

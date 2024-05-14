@@ -47,7 +47,7 @@ const PlanEstudios = () => {
   const add = () => {
   //VALIDACION DE CAMPOS VACIOS
   if (!nombre_PlanEstudios || !clave_ProgramaEducativo || !cant_semestres) {
-    mostrarAdvertencia("Existen campos vacios");
+    mostrarAdvertencia("Existen campos vacíos");
     return;
   }
 
@@ -59,14 +59,14 @@ const PlanEstudios = () => {
     }).then(response => {
     // Caso exitoso
     if (response.status === 200) {
-      mostrarExito("Registro exitoso");
+      mostrarExito("Registro Exitoso");
       get();
       limpiarCampos();
     }
     }).catch(error => {
         // Excepciones
         if (error.response.status === 400) {
-            mostrarAdvertencia("nombre ya existente en este programa educativo");
+            mostrarAdvertencia("Nombre ya existente en este Programa Educativo");
         } else if (error.response.status === 500) {
             mostrarError("Error interno del servidor");
         }
@@ -88,11 +88,11 @@ const PlanEstudios = () => {
 const put = (rowData) =>{
     PlanEstudiosService.modificarPlanEstudios(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificacion exitosa");
+        mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
-      if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya existente");
+      if(error.response.status === 400){
+        mostrarAdvertencia("Nombre ya Existente en este Programa Educativo");
         get();
       }else if(error.response.status === 500){
         mostrarError("Error del sistema");
@@ -113,7 +113,7 @@ const put = (rowData) =>{
   const columns = [
     {field: 'clave_PlanEstudios', header: 'Clave' },
     {field: 'nombre_PlanEstudios', header: 'Nombre' },
-    {field: 'cant_semestres', header: 'Cantidad de semestres'},
+    {field: 'cant_semestres', header: 'Cantidad de Semestres'},
     {field: 'clave_ProgramaEducativo', header: 'Clave Programa Educativo'},          
   ];
 
@@ -265,7 +265,7 @@ const TipoProgramaEducativoEditor = (options) => {
             <Panel header="Registrar Plan de Estudios" className='mt-3' toggleable>
                 <div className="formgrid grid mx-8 justify-content-center">
                     <div className="field col-3">
-                        <label>Nombre</label>
+                        <label>Nombre*</label>
                         <InputText type="text" keyfilter={/^[0-9a-zA-Z\-/]*$/} value={nombre_PlanEstudios} maxLength={255}
                             onChange={(event) => {
                               if (validarTexto(event.target.value)) {
@@ -276,7 +276,7 @@ const TipoProgramaEducativoEditor = (options) => {
                         />
                     </div>
                     <div className="field col-5">
-                        <label>Programa Educativo</label>
+                        <label>Programa Educativo*</label>
                         <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
                             value={clave_ProgramaEducativo}
                             options={ProgramasEducativos}
@@ -289,7 +289,7 @@ const TipoProgramaEducativoEditor = (options) => {
                         />
                     </div>
                     <div className="field col-3">
-                        <label>Cantidad de semestres</label>
+                        <label>Cantidad de semestres*</label>
                         <InputText type="text" keyfilter="pint" value={cant_semestres} maxLength={2}
                             onChange={(event)=>{
                               if (validarNumero(event.target.value)) {    
@@ -304,7 +304,7 @@ const TipoProgramaEducativoEditor = (options) => {
                 </div>
             </Panel>
              {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Plan de Etudios" className='mt-3' toggleable>
+      <Panel header="Consultar Planes de Etudios" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
