@@ -167,7 +167,6 @@ const ProgramaEducativo = () => {
 
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
-    seteditando(true);
     switch (options.field) {
       case 'nombre_ProgramaEducativo':
         return textEditor(options);
@@ -347,7 +346,7 @@ const ProgramaEducativo = () => {
         <DataTable value={filtroprogramaeducativo.length ? filtroprogramaeducativo :programaeducativoList} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
           {columns.map(({ field, header }) => {
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
-              editor={field === 'clave_ProgramaEducativo' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
+              editor={field === 'clave_ProgramaEducativo' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
           })}
         </DataTable>
       </Panel>  

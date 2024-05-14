@@ -178,6 +178,17 @@ const Sala = () => {
     }else if (field === 'clave_TipoSala'){
       const tiposala = tiposalas.find((tiposala) => tiposala.clave_TipoSala === rowData.clave_TipoSala);
       return tiposala ? `${tiposala.nombre_TipoSala}` : '';
+    }else if (field === 'validar_Traslape') {
+      return (
+        <ToggleButton
+          onLabel="Si"
+          onIcon="pi pi-check"
+          offIcon="pi pi-times"
+          checked={rowData[field] === 1}
+          className="w-8rem"
+          disabled={true} // Para hacerlo no editable
+        />
+      );
     }else {
       return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
     }
@@ -193,8 +204,8 @@ const Sala = () => {
         return textEditor(options);        
       case 'capacidad_Sala':
         return numberEditor(options);
-      case 'validar_Traslape':
-        return textEditor(options);
+        case 'validar_Traslape':
+         return ValidarTraslapeEditor(options);
       case 'nota_Descriptiva':
          return textEditor(options);      
       case 'clave_Edificio':
@@ -255,6 +266,20 @@ const Sala = () => {
         />
     );
   };
+
+  //EDITAR TOOGLEBUTTON (VALIDARTRASLAPE)
+  const ValidarTraslapeEditor = (options) => {
+    return (
+      <ToggleButton
+      onLabel="Si"
+      onIcon="pi pi-check" 
+      offIcon="pi pi-times" 
+      checked={options.value === 1} 
+      onChange={(e) => options.editorCallback(e.value ? 1 : 0)} 
+      className="w-8rem" 
+      />
+    );
+  };    
   
   //COMPLETAR MODIFICACION
   const onCellEditComplete = (e) => {
@@ -275,12 +300,12 @@ const Sala = () => {
           event.preventDefault();
         }
         break;
-      case 'validar_Traslape':
-        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
+        case 'validar_Traslape':
+          if(newValue !== '' &&  newValue !== null && newValue !== rowData[field]){
+            rowData[field] = newValue; put(rowData);
+          }else{
+            event.preventDefault();
+          }
         break;
       case 'nota_Descriptiva':
         if (newValue !== rowData[field]){ 
@@ -353,7 +378,6 @@ const Sala = () => {
           <div className="field col-2">
               <label>Validar Traslape*</label>
               <ToggleButton
-                invalid
                 onLabel="Si"
                 onIcon="pi pi-check" 
                 offIcon="pi pi-times" 
