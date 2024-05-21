@@ -29,6 +29,7 @@ const Menu = () => {
                     ]
                 },
                 { label: 'Sala', command: () => {window.location.href='/Sala';} },
+                { label: 'SalaN', command: () => {window.location.href='/SalaN';} },
                 { label: 'Tipo Sala', command: () => {window.location.href='/TipoSala';} }
             ]
         },
@@ -58,7 +59,7 @@ const Menu = () => {
                 { label: 'Tipo SubGrupo', command: () => {window.location.href='/TipoSubGrupo';} },
                 { label: 'Grado de Estudios', command: () => {window.location.href='/GradoEstudio';} }
             ]
-        }           
+        } 
     ];
     const start = <img alt="logo" src="https://comunicacioninstitucional.uabc.mx/sites/default/files/inline-images/escudo-actualizado-2022.png" height="40" className="mr-2"></img>;         
   return (

@@ -12,6 +12,11 @@ const SalaService = {
     },    
     modificarSala: (datos)=>{
         return Axios.put("http://localhost:3001/sala/modificarSala", datos);
+    },
+    eliminarSala:(datos)=>{
+        return Axios.delete("http://localhost:3001/sala/eliminarSala", {
+            data: datos
+        });
     }   
 }
 
