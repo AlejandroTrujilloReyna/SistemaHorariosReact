@@ -1,0 +1,25 @@
+
+/* CAMBIO DE ICONOS A COLOR BLANCO */
+.custom-menubar .p-menuitem-link .pi {
+    color: white; 
+}
+
+/*Cuando se da click en el menu y abre el submenu, tendra el color verde de fondo */
+.custom-menubar .p-submenu-list {
+    background-color: #2c8d57; /* Fondo verde para el submenu */
+   
+}
+.p-menuitem :hover{
+
+    background-color: rgba(169, 165, 165, 0.504);
+}
+
+/* VISTA DEL MENUBAR */
+.p-menubar {
+    background-color: #2c8d57; 
+    border-bottom: 6px solid #FFD700; 
+  }
+ 
+
+
+
