@@ -154,7 +154,7 @@ const TipoSala = () => {
 
   const validarTexto = (value) => {
     // Expresión regular para validar caracteres alfabeticos y espacios
-    const regex = /^[a-zA-Z\s]*$/;
+    const regex = /^[a-zA-ZñÑ\s]*$/;
     // Verificar si el valor coincide con la expresión regular
     return regex.test(value);
   };
