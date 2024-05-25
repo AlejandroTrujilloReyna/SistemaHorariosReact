@@ -77,9 +77,13 @@ const Menu = () => {
                 { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Tipo SubGrupo</span>,
                 command: () => { window.location.href = '/TipoSubGrupo'; } },
                 { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Grado de Estudios</span>,
-                command: () => { window.location.href = '/GradoEstudio'; } }
+                command: () => { window.location.href = '/GradoEstudio'; } },
+                { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Material</span>,
+                command: () => { window.location.href = '/Material'; } } ,
+                { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Sala Material</span>,
+                command: () => { window.location.href = '/SalaMaterial'; } }            
             ]
-        }           
+        }         
     ];
 
     const start = <img alt="logo" src="https://comunicacioninstitucional.uabc.mx/sites/default/files/inline-images/escudo-actualizado-2022.png" height="40" className="mr-2"></img>;

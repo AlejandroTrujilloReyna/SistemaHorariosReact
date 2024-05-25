@@ -56,6 +56,12 @@ app.use("/horarioactividad", horarioactividadRoutes);
 const diaRoutes = require("./routes/dia")
 app.use("/dia", diaRoutes);
 
+const materialRoutes = require("./routes/material")
+app.use("/material", materialRoutes);
+
+const salamaterialRoutes = require("./routes/salamaterial")
+app.use("/salamaterial", salamaterialRoutes);
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });
