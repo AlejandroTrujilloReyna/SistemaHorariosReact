@@ -24,6 +24,7 @@ import Actividad from './components/Actividad';
 import HorarioActividad from './components/HorarioActividad';
 import Inicio from './components/Inicio';
 import SalaN from './components/SalaN';
+import ModificarSubgrupos from './components/ModificarSubgrupos';
 function App() {
   return (
     <div className="App">
@@ -48,6 +49,7 @@ function App() {
           <Route path='/Docente' element={<Docente/>}/>
           <Route path='/Actividad' element={<Actividad/>}/>
           <Route path='/HorarioActividad' element={<HorarioActividad/>}/>
+          <Route path='/ModificarSubgrupos' element={<ModificarSubgrupos/>}/>
           <Route path='/Inicio' element={<Inicio/>}/>
         </Routes>
       </BrowserRouter>    

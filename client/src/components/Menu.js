@@ -82,7 +82,7 @@ const Menu = () => {
         }           
     ];
 
-    const start = <img alt="logo" src="https://comunicacioninstitucional.uabc.mx/sites/default/files/inline-images/escudo-actualizado-2022.png" height="40" className="mr-2"></img>;
+    const start = <img alt="logo" src="https://comunicacioninstitucional.uabc.mx/wp-content/uploads/2024/03/escudo-actualizado-2022-w1000px-751x1024.png" height="40" className="mr-2"></img>;
  
    
     return (

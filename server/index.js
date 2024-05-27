@@ -56,6 +56,9 @@ app.use("/horarioactividad", horarioactividadRoutes);
 const diaRoutes = require("./routes/dia")
 app.use("/dia", diaRoutes);
 
+const modificarsubgruposRoutes = require("./routes/modificarsubgrupos")
+app.use("/modificarsubgrupos",modificarsubgruposRoutes);
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });
