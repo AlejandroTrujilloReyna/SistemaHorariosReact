@@ -11,7 +11,7 @@ import ProgramaEducativo from './components/ProgramaEducativo';
 import Edificio from './components/Edificio';
 import Sala from './components/Sala';
 import TipoSala from './components/TipoSala';
-import UsarEdificio from './components/UsarEdificio';
+import UsarEdificio from './components/UsarEdificioo';
 import UnidadAprendizaje from './components/UnidadAprendizaje';
 import PlanEstudios from './components/PlanEstudios'
 import TipoSubGrupo from './components/TipoSubGrupo'
@@ -24,6 +24,8 @@ import Actividad from './components/Actividad';
 import HorarioActividad from './components/HorarioActividad';
 import Inicio from './components/Inicio';
 import SalaN from './components/SalaN';
+import UsarEdificioo from './components/UsarEdificioo';
+import UnidadAprendizajePlanEstudios from './components/UnidadAprendizajePlanEstudios';
 function App() {
   return (
     <div className="App">
@@ -48,7 +50,10 @@ function App() {
           <Route path='/Docente' element={<Docente/>}/>
           <Route path='/Actividad' element={<Actividad/>}/>
           <Route path='/HorarioActividad' element={<HorarioActividad/>}/>
+          <Route path='/UsarEdificioo' element={<UsarEdificioo/>}/>
+          <Route path='/UnidadAprendizajePlanEstudios' element={<UnidadAprendizajePlanEstudios/>}/>
           <Route path='/Inicio' element={<Inicio/>}/>
+        
         </Routes>
       </BrowserRouter>    
     </div>

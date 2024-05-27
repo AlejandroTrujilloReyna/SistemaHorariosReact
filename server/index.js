@@ -56,6 +56,19 @@ app.use("/horarioactividad", horarioactividadRoutes);
 const diaRoutes = require("./routes/dia")
 app.use("/dia", diaRoutes);
 
+const usaredificioRoutes = require("./routes/UsarEdificio")
+app.use("/usaredificio", usaredificioRoutes);
+
+const unidadaprendizajeplanestudiosRoutes = require("./routes/unidadaprendizajeplanestudios")
+app.use("/unidadaprendizajeplanestudios",unidadaprendizajeplanestudiosRoutes)
+
+const etapaRoutes = require("./routes/etapa")
+app.use("/etapa",etapaRoutes)
+
+const clasificacionunidadaprendizajeRoutes = require("./routes/clasificacionunidadaprendizaje")
+app.use("/clasificacionunidadaprendizaje",clasificacionunidadaprendizajeRoutes)
+
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });
