@@ -68,6 +68,8 @@ app.use("/etapa",etapaRoutes)
 const clasificacionunidadaprendizajeRoutes = require("./routes/clasificacionunidadaprendizaje")
 app.use("/clasificacionunidadaprendizaje",clasificacionunidadaprendizajeRoutes)
 
+const modificarsubgruposRoutes = require("./routes/modificarsubgrupos")
+app.use("/modificarsubgrupos",modificarsubgruposRoutes);
 
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");

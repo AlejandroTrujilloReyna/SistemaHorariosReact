@@ -26,6 +26,7 @@ import Inicio from './components/Inicio';
 import SalaN from './components/SalaN';
 import UsarEdificioo from './components/UsarEdificioo';
 import UnidadAprendizajePlanEstudios from './components/UnidadAprendizajePlanEstudios';
+import ModificarSubgrupos from './components/ModificarSubgrupos';
 function App() {
   return (
     <div className="App">
@@ -52,6 +53,7 @@ function App() {
           <Route path='/HorarioActividad' element={<HorarioActividad/>}/>
           <Route path='/UsarEdificioo' element={<UsarEdificioo/>}/>
           <Route path='/UnidadAprendizajePlanEstudios' element={<UnidadAprendizajePlanEstudios/>}/>
+          <Route path='/ModificarSubgrupos' element={<ModificarSubgrupos/>}/>
           <Route path='/Inicio' element={<Inicio/>}/>
         
         </Routes>
