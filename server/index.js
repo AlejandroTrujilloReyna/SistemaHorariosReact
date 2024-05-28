@@ -59,6 +59,9 @@ app.use("/dia", diaRoutes);
 const impartirunidadaprendizajeRoutes = require("./routes/impartirunidadaprendizaje")
 app.use("/impartirunidadaprendizaje", impartirunidadaprendizajeRoutes);
 
+const programaeducativodocenteRoutes = require("./routes/programaeducativodocente")
+app.use("/programaeducativodocente", programaeducativodocenteRoutes);
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });

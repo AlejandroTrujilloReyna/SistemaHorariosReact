@@ -18,12 +18,22 @@ import UsuarioService from '../services/UsuarioService';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 import ImpartirUnidadAprendizajeService from '../services/ImpartirUnidadAprendizajeService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
+import ProgramaEducativoDocenteService from '../services/ProgramaEducativoDocenteService';
 import { Toolbar } from 'primereact/toolbar';
 import { Dialog } from 'primereact/dialog';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 
 const DocenteN = () => {
+  
+    const handleSelectionChange = (e) => {
+        setprogramaseducativosseleccionados(e.value);
+    };
+
+    const handleInputChange = (e, key) => {
+        const newValues = { ...programaeducativohoras, [key]: e.target.value };
+        setprogramaeducativohoras(newValues);
+    };
   //VARIABLES ESTADO PARA LOS DIALOG, ACCIONES Y FILTRO TABLA
     const [mostrarDialog, setMostrarDialog] = useState(false);
     const [mostrarEliminarDialog, setMostrarEliminarDialog] = useState(false);
@@ -51,7 +61,7 @@ const DocenteN = () => {
   const [clave_Usuario, setclave_Usuario] = useState(null);
   const [unidadesseleccionadas,setunidadesseleccionadas] = useState([]);
   const [programaseducativosseleccionados,setprogramaseducativosseleccionados] = useState([]);
-  const [horasprogramaseducativos,sethorasprogramaseducativos] = useState([]);
+  //const [horasprogramaseducativos,sethorasprogramaseducativos] = useState([]);
   const [programaeducativohoras, setprogramaeducativohoras] = useState({});
   //VARIABLES PARA LA CONSULTA
   const [unidadesaprendizajeList,setunidadesaprendizajeList] = useState([]);
@@ -103,7 +113,8 @@ const DocenteN = () => {
           }).then(response=>{//CASO EXITOSO
             if (response.status === 200) {
               mostrarExito("Registro Exitoso");
-              addUnidadAprendizaje();
+              addProgramaEducativoDocente();
+              addUnidadAprendizaje();              
               get();
               limpiarCampos();
             }
@@ -130,8 +141,8 @@ const DocenteN = () => {
       }
       ).then(response => {//CASO EXITOSO
         if (response.status === 200) {                              
-          eliminarImpartir();          
           addUnidadAprendizaje();
+          eliminarImpartir();                    
           mostrarExito("Modificación Exitosa");
           setFrmEnviado(false);
           seteditando(false);
@@ -168,6 +179,7 @@ const DocenteN = () => {
         }
       })
   }
+
   const addUnidadAprendizaje = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!unidadesseleccionadas) {      
@@ -183,6 +195,35 @@ const DocenteN = () => {
       if (response.status === 200) {
           if(i===unidadesseleccionadas.length-1){
               //mostrarExito("Registro Exitoso");                            
+          }
+          //get();
+          //limpiarCampos();
+      }
+      }).catch(error=>{//EXCEPCIONES
+      if(error.response.status === 500){  
+          mostrarError("Error interno del servidor");
+      }     
+      });  
+    }
+    get();
+  }
+
+  const addProgramaEducativoDocente = ()=>{
+    //VALIDACION DE CAMPOS VACIOS
+    if (!programaseducativosseleccionados || !programaeducativohoras) {      
+      mostrarAdvertencia("Existen campos Obligatorios vacíos Programa");
+      return;
+    }
+
+    for (let i = 0; i < programaseducativosseleccionados.length; i++) {                    
+      ProgramaEducativoDocenteService.registrarProgramaEducativoDocentedos({
+        clave_ProgramaEducativo:programaseducativosseleccionados[i],
+          no_EmpleadoDocente:no_EmpleadoDocente,
+          horas_Impartir: programaeducativohoras[programaseducativosseleccionados[i]]    
+      }).then(response=>{//CASO EXITOSO
+      if (response.status === 200) {
+          if(i===unidadesseleccionadas.length-1){
+              mostrarExito("Registro Exitoso");                            
           }
           //get();
           //limpiarCampos();
@@ -235,7 +276,9 @@ const DocenteN = () => {
     setclave_TipoEmpleado(null);
     setclave_GradoEstudio(null);
     setclave_Usuario(null);
-    setunidadesseleccionadas([]);    
+    setunidadesseleccionadas([]); 
+    setprogramaseducativosseleccionados([]);   
+    setprogramaeducativohoras({});
   };
   
   
@@ -489,7 +532,7 @@ const DocenteN = () => {
     setlazyState(event);
   };
  
-  const manejoInputPrograma = (code, value) => {
+  /*const manejoInputPrograma = (code, value) => {
     sethorasprogramaseducativos((prevValues) => ({
       ...prevValues,
       [code]: value,
@@ -502,9 +545,9 @@ const DocenteN = () => {
     if (programaeducativo && !programaseducativosseleccionados.some((p) => p.clave_ProgramaEducativo === code)) {
       setprogramaseducativosseleccionados((prevSelected) => [...prevSelected, programaeducativo]);
     }
-  };
+  };*/
 
-  const elementosProgramaEducativo = (option) => {
+  /*const elementosProgramaEducativo = (option) => {
     return (
       <React.Fragment>
       <div className="flex align-items-center">
@@ -521,7 +564,7 @@ const DocenteN = () => {
       </div>
       </React.Fragment>
     );
-  };
+  };*/
 
   return (
     <>
@@ -539,7 +582,7 @@ const DocenteN = () => {
         footer={footerDialog}
         onHide={esconderDialog}
       >    
-        <div className="formgrid grid">
+      <div className="formgrid grid">
         <div className="field col">
             <label htmlFor="NoEmpleado" className="font-bold">
               NO.Empleado*
@@ -624,50 +667,6 @@ const DocenteN = () => {
                 )}
             </div>
         </div>
-        <div className="field col">
-            <label htmlFor="UnidadesAprendizaje" className="font-bold">Unidades Aprendizaje*</label>
-            <MultiSelect 
-            id="UnidadesAprendizaje"
-            value={unidadesseleccionadas} 
-            options={unidadesaprendizajeList} 
-            onChange={(e) => {
-                setunidadesseleccionadas(e.value);
-            }} 
-            required
-            filter
-            optionLabel = {(option) => `${option.clave_UnidadAprendizaje} - ${option.nombre_UnidadAprendizaje}`}
-            optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-            placeholder="Unidades de Aprendizaje a Impartir" 
-            display="chip"
-            className={classNames({ 'p-invalid': frmEnviado && !unidadesseleccionadas })}
-            />
-            {frmEnviado && !unidadesseleccionadas && (
-                <small className="p-error">Se requiere el Material.</small>
-            )}
-          </div>
-          <div className="field col">
-            <label htmlFor="horasprogramaeducativo" className="font-bold">Programas Educativos*</label>
-            <MultiSelect 
-            id="horasprogramaeducativo"
-            value={programaseducativosseleccionados} 
-            options={programaseducativosList} 
-            onChange={(e) => {
-                setprogramaseducativosseleccionados(e.value);
-            }} 
-            required
-            filter
-            itemTemplate={elementosProgramaEducativo}
-            //optionLabel = {(option) => `${option.clave_ProgramaEducativo} - ${option.nombre_ProgramaEducativo}`}
-            optionValue="clave_ProgramaEducativo" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-            placeholder="Impartir en Programas Educativos" 
-            display="chip"
-            className={classNames({ 'p-invalid': frmEnviado && !programaseducativosseleccionados })}
-            />
-            {frmEnviado && !programaseducativosseleccionados && (
-                <small className="p-error">Se requiere el Material.</small>
-            )}
-          </div>
-            
         <div className="formgrid grid">                      
           <div className="field col">
               <label htmlFor="horasMinimas" className="font-bold">Horas Minimas*</label>
@@ -717,7 +716,64 @@ const DocenteN = () => {
                     <small className="p-error">Se requiere la Capacidad.</small>
                 )} 
           </div>                   
-        </div>        
+        </div>
+        <div className="field col">
+            <label htmlFor="UnidadesAprendizaje" className="font-bold">Unidades Aprendizaje*</label>
+            <MultiSelect 
+            id="UnidadesAprendizaje"
+            value={unidadesseleccionadas} 
+            options={unidadesaprendizajeList} 
+            onChange={(e) => {
+                setunidadesseleccionadas(e.value);
+            }} 
+            required
+            filter
+            optionLabel = {(option) => `${option.clave_UnidadAprendizaje} - ${option.nombre_UnidadAprendizaje}`}
+            optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            placeholder="Unidades de Aprendizaje a Impartir" 
+            display="chip"
+            className={classNames({ 'p-invalid': frmEnviado && !unidadesseleccionadas.length })}
+            />
+            {frmEnviado && !unidadesseleccionadas && (
+                <small className="p-error">Se requieren Unidades de Aprendizaje.</small>
+            )}
+          </div>
+          <div className="field col">
+            <label htmlFor="programaseducativos" className="font-bold">Programas Educativos*</label>
+            <MultiSelect
+                id="programaseducativos"
+                value={programaseducativosseleccionados}
+                options={programaseducativosList}
+                onChange={handleSelectionChange}
+                filter
+                optionLabel={(option) => `${option.clave_ProgramaEducativo} - ${option.nombre_ProgramaEducativo}`}
+                optionValue="clave_ProgramaEducativo"
+                placeholder="Impartir en Programas Educativos"
+                className={classNames({ 'p-invalid': frmEnviado && !programaseducativosseleccionados.length })}
+            />            
+            <div className="selected-items">
+                {programaseducativosseleccionados.map((selected) => (
+                    <div key={selected} className="formgrid grid">
+                        <div className="field col">
+                            <label>{`${selected} - ${programaseducativosList.find(option => option.clave_ProgramaEducativo === selected)?.nombre_ProgramaEducativo}`}</label>
+                        </div>
+                        <div className="field col">
+                            <InputText
+                                value={programaeducativohoras[selected] || ''}
+                                onChange={(e) => handleInputChange(e, selected)}
+                                placeholder="Horas Impartir"
+                                required
+                                //className={classNames({ 'p-invalid': frmEnviado && !programaseducativosseleccionados.length })}
+                                className={classNames({ 'p-invalid': frmEnviado && !programaeducativohoras.length })}
+                            />
+                            {frmEnviado && !programaeducativohoras.length && (
+                                <small className="p-error">Se requiere el Programa Educativo y las horas.</small>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>            
+        </div>                          
       </Dialog>
       {/*Dialog para Confirmación de eliminar*/} 
       <Dialog
