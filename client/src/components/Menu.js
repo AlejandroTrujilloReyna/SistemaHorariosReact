@@ -38,7 +38,7 @@ const Menu = () => {
                     ]
                 },
                 { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Sala</span>,
-                command: () => { window.location.href = '/Sala'; } },
+                command: () => { window.location.href = '/SalaN'; } },
                 { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Tipo Sala</span>,
                 command: () => { window.location.href = '/TipoSala'; } }
             ]
@@ -79,9 +79,7 @@ const Menu = () => {
                 { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Grado de Estudios</span>,
                 command: () => { window.location.href = '/GradoEstudio'; } },
                 { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Material</span>,
-                command: () => { window.location.href = '/Material'; } } ,
-                { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Sala Material</span>,
-                command: () => { window.location.href = '/SalaMaterial'; } }            
+                command: () => { window.location.href = '/Material'; } }          
             ]
         }         
     ];

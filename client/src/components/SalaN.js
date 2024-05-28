@@ -14,10 +14,14 @@ import { Toast } from 'primereact/toast';
 import SalaService from '../services/SalaService';
 import EdificiosService from '../services/EdificioService';
 import TipoSalaService from '../services/TipoSalaService';
+import MaterialService from '../services/MaterialService';
+import SalaMaterialService from '../services/SalaMaterialService';
+import { MultiSelect } from 'primereact/multiselect';
 import { Toolbar } from 'primereact/toolbar';
 import { Dialog } from 'primereact/dialog';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
+
 
 const SalaN = () => {
   //VARIABLES ESTADO PARA LOS DIALOG, ACCIONES Y FILTRO TABLA
@@ -33,7 +37,9 @@ const SalaN = () => {
         capacidad_Sala: { value: '', matchMode: 'startsWith' },
         nota_Descriptiva: { value: '', matchMode: 'contains' },
         clave_Edificio: { value: '', matchMode: 'startsWith' },
-        clave_TipoSala: { value: '', matchMode: 'startsWith' }
+        clave_TipoSala: { value: '', matchMode: 'startsWith' },
+        materiales: { value: '', matchMode: 'contains' }
+
       },
     });    
   //VARIABLES PARA EL REGISTRO
@@ -44,7 +50,10 @@ const SalaN = () => {
   const [nota_Descriptiva,setnota_Descriptiva] = useState("");
   const [clave_Edificio,setclave_Edificio] = useState(0);
   const [clave_TipoSala,setclave_TipoSala] = useState(0);
+  const [materialesseleccionados,setmaterialesseleccionados] = useState([]);
+
   //VARIABLES PARA LA CONSULTA
+  const [materialesList,setmaterialesList] = useState([]);
   const [salaList,setsalaList] = useState([]);
   const [filtrosala, setfiltrosala] = useState([]);
   const [edificios, setedificios] = useState([]);
@@ -90,6 +99,7 @@ const SalaN = () => {
       }).then(response => {//CASO EXITOSO
         if (response.status === 200) {
           mostrarExito("Registro Exitoso");
+          addMaterial();
           get();
           setFrmEnviado(false);
           limpiarCampos();
@@ -113,6 +123,8 @@ const SalaN = () => {
       }
       ).then(response => {//CASO EXITOSO
         if (response.status === 200) {
+          addMaterial();
+          eliminarImpartir();
           mostrarExito("Modificación Exitosa");
           setFrmEnviado(false);
           seteditando(false);
@@ -128,6 +140,51 @@ const SalaN = () => {
         }
       })
     }
+  }
+
+  const eliminarImpartir = ()=>{
+    if(materialesseleccionados.length ===0){// Si se desea que Unidades Aprendizaje a impartir pueda modificarse a vacio quitar
+        return 0;
+    }
+    SalaMaterialService.eliminarSalaMaterial({
+        clave_Sala:clave_Sala
+      }).then(response => {//CASO EXITOSO
+        if (response.status === 200) {
+          //mostrarExito("Eliminación Impartir Exitosa");          
+        }
+      }).catch(error => {//EXCEPCIONES
+        if (error.response.status === 500) {
+          mostrarError("Error interno del servidor");
+        }
+      })
+  }
+
+  const addMaterial = ()=>{
+    //VALIDACION DE CAMPOS VACIOS
+    if (!materialesseleccionados) {      
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
+      return;
+    }
+
+    for (let i = 0; i < materialesseleccionados.length; i++) {                    
+      SalaMaterialService.registrarSalaMaterialdos({
+        clave_Material:materialesseleccionados[i],
+          clave_Sala:clave_Sala     
+      }).then(response=>{//CASO EXITOSO
+      if (response.status === 200) {
+          if(i===materialesseleccionados.length-1){
+              //mostrarExito("Registro Exitoso");                            
+          }
+          //get();
+          //limpiarCampos();
+      }
+      }).catch(error=>{//EXCEPCIONES
+      if(error.response.status === 500){  
+          mostrarError("Error interno del servidor");
+      }     
+      });  
+    }
+    get();
   }
 
   //FUNCION PARA CONSULTA
@@ -167,7 +224,9 @@ const SalaN = () => {
     setnombre_Sala("");
     setcapacidad_Sala("");
     setvalidar_Traslape(1);
-    setnota_Descriptiva("");    
+    setnota_Descriptiva(""); 
+    setmaterialesseleccionados([]); 
+   
   };
   
   
@@ -216,6 +275,14 @@ const SalaN = () => {
     })
     .catch(error => {
       console.error("Error fetching edificios:", error);
+    });
+    // Lista Materiales
+    MaterialService.consultarMaterial()
+    .then(response => {
+      setmaterialesList(response.data);
+    })
+    .catch(error => {
+      console.error("Error fetching material:", error);
     });
   }, []);
 
@@ -282,6 +349,11 @@ const SalaN = () => {
     setvalidar_Traslape(sala.validar_Traslape);
     setnota_Descriptiva(sala.nota_Descriptiva);
     setclave_TipoSala(sala.clave_TipoSala);    
+    const MaterialArray = sala.materiales
+    ? sala.materiales.split(',').map(Number)
+    : [];
+
+    setmaterialesseleccionados(MaterialArray);
   }
 
   // Funcion para contenido de Footer del Dialog Guardado
@@ -355,7 +427,8 @@ const SalaN = () => {
     {field: 'validar_Traslape', header: 'Validar',},
     {field: 'nota_Descriptiva', header: 'Nota Descriptiva'},
     {field: 'clave_Edificio', header: 'Edificio'},    
-    {field: 'clave_TipoSala', header: 'Tipo Sala'}    
+    {field: 'clave_TipoSala', header: 'Tipo Sala'},
+    {field: 'materiales', header: 'Materiales' }    
   ];
 
   //Cabecera de la Tabla
@@ -534,6 +607,27 @@ const SalaN = () => {
                   placeholder="Ej.Espacio para impartir clase teóricas"  
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
         </div>
+        <div className="field col">
+            <label htmlFor="Materiales" className="font-bold">Materiales*</label>
+            <MultiSelect 
+            id="Materiales"
+            value={materialesseleccionados} 
+            options={materialesList} 
+            onChange={(e) => {
+                setmaterialesseleccionados(e.value);
+            }} 
+            required
+            filter
+            optionLabel = {(option) => `${option.clave_Material} - ${option.nombre_Material}`}
+            optionValue="clave_Material" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            placeholder="Materiales para seleccionar" 
+            display="chip"
+            className={classNames({ 'p-invalid': frmEnviado && !materialesseleccionados.length })}
+            />
+            {frmEnviado && !materialesseleccionados && (
+                <small className="p-error">Se requiere almenos un Material.</small>
+            )}
+          </div>
       </Dialog>
       {/*Dialog para Confirmación de eliminar*/} 
       <Dialog
