@@ -67,7 +67,6 @@ const Material = () => {
       setmaterialList(response.data);      
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 500) {
-        //mostrarError("Error del sistema");
       }
     });    
   }
@@ -120,8 +119,6 @@ const Material = () => {
     setfiltroMaterial(filteredData);
   };  
   
-  //!!!EXTRAS DE MODIFICACION
-
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
     switch(options.field){
@@ -147,7 +144,6 @@ const Material = () => {
   const onCellEditComplete = (e) => {            
       let { rowData, newValue, field, originalEvent: event } = e;                          
       switch (field) {
-        //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO        
         case 'nombre_Material':
           if (newValue.trim().length > 0 && newValue !== rowData[field]){                                    
                 rowData[field] = newValue;               
@@ -162,18 +158,13 @@ const Material = () => {
       seteditando(false);
   }; 
 
-  //!!!EXTRAS CAMPOS
-
   const validarTexto = (value) => {
-    // Expresión regular para validar caracteres alfabeticos y espacios
     const regex = /^[a-zA-Z\s]*$/;
-    // Verificar si el valor coincide con la expresión regular
     return regex.test(value);
   };
 
   return (
     <>
-    {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
       {/*PANEL PARA EL REGISTRO*/}
       <Panel header="Registrar Material" className='mt-3' toggleable>        

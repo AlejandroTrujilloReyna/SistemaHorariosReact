@@ -9,7 +9,6 @@ const db = mysql.createConnection({
     database:"bdsistemahorarios"
 });
 
-
 router.post("/registrarSalaMaterial",(req,res)=>{
     const clave_Sala = req.body.clave_Sala;
     const materiales = req.body.materiales;
@@ -27,7 +26,7 @@ router.post("/registrarSalaMaterial",(req,res)=>{
                 }                
         });            
     });
-    res.status(200).send("Exito en imparir unidad aprendizaje");
+    res.status(200).send("Exito en Sala Material");
 });
 
 
@@ -39,21 +38,21 @@ router.delete("/eliminarSalaMaterial", (req, res) => {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
         }
-        res.status(200).send("salamaterial eliminada con exito");
+        res.status(200).send("Sala Material eliminada con exito");
     });
 });
 
 router.post("/registrarSalaMaterialdos",(req,res)=>{
     const clave_Sala = req.body.clave_Sala;
     const clave_Material = req.body.clave_Material;
-
+    const cantidad_Material = 0;
     db.query('INSERT INTO salamaterial (clave_SalaMaterial, cantidad_Material, clave_Sala, clave_Material) VALUES (?, ?, ?, ?)',
         [null,cantidad_Material,clave_Sala, clave_Material], (err, result) => {
             if (err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
             }
-        res.status(200).send("Exito en impartir material");
+        res.status(200).send("Exito en Sala Material");
     });        
 });
 

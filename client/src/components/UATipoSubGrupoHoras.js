@@ -57,12 +57,12 @@ const UATipoSubGrupoHoras = () => {
       clave_UnidadAprendizaje:clave_UnidadAprendizaje,
     
     }).then(response=>{
-      if (response.status === 200) {//CASO EXITOSO
+      if (response.status === 200) {
         mostrarExito("Registro Exitoso");
         get();
         limpiarCampos();
       }
-    }).catch(error=>{//EXCEPCIONES
+    }).catch(error=>{
       if (error.response.status === 401) {
         mostrarAdvertencia("Subgrupo ya existente para esa Unidad de Aprendizaje");      
       }else if(error.response.status === 500){          
@@ -73,18 +73,17 @@ const UATipoSubGrupoHoras = () => {
 
   //FUNCION PARA CONSULTA
   const get = ()=>{
-    UATipoSubGrupoHorasService.consultarUATipoSubGrupoHoras().then((response)=>{//CASO EXITOSO
+    UATipoSubGrupoHorasService.consultarUATipoSubGrupoHoras().then((response)=>{
       setuatiposubgrupohorasList(response.data);  
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 500) {
-        //setmensajeError("Error del sistema");
       }
     });    
   }
 
   //FUNCION PARA LA MODIFICACION
   const put = (rowData) =>{
-    UATipoSubGrupoHorasService.modificarUATipoSubGrupoHoras(rowData).then(response=>{//CASO EXITOSO
+    UATipoSubGrupoHorasService.modificarUATipoSubGrupoHoras(rowData).then(response=>{
       if(response.status === 200){
         mostrarExito("Modificación Exitosa");
       }
@@ -98,8 +97,6 @@ const UATipoSubGrupoHoras = () => {
     })
   }
 
-  //!!!EXTRAS DE REGISTRO
-
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
   const limpiarCampos = () =>{
     setclave_TipoSubGrupo(0);
@@ -107,8 +104,6 @@ const UATipoSubGrupoHoras = () => {
     sethoras(0);
   }
   
-  //!!!EXTRAS DE CONSULTA
-
   //COLUMNAS PARA LA TABLA
   const columns = [
     {field: 'clave_UATipoSubGrupoHoras', header: 'Clave' },
@@ -135,7 +130,6 @@ const UATipoSubGrupoHoras = () => {
     });
     setfiltrouatiposubgrupohoras(filteredData);
   }; 
-
 
   //MANDAR A LLAMAR A LA LISTA DE TIPOS DE SUBGRUPO
   useEffect(() => {
@@ -168,12 +162,10 @@ const UATipoSubGrupoHoras = () => {
       const unidad = UnidadesAprendizaje.find((unidad) => unidad.clave_UnidadAprendizaje === rowData.clave_UnidadAprendizaje);
       return unidad ? `${unidad.nombre_UnidadAprendizaje}` : '';      
     }else {
-      return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
+      return rowData[field];
     }
   };
   
-  //!!!EXTRAS DE MODIFICACION
-
   //ACTIVAR EDICION DE CELDA
   const cellEditor = (options) => {
     switch (options.field) {
@@ -199,7 +191,6 @@ const UATipoSubGrupoHoras = () => {
     onKeyDown={(e) => e.stopPropagation()} />;
   };
   
-
   //EDITAR NUMEROS
   const numberEditor = (options) => {
     return <InputText keyfilter="int"  type="text" maxLength={6} value={options.value} 
@@ -241,7 +232,6 @@ const UATipoSubGrupoHoras = () => {
   const onCellEditComplete = (e) => {
       let { rowData, newValue, field, originalEvent: event } = e;
       switch (field) {
-        //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
         case 'clave_UnidadAprendizaje':
           if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
             rowData[field] = newValue; put(rowData);
@@ -270,27 +260,19 @@ const UATipoSubGrupoHoras = () => {
       seteditando(false);
   };
 
-  //!!!EXTRAS CAMPOS
-
   const validarTexto = (value) => {
-    // Expresión regular para validar caracteres alfabeticos y espacios
     const regex = /^[a-zA-Z\s]*$/;
-    // Verificar si el valor coincide con la expresión regular
     return regex.test(value);
   };
 
   const validarNumero = (value) => {
-    // Expresión regular para validar números enteros positivos
     const regex = /^[0-9]\d*$/;
-    // Verificar si el valor coincide con la expresión regular
     return value==='' || regex.test(value);
   };  
 
   return (
     <>
-    {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
-      {/*PANEL PARA EL REGISTRO*/}
       <Panel header="Registrar Tipos de SubGrupo de Unidades de Aprendizaje" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-2">
@@ -313,7 +295,7 @@ const UATipoSubGrupoHoras = () => {
                 setclave_TipoSubGrupo(e.value);
               }} 
               optionLabel="nombre_TipoSubGrupo" 
-              optionValue="clave_TipoSubGrupo" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+              optionValue="clave_TipoSubGrupo"
               placeholder="Seleccione un Tipo de Sub Grupo" 
             />
           </div>                                                                           
@@ -326,7 +308,7 @@ const UATipoSubGrupoHoras = () => {
                 setclave_UnidadAprendizaje(e.value);
               }} 
               optionLabel="nombre_UnidadAprendizaje" 
-              optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+              optionValue="clave_UnidadAprendizaje"
               placeholder="Seleccione una Unidad de Aprendizaje" 
             />
           </div> 

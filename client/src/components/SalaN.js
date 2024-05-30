@@ -169,7 +169,7 @@ const SalaN = () => {
     for (let i = 0; i < materialesseleccionados.length; i++) {                    
       SalaMaterialService.registrarSalaMaterialdos({
         clave_Material:materialesseleccionados[i],
-          clave_Sala:clave_Sala     
+          clave_Sala:5     
       }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
           if(i===materialesseleccionados.length-1){

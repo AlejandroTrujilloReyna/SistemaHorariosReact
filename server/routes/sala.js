@@ -53,7 +53,7 @@ router.get("/consultarTiposala", (req, res) => {
 });
 
 router.get("/consultarSala", (req, res) => {
-    db.query('SELECT * FROM sala ORDER BY clave_Sala', (err, results) => {
+    db.query('SELECT d.*, GROUP_CONCAT(DISTINCT u.clave_Material SEPARATOR ", ") AS materiales FROM bdsistemahorarios.sala d LEFT JOIN bdsistemahorarios.salamaterial i ON d.clave_Sala = i.clave_Sala LEFT JOIN bdsistemahorarios.material u ON i.clave_Material = u.clave_Material GROUP BY d.clave_Sala ORDER BY d.clave_Sala', (err, results) => {
         if (err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");

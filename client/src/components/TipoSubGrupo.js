@@ -68,7 +68,6 @@ const TipoSubGrupo = () => {
         settiposubgrupoList(response.data);  
       }).catch(error=>{//EXCEPCIONES
         if (error.response.status === 500) {
-          //setmensajeError("Error del sistema");
         }
       });    
     }
@@ -88,16 +87,12 @@ const TipoSubGrupo = () => {
         }
       })
     }
-  
-    //!!!EXTRAS DE REGISTRO
-  
+    
     //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
     const limpiarCampos = () =>{
       setnombre_TipoSubGrupo("");
     }
-    
-    //!!!EXTRAS DE CONSULTA
-  
+      
     //COLUMNAS PARA LA TABLA
     const columns = [
       {field: 'clave_TipoSubGrupo', header: 'Clave' },
@@ -121,29 +116,6 @@ const TipoSubGrupo = () => {
       setfiltrotiposubgrupo(filteredData);
     }; 
   
-    //MANDAR A LLAMAR A LA LISTA DE UNIDADES ACADEMICAS
-    /*useEffect(() => {
-      TipoSubGrupoService.consultarTipoSubGrupo()
-        .then(response => {
-          setUnidadesAcademicas(response.data);
-        })
-        .catch(error => {
-          console.error("Error fetching unidades académicas:", error);
-        });
-    }, []);*/
-  
-    //FUNCION PARA QUE SE MUESTRE INFORMACION ESPECIFICA DE LAS LLAVES FORANEAS
-    /*const renderBody = (rowData, field) => {
-      if (field === 'clave_UnidadAcademica') {
-        const unidad = unidadesAcademicas.find((unidad) => unidad.clave_UnidadAcademica === rowData.clave_UnidadAcademica);
-        return unidad ? `${unidad.nombre_UnidadAcademica}` : '';
-      }else {
-        return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
-      }
-    };*/
-    
-    //!!!EXTRAS DE MODIFICACION
-  
     //ACTIVAR EDICION DE CELDA
     const cellEditor = (options) => {
       switch (options.field) {
@@ -164,14 +136,11 @@ const TipoSubGrupo = () => {
       }}
       onKeyDown={(e) => e.stopPropagation()} />;
     };
-  
-    //EDITAR DROPDOWN (UNIDAD ACADEMICA)  
-  
+    
     //COMPLETAR MODIFICACION
     const onCellEditComplete = (e) => {
         let { rowData, newValue, field, originalEvent: event } = e;
         switch (field) {
-          //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
           case 'nombre_TipoSubGrupo':
             if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
               rowData[field] = newValue; put(rowData);
@@ -185,13 +154,9 @@ const TipoSubGrupo = () => {
         }
         seteditando(false);
     };
-  
-    //!!!EXTRAS CAMPOS
-  
+    
     const validarTexto = (value) => {
-      // Expresión regular para validar caracteres alfabeticos y espacios
       const regex = /^[a-zA-Z\s]*$/;
-      // Verificar si el valor coincide con la expresión regular
       return regex.test(value);
     };
   
@@ -199,9 +164,7 @@ const TipoSubGrupo = () => {
   
     return (
       <>
-      {/*APARICION DE LOS MENSAJES (TOAST)*/}
       <Toast ref={toast} />
-        {/*PANEL PARA EL REGISTRO*/}
         <Panel header="Registrar Tipo SubGrupo" className='mt-3' toggleable>
           <div className="formgrid grid mx-8 justify-content-center">
             
