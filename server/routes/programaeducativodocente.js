@@ -58,5 +58,29 @@ router.post("/registrarProgramaEducativoDocentedos",(req,res)=>{
     });        
 });
 
+router.get("/consultarProgramaEducativoDocente",(req,res)=>{
+    const no_EmpleadoDocente = req.body.no_EmpleadoDocente;
+    const clave_ProgramaEducativo = req.body.clave_ProgramaEducativo;
+                 
+    db.query('SELECT horas_impartir FROM programaeducativodocente WHERE no_EmpleadoDocente=? AND clave_ProgramaEducativo=?',
+        [no_EmpleadoDocente,clave_ProgramaEducativo], (err, result) => {
+            if (err) {
+                console.log(err);                    
+                return res.status(500).send("Error interno del servidor");
+            }                
+            res.status(200).send("Consulta programaeducativodocente exitosa");
+    });                    
+});
+
+router.get("/consultarProgEducativoDocente",(req,res)=>{    
+    db.query('SELECT * FROM programaeducativodocente', (err, result) => {
+            if (err) {
+                console.log(err);                    
+                return res.status(500).send("Error interno del servidor");
+            }                
+            res.status(200).send("Consulta programaeducativodocente exitosa");
+    });                    
+});
+
 
 module.exports = router;

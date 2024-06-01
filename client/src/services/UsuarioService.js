@@ -8,6 +8,9 @@ const UsuarioService = {
     consultarUsuario:()=>{
         return Axios.get("http://localhost:3001/usuario/consultarUsuario");
     },
+    consultarUsuarioSinUsar:()=>{
+        return Axios.get("http://localhost:3001/usuario/consultarUsuarioSinUsar");
+    },
     modificarUsuario:(datos)=>{
         return Axios.put("http://localhost:3001/usuario/modificarUsuario", datos)
 

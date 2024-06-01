@@ -7,6 +7,10 @@ const ProgramaEducativoDocenteService = {
         return Axios.delete("http://localhost:3001/programaeducativodocente/eliminarProgramaEducativoDocente",{
             data: datos
         });
+    },consultarProgramaEducativoDocente:(datos) => {
+        return Axios.get("http://localhost:3001/programaeducativodocente/consultarProgramaEducativoDocente",datos);
+    },consultarProgEducativoDocente:() => {
+        return Axios.get("http://localhost:3001/programaeducativodocente/consultarProgEducativoDocente");
     }
     
 }

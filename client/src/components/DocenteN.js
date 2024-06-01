@@ -48,7 +48,8 @@ const DocenteN = () => {
         clave_TipoEmpleado: { value: '', matchMode: 'startsWith' },
         clave_GradoEstudio: { value: '', matchMode: 'startsWith' },
         clave_Usuario: { value: '', matchMode: 'startsWith' },
-        unidadesAprendizaje: { value: '', matchMode: 'contains' }
+        unidadesAprendizaje: { value: '', matchMode: 'contains' },
+        programasEducativos: { value: '', matchMode: 'contains' }
       },
     });  
   //VARIABLES PARA EL REGISTRO
@@ -60,16 +61,19 @@ const DocenteN = () => {
   const [clave_GradoEstudio, setclave_GradoEstudio] = useState(null);
   const [clave_Usuario, setclave_Usuario] = useState(null);
   const [unidadesseleccionadas,setunidadesseleccionadas] = useState([]);
+  const [unidadesoriginal,setunidadesoriginal] = useState([]);
   const [programaseducativosseleccionados,setprogramaseducativosseleccionados] = useState([]);
+  const [programaseducativosoriginal,setprogramaseducativosoriginal] = useState([]);
   //const [horasprogramaseducativos,sethorasprogramaseducativos] = useState([]);
   const [programaeducativohoras, setprogramaeducativohoras] = useState({});
   //VARIABLES PARA LA CONSULTA
   const [unidadesaprendizajeList,setunidadesaprendizajeList] = useState([]);
-  const [programaseducativosList,setprogramaseducativosList] = useState([]);
+  const [programaseducativosList,setprogramaseducativosList] = useState([]);  
   const [docentesList,setdocentesList] = useState([]);
   const [filtroDocente, setfiltroDocente] = useState([]);
   const [gradosEstudio, setGradosEstudio] = useState([]);
   const [tiposEmpleados, setTiposEmpleados] = useState([]);
+  const [usuariosList, setUsuariosList] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
   const [editando,seteditando] = useState(false);
@@ -113,9 +117,10 @@ const DocenteN = () => {
           }).then(response=>{//CASO EXITOSO
             if (response.status === 200) {
               mostrarExito("Registro Exitoso");
-              addProgramaEducativoDocente();
+              //addProgramaEducativoDocente();
               addUnidadAprendizaje();              
               get();
+              setFrmEnviado(false);
               limpiarCampos();
             }
           }).catch(error=>{//EXCEPCIONES
@@ -140,14 +145,13 @@ const DocenteN = () => {
         clave_Usuario:clave_Usuario    
       }
       ).then(response => {//CASO EXITOSO
-        if (response.status === 200) {                              
+        if (response.status === 200) {                 
+          //addProgramaEducativoDocente();                                                                     
           addUnidadAprendizaje();
-          eliminarImpartir();                    
           mostrarExito("Modificación Exitosa");
           setFrmEnviado(false);
           seteditando(false);
-          setMostrarDialog(false);
-          get();
+          setMostrarDialog(false);                              
         }
       }).catch(error => {//EXCEPCIONES
         if (error.response.status === 400) {        
@@ -160,7 +164,8 @@ const DocenteN = () => {
             mostrarError("Error interno del servidor");
           }
       })
-    }
+    }    
+    
   }
 
   const eliminarImpartir = ()=>{
@@ -168,6 +173,23 @@ const DocenteN = () => {
         return 0;
     }
     ImpartirUnidadAprendizajeService.eliminarImpartirUnidadAprendizaje({
+        no_EmpleadoDocente:no_EmpleadoDocente
+      }).then(response => {//CASO EXITOSO
+        if (response.status === 200) {
+          mostrarExito("Eliminación Impartir Exitosa");          
+        }
+      }).catch(error => {//EXCEPCIONES
+        if (error.response.status === 500) {
+          mostrarError("Error interno del servidor");
+        }
+      })
+  }
+
+  const eliminarProgramaEducativoDocente = ()=>{
+    if(programaseducativosseleccionados.length ===0){// Si se desea que Unidades Aprendizaje a impartir pueda modificarse a vacio quitar
+        return 0;
+    }
+    ProgramaEducativoDocenteService.eliminarProgramaEducativoDocente({
         no_EmpleadoDocente:no_EmpleadoDocente
       }).then(response => {//CASO EXITOSO
         if (response.status === 200) {
@@ -182,6 +204,14 @@ const DocenteN = () => {
 
   const addUnidadAprendizaje = ()=>{
     //VALIDACION DE CAMPOS VACIOS
+    mostrarExito("Registro Exitoso Unidades: "+ unidadesseleccionadas[0]+":" + unidadesseleccionadas[1]+":" + unidadesseleccionadas[2]);
+    if(editando){
+      if(unidadesseleccionadas === unidadesoriginal){
+        mostrarAdvertencia("IGUAL");
+      }else{
+        eliminarImpartir();
+      }      
+    }
     if (!unidadesseleccionadas) {      
       mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
@@ -194,8 +224,9 @@ const DocenteN = () => {
       }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
           if(i===unidadesseleccionadas.length-1){
-              //mostrarExito("Registro Exitoso");                            
+              mostrarExito("Registro Exitoso Unidades");                            
           }
+          mostrarExito("Registro Exitoso Unidades: "+ unidadesseleccionadas[i]);
           //get();
           //limpiarCampos();
       }
@@ -204,11 +235,17 @@ const DocenteN = () => {
           mostrarError("Error interno del servidor");
       }     
       });  
-    }
-    get();
+    }    
   }
 
   const addProgramaEducativoDocente = ()=>{
+    if(editando){
+      if(programaseducativosseleccionados === programaseducativosoriginal){
+
+      }else{
+        eliminarProgramaEducativoDocente();
+      }      
+    }
     //VALIDACION DE CAMPOS VACIOS
     if (!programaseducativosseleccionados || !programaeducativohoras) {      
       mostrarAdvertencia("Existen campos Obligatorios vacíos Programa");
@@ -223,7 +260,7 @@ const DocenteN = () => {
       }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
           if(i===unidadesseleccionadas.length-1){
-              mostrarExito("Registro Exitoso");                            
+              //mostrarExito("Registro Exitoso");                            
           }
           //get();
           //limpiarCampos();
@@ -233,8 +270,7 @@ const DocenteN = () => {
           mostrarError("Error interno del servidor");
       }     
       });  
-    }
-    get();
+    }    
   }
   //FUNCION PARA CONSULTA
   const get = ()=>{
@@ -246,6 +282,7 @@ const DocenteN = () => {
       }
     });    
   }  
+
   // FUNCION PARA ELIMINAR NOTA: delete parece ser una variable reservada
   const eliminar = ()=>{
     /*SalaService.eliminarSala({
@@ -337,6 +374,13 @@ const DocenteN = () => {
       .catch(error => {
         console.error("Error fetching usuarios:", error);
       });
+    UsuarioService.consultarUsuarioSinUsar()
+      .then(response => {
+        setUsuariosList(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching usuarios:", error);
+      });
     // Lista Unidades Aprendizaje
     UnidadAprendizajeService.consultarUnidadAprendizaje()
       .then(response => {
@@ -366,7 +410,8 @@ const DocenteN = () => {
     } else if (field === 'clave_GradoEstudio') {
         const grado = gradosEstudio.find((grado) => grado.clave_GradoEstudio === rowData.clave_GradoEstudio);
         return grado ? `${grado.clave_GradoEstudio} - ${grado.nombre_GradoEstudio}` : '';
-    } else {
+    }
+     else {
       return rowData[field];
     }
   };  
@@ -393,6 +438,7 @@ const DocenteN = () => {
     setFrmEnviado(false);
     seteditando(false);    
     setMostrarDialog(false);
+    get();
   };
   // Inicializa las constantes de la modificacion
   const inicializar = (docente) => {
@@ -404,10 +450,37 @@ const DocenteN = () => {
     sethoras_MaximasDocente(docente.horas_MaximasDocente);
     sethoras_Externas(docente.horas_Externas);
     const unidadesAprendizajeArray = docente.unidadesAprendizaje
-    ? docente.unidadesAprendizaje.split(',').map(Number)
+    ? docente.unidadesAprendizaje.split(',').map(item => item.trim()).map(Number)
     : [];
 
+    setunidadesoriginal(unidadesAprendizajeArray);
     setunidadesseleccionadas(unidadesAprendizajeArray);
+
+    mostrarAdvertencia("Unidades"+docente.unidadesAprendizaje);
+    const programasEducativosArray = docente.programasEducativos
+    ? docente.programasEducativos.split(',').map(item => {
+        const match = item.match(/(\d+)\s*\(/);
+        return match ? Number(match[1]) : null;
+    }).filter(item => item !== null)
+    : [];
+    
+    setprogramaseducativosoriginal(programasEducativosArray); 
+    setprogramaseducativosseleccionados(programasEducativosArray); 
+    const programasHoras = docente.programasEducativos
+    ? docente.programasEducativos.split(',').reduce((acc, item) => {
+        const claveMatch = item.match(/(\d+)\s*\(/);
+        const horasMatch = item.match(/\(\s*Horas:\s*(\d+)\s*\)/);
+        
+        if (claveMatch && horasMatch) {
+            const clave = Number(claveMatch[1]);
+            const horas = Number(horasMatch[1]);
+            acc[clave] = horas;
+        }
+        return acc;
+    }, {})
+    : {};
+
+  setprogramaeducativohoras(programasHoras);   
   }
 
   // Funcion para contenido de Footer del Dialog Guardado
@@ -419,8 +492,8 @@ const DocenteN = () => {
   );
 
   // Funcion para iniciar con Edición
-  const editSala = (sala) => {
-    inicializar(sala);    
+  const editDocente = (docente) => {
+    inicializar(docente);    
     setMostrarDialog(true);
     seteditando(true);
   };
@@ -467,8 +540,8 @@ const DocenteN = () => {
   );
   
   // Funcion para motrar el Dialog de Eliminar
-  const confirmarEliminar = (sala) => {
-    inicializar(sala);
+  const confirmarEliminar = (docente) => {
+    inicializar(docente);
     setMostrarEliminarDialog(true);
   };
 
@@ -483,16 +556,16 @@ const DocenteN = () => {
     {field: 'clave_GradoEstudio', header: 'Grado Estudio' },
     {field: 'clave_Usuario', header: 'Usuario' },
     {field: 'unidadesAprendizaje', header: 'Unidades Aprendizaje' },
+    {field: 'programasEducativos', header: 'Programas Educativos' }
   ];
 
   //Cabecera de la Tabla
   const header = (
-    <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-      <h4 className="m-0">Salas</h4>                              
-        
+    <div className="flex flex-wrap gap-2 align-items-center justify-content-between">              
       <IconField iconPosition="left">
         <InputIcon className="pi pi-search" />
         <InputText
+        className='mr-4'
           type="search"
           //onInput={(e) => setGlobalFilter(e.target.value)}
         onInput={(e) => onSearch(e)}
@@ -512,16 +585,16 @@ const DocenteN = () => {
           rounded
           outlined
           className="m-1"
-          onClick={() => editSala(rowData)}
+          onClick={() => editDocente(rowData)}
         />
-        <Button
+        {/*<Button
           icon="pi pi-trash"
           rounded
           outlined
           severity="danger"
           className="m-1"
           onClick={() => confirmarEliminar(rowData)}
-        />
+        />*/}
       </React.Fragment>
     );
   };
@@ -570,13 +643,12 @@ const DocenteN = () => {
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />            
-      {/*Dialog para Registrar y Modificar Sala*/} 
-      <label className="block text-4xl font-bold mb-1">Docente</label>
+      {/*Dialog para Registrar y Modificar Docente*/}       
       <Dialog
         visible={mostrarDialog}
         style={{ width: '32rem' }}
         breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-        header="Sala"
+        header="Docente"
         modal
         className="p-fluid"
         footer={footerDialog}
@@ -611,7 +683,7 @@ const DocenteN = () => {
                 <Dropdown
                 id="Usuario"
                 value={clave_Usuario} 
-                options={usuarios} 
+                options={usuariosList} 
                 onChange={(e) => {
                     setclave_Usuario(e.value);
                 }} 
@@ -644,7 +716,7 @@ const DocenteN = () => {
                 className={classNames({ 'p-invalid': frmEnviado && !clave_TipoEmpleado })}
                 />
                 {frmEnviado && !clave_TipoEmpleado && (
-                    <small className="p-error">Se requiere el Tipo de Sala.</small>
+                    <small className="p-error">Se requiere el Tipo de Empleado.</small>
                 )}
             </div>
             <div className="field col">
@@ -663,7 +735,7 @@ const DocenteN = () => {
                 className={classNames({ 'p-invalid': frmEnviado && !clave_GradoEstudio })}
                 />
                 {frmEnviado && !clave_GradoEstudio && (
-                    <small className="p-error">Se requiere el Tipo de Sala.</small>
+                    <small className="p-error">Se requiere el Grado de Estudio .</small>
                 )}
             </div>
         </div>
@@ -730,8 +802,7 @@ const DocenteN = () => {
             filter
             optionLabel = {(option) => `${option.clave_UnidadAprendizaje} - ${option.nombre_UnidadAprendizaje}`}
             optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-            placeholder="Unidades de Aprendizaje a Impartir" 
-            display="chip"
+            placeholder="Unidades de Aprendizaje a Impartir"             
             className={classNames({ 'p-invalid': frmEnviado && !unidadesseleccionadas.length })}
             />
             {frmEnviado && !unidadesseleccionadas && (
@@ -798,6 +869,9 @@ const DocenteN = () => {
         </div>
       </Dialog>   
       {/*Barra de herramientas con boton nuevo, boton para anclar la columna de Acciones y Exportar*/} 
+      <div className='mt-1'>
+        <label className="text-left text-4xl font-bold mt-1">Docente</label>
+      </div>      
       <Toolbar className="mt-3" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
       {/*Tabla de Contenido*/}         
       <div className="card">        
