@@ -25,6 +25,7 @@ import HorarioActividad from './components/HorarioActividad';
 import Inicio from './components/Inicio';
 import SalaN from './components/SalaN';
 import Material from './components/Material';
+import Grupo from './components/Grupo';
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
           <Route path='/HorarioActividad' element={<HorarioActividad/>}/>
           <Route path='/Inicio' element={<Inicio/>}/>
           <Route path='/Material' element={<Material/>}/>
+          <Route path='/Grupo' element={<Grupo/>}/>
         </Routes>
       </BrowserRouter>    
     </div>
