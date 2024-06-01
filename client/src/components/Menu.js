@@ -95,7 +95,11 @@ const Menu = () => {
                 {
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Horario de Actividad</span>,
                     command: () => { window.location.href = '/HorarioActividad'; }
-                }
+                },
+                {
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Horarios</span>,
+                    command: () => { window.location.href = '/Horario'; }
+                }                
             ]
         },
         {
