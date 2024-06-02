@@ -667,7 +667,7 @@ const DocenteN = () => {
                     <small className="p-error">Se requiere el Tipo de Empleado.</small>
                 )}
             </div>
-            {clave_TipoEmpleado === 1 && (
+            {clave_TipoEmpleado && (
             <div className="field col">
               <label htmlFor="GradoEstudio" className="font-bold">Grado de Estudio*</label>
               <Dropdown 
