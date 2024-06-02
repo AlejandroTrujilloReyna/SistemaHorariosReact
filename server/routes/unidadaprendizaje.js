@@ -69,16 +69,16 @@ router.get("/consultarUnidadAprendizajePlanEstudios", (req, res) => {
 });
 
 router.get("/consultarUnidadAprendizajePlanEstudiosdos", (req, res) => {
-    const clave_PlanEstudio = req.query.clave_PlanEstudios;    
+    const clave_PlanEstudios = req.query.clave_PlanEstudios;    
 
-    db.query('SELECT * FROM unidadaprendizaje WHERE clave_PlanEstudios = ? ORDER BY clave_UnidadAprendizaje', [clave_PlanEstudio], (err, results) => {
+    db.query('SELECT * FROM unidadaprendizaje WHERE clave_PlanEstudios = ? ORDER BY clave_UnidadAprendizaje', [clave_PlanEstudios], (err, results) => {
             
         if (err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
         }
-        if (results.length<1) {
-            return res.status(401).send("Sin resultados");
+        if (results.length == 0) {
+            return res.status(404).send("Sin resultados");
         }
         res.status(200).json(results);
     });

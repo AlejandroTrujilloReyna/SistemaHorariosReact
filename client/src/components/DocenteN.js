@@ -51,7 +51,7 @@ const DocenteN = () => {
   const [clave_TipoEmpleado,setclave_TipoEmpleado] = useState(null);
   const [clave_GradoEstudio, setclave_GradoEstudio] = useState(null);
   const [clave_Usuario, setclave_Usuario] = useState(null);
-  const [clave_PlanEstudio, setclave_PlanEstudio] = useState(1);
+  const [clave_PlanEstudios, setclave_PlanEstudios] = useState(null);
   const [unidadesseleccionadas,setunidadesseleccionadas] = useState([]);
   const [unidadesoriginal,setunidadesoriginal] = useState([]);
   //VARIABLES PARA LA CONSULTA
@@ -249,7 +249,8 @@ const DocenteN = () => {
     setclave_TipoEmpleado(null);
     setclave_GradoEstudio(null);
     setclave_Usuario(null);
-    setunidadesseleccionadas([]);     
+    setunidadesseleccionadas([]);    
+    setclave_PlanEstudios(null); 
   };
   
   
@@ -299,17 +300,7 @@ const DocenteN = () => {
       })
       .catch(error => {
         console.error("Error fetching grados estudio:", error);
-      });
-    // Lista Unidades Aprendizaje
-    
-    console.log("dato"+clave_PlanEstudio);
-    UnidadAprendizajeService.consultarUnidadAprendizajePlanEstudiosdos({clave_PlanEstudio:clave_PlanEstudio})
-      .then(response => {
-        setunidadesaprendizajeList(response.data);
-      })
-      .catch(error => {
-        console.error("Error fetching usuarios:", error);
-      });
+      });    
     // Lista Usuarios
     UsuarioService.consultarUsuario()
       .then(response => {
@@ -335,16 +326,51 @@ const DocenteN = () => {
     });    
   }, []);
 
-  /*const actualizarUnidadAprendizaje = () => {
+  useEffect(() => {    
     // Lista Unidades Aprendizaje
-    UnidadAprendizajeService.consultarUnidadAprendizajePlanEstudios({clave_PlanEstudios:clave_PlanEstudio})
-      .then(response => {
+    if(clave_PlanEstudios){
+    UnidadAprendizajeService.consultarUnidadAprendizajePlanEstudiosdos({ clave_PlanEstudios: clave_PlanEstudios })
+    .then(response => {
         setunidadesaprendizajeList(response.data);
-      })
-      .catch(error => {
-        console.error("Error fetching usuarios:", error);
-      });      
-  }*/
+    })
+    .catch(error => {
+        if (error.response) {
+            if (error.response.status === 404) {
+                console.error("Sin resultados");
+                // Aquí puedes manejar el caso de "sin resultados", por ejemplo:
+                setunidadesaprendizajeList([]);
+            } else {
+                //console.error(`Error: ${error.response.status}`);
+            }
+        } else {
+            console.error("Error de red o de otro tipo");
+        }
+    });    
+    }else{
+      const filtroseleccionadas = unidadesaprendizajeList.filter(uni => unidadesseleccionadas.includes(uni.clave_UnidadAprendizaje));
+      setunidadesaprendizajeList(filtroseleccionadas);
+    } 
+  }, [clave_PlanEstudios]);
+
+  const actualizarHorasPorTipoEmpleado = (tipoEmpleadoSeleccionado) => {
+    const tipoEmpleado = tiposEmpleados.find(tipo => tipo.clave_TipoEmpleado === tipoEmpleadoSeleccionado);
+    if (tipoEmpleado) {
+      sethoras_MinimasDocente(tipoEmpleado.horas_MinimasTipoEmpleado);
+      sethoras_MaximasDocente(tipoEmpleado.horas_MaximasTipoEmpleado);
+    }    
+  };
+
+  const actualizarHorasPorGradoEstudio = (tipoGradoEstudioSeleccionado) => {
+    if(clave_TipoEmpleado === 1){
+      const gradoEst = gradosEstudio.find(grado => grado.clave_GradoEstudio === tipoGradoEstudioSeleccionado);
+      if (gradoEst) {
+        sethoras_MinimasDocente(gradoEst.horas_MinimasGradoEstudio);
+        sethoras_MaximasDocente(gradoEst.horas_MaximasGradoEstudio);
+      }
+    }
+  };
+  
+  
   //FUNCION PARA QUE SE MUESTRE INFORMACION ESPECIFICA DE LAS LLAVES FORANEAS
   const renderBody = (rowData, field) => {
     if (field === 'clave_Usuario') {
@@ -629,6 +655,7 @@ const DocenteN = () => {
                 options={tiposEmpleados} 
                 onChange={(e) => {
                     setclave_TipoEmpleado(e.value);
+                    actualizarHorasPorTipoEmpleado(e.value);
                 }} 
                 required
                 optionLabel = {(option) => `${option.clave_TipoEmpleado} - ${option.nombre_TipoEmpleado}`}
@@ -640,25 +667,28 @@ const DocenteN = () => {
                     <small className="p-error">Se requiere el Tipo de Empleado.</small>
                 )}
             </div>
+            {clave_TipoEmpleado === 1 && (
             <div className="field col">
-                <label htmlFor="GradoEstudio" className="font-bold">Grado de Estudio*</label>
-                <Dropdown 
+              <label htmlFor="GradoEstudio" className="font-bold">Grado de Estudio*</label>
+              <Dropdown 
                 id="GradoEstudio"
                 value={clave_GradoEstudio} 
                 options={gradosEstudio} 
                 onChange={(e) => {
-                    setclave_GradoEstudio(e.value);
+                  setclave_GradoEstudio(e.value);
+                  actualizarHorasPorGradoEstudio(e.value);
                 }} 
                 required
-                optionLabel = {(option) => `${option.clave_GradoEstudio} - ${option.nombre_GradoEstudio}`}
-                optionValue="clave_GradoEstudio" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+                optionLabel={(option) => `${option.clave_GradoEstudio} - ${option.nombre_GradoEstudio}`}
+                optionValue="clave_GradoEstudio"
                 placeholder="Seleccione un Grado de Estudio" 
                 className={classNames({ 'p-invalid': frmEnviado && !clave_GradoEstudio })}
-                />
-                {frmEnviado && !clave_GradoEstudio && (
-                    <small className="p-error">Se requiere el Grado de Estudio .</small>
-                )}
+              />
+              {frmEnviado && !clave_GradoEstudio && (
+                <small className="p-error">Se requiere el Grado de Estudio.</small>
+              )}
             </div>
+          )}
         </div>
         <div className="formgrid grid">                      
           <div className="field col">
@@ -714,14 +744,15 @@ const DocenteN = () => {
           <label htmlFor="PlanEstudio" className="font-bold">PlanEstudio</label>
           <Dropdown 
               id="PlanEstudio"
-              value={clave_PlanEstudio} 
+              value={clave_PlanEstudios} 
               options={planEstudioList} 
-            onChange={(e) => {
-              setclave_PlanEstudio(e.value);              
-            }}             
+            onChange={(e) => {              
+              setclave_PlanEstudios(e.value);              
+            }}     
+            showClear         
             optionLabel = {(option) => `${option.nombre_PlanEstudios} - ${option.clave_ProgramaEducativo}`}
             optionValue="clave_PlanEstudios" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-            placeholder="Seleccione un Plan Estudio"                 
+            placeholder="Seleccione un Plan Estudio"             
           />                
         </div>
         <div className="field col">
