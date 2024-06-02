@@ -17,6 +17,7 @@ import GradoEstudioService from '../services/GradoEstudioService';
 import TipoEmpleadoService from '../services/TipoEmpleadoService';
 import UsuarioService from '../services/UsuarioService';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
+import ProgramaEducativoService from '../services/ProgramaEducativoService'
 import ImpartirUnidadAprendizajeService from '../services/ImpartirUnidadAprendizajeService';
 import PlanEstudiosService from '../services/PlanEstudiosService';
 import { Toolbar } from 'primereact/toolbar';
@@ -63,6 +64,7 @@ const DocenteN = () => {
   const [tiposEmpleados, setTiposEmpleados] = useState([]);
   const [usuariosList, setUsuariosList] = useState([]);  
   const [planEstudioList, setplanEstudioList] = useState([]);
+  const [programaEducativoList, setprogramaEducativoList] = useState([]);
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
   const [editando,seteditando] = useState(false);
   //VARIABLES PARA EL ERROR
@@ -302,13 +304,13 @@ const DocenteN = () => {
         console.error("Error fetching grados estudio:", error);
       });    
     // Lista Usuarios
-    /*UsuarioService.consultarUsuario()
+     ProgramaEducativoService.consultarProgramaEducativo()
       .then(response => {
-        setUsuarios(response.data);
+        setprogramaEducativoList(response.data);
       })
       .catch(error => {
         console.error("Error fetching usuarios:", error);
-      });*/
+      });
       UnidadAprendizajeService.consultarUnidadAprendizaje()
       .then(response => {
         setunidadesoriginal(response.data);
@@ -780,7 +782,19 @@ const DocenteN = () => {
               setclave_PlanEstudios(e.value);                            
             }}     
             showClear         
-            optionLabel = {(option) => `${option.nombre_PlanEstudios} - ${option.clave_ProgramaEducativo}`}
+            optionLabel={(option) => { 
+              // Verifica si la opción está presente y muestra el nombre del plan de estudios y, si está en la lista programaEducativoList, su nombre
+              if (option) {
+                  let label = `${option.nombre_PlanEstudios} - ${option.clave_ProgramaEducativo}`;
+                  const programaEducativo = programaEducativoList.find(programa => programa.clave_ProgramaEducativo === option.clave_ProgramaEducativo);
+                  if (programaEducativo) {
+                      label += ` ${programaEducativo.nombre_ProgramaEducativo}`;
+                  }
+                  return label;
+              } else {
+                  return null;
+              }
+          }}
             optionValue="clave_PlanEstudios" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
             placeholder="Seleccione un Plan Estudio"             
           />                
