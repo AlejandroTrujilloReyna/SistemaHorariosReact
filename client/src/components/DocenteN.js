@@ -271,6 +271,11 @@ const DocenteN = () => {
     const nombreTipoEmpl = tiposEmpleados.find(tip => tip.clave_TipoEmpleado === item.clave_TipoEmpleado)?.nombre_TipoEmpleado || '';
     const nombre_GradoEst = gradosEstudio.find(grad => grad.clave_GradoEstudio === item.clave_GradoEstudio)?.nombre_GradoEstudio || '';
     const nombre_Us = usuariosList.find(u => u.clave_Usuario === item.clave_Usuario)?.correo || '';
+    // Buscar por unidades de aprendizaje
+    const unidadesAprendizaje = item.unidadesAprendizaje ? item.unidadesAprendizaje.split(',').map(unidad => {
+      const unidadEncontrada = unidadesoriginal.find(unidadLista => unidadLista.clave_UnidadAprendizaje === parseInt(unidad));
+      return unidadEncontrada ? `${unidadEncontrada.clave_UnidadAprendizaje} - ${unidadEncontrada.nombre_UnidadAprendizaje}` : '';
+  }) : [];
         return (
             item.no_EmpleadoDocente.toString().includes(value) ||
             item.horas_MinimasDocente.toString().includes(value) ||
@@ -279,7 +284,8 @@ const DocenteN = () => {
             gradoEst.toString().includes(value) ||
             nombreTipoEmpl.toLowerCase().includes(value) ||
             nombre_GradoEst.toLowerCase().includes(value) ||
-            nombre_Us.toLowerCase().includes(value)
+            nombre_Us.toLowerCase().includes(value) ||
+            unidadesAprendizaje.some(unidad => unidad.toLowerCase().includes(value))
         );
     });
     setfiltroDocente(filteredData);
@@ -373,9 +379,9 @@ const DocenteN = () => {
 
   const actualizarHorasPorTipoEmpleado = (tipoEmpleadoSeleccionado) => {
     const tipoEmpleado = tiposEmpleados.find(tipo => tipo.clave_TipoEmpleado === tipoEmpleadoSeleccionado);
-    if (tipoEmpleado) {
+    if (tipoEmpleado) {      
       sethoras_MinimasDocente(tipoEmpleado.horas_MinimasTipoEmpleado);
-      sethoras_MaximasDocente(tipoEmpleado.horas_MaximasTipoEmpleado);
+      sethoras_MaximasDocente(tipoEmpleado.horas_MaximasTipoEmpleado);            
     }    
   };
 
