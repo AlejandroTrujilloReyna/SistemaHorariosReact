@@ -11,6 +11,7 @@ import { MultiSelect } from 'primereact/multiselect';
 import { Dropdown } from 'primereact/dropdown';
 import { ToggleButton } from 'primereact/togglebutton';
 import { Toast } from 'primereact/toast';
+import { Tag } from 'primereact/tag';
 import DocenteService from '../services/DocenteService';
 import GradoEstudioService from '../services/GradoEstudioService';
 import TipoEmpleadoService from '../services/TipoEmpleadoService';
@@ -60,8 +61,7 @@ const DocenteN = () => {
   const [filtroDocente, setfiltroDocente] = useState([]);
   const [gradosEstudio, setGradosEstudio] = useState([]);
   const [tiposEmpleados, setTiposEmpleados] = useState([]);
-  const [usuariosList, setUsuariosList] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
+  const [usuariosList, setUsuariosList] = useState([]);  
   const [planEstudioList, setplanEstudioList] = useState([]);
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
   const [editando,seteditando] = useState(false);
@@ -268,7 +268,7 @@ const DocenteN = () => {
     const gradoEst = item.clave_GradoEstudio ? item.clave_GradoEstudio.toString() : '';    
     const nombreTipoEmpl = tiposEmpleados.find(tip => tip.clave_TipoEmpleado === item.clave_TipoEmpleado)?.nombre_TipoEmpleado || '';
     const nombre_GradoEst = gradosEstudio.find(grad => grad.clave_GradoEstudio === item.clave_GradoEstudio)?.nombre_GradoEstudio || '';
-    const nombre_Us = usuarios.find(u => u.clave_Usuario === item.clave_Usuario)?.correo || '';
+    const nombre_Us = usuariosList.find(u => u.clave_Usuario === item.clave_Usuario)?.correo || '';
         return (
             item.no_EmpleadoDocente.toString().includes(value) ||
             item.horas_MinimasDocente.toString().includes(value) ||
@@ -302,14 +302,21 @@ const DocenteN = () => {
         console.error("Error fetching grados estudio:", error);
       });    
     // Lista Usuarios
-    UsuarioService.consultarUsuario()
+    /*UsuarioService.consultarUsuario()
       .then(response => {
         setUsuarios(response.data);
       })
       .catch(error => {
         console.error("Error fetching usuarios:", error);
+      });*/
+      UnidadAprendizajeService.consultarUnidadAprendizaje()
+      .then(response => {
+        setunidadesoriginal(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching tipos empleado:", error);
       });
-    UsuarioService.consultarUsuarioSinUsar()
+    UsuarioService.consultarUsuario()
       .then(response => {
         setUsuariosList(response.data);
       })
@@ -346,11 +353,21 @@ const DocenteN = () => {
             console.error("Error de red o de otro tipo");
         }
     });    
-    }else{
-      const filtroseleccionadas = unidadesaprendizajeList.filter(uni => unidadesseleccionadas.includes(uni.clave_UnidadAprendizaje));
+    }else{        
+      const filtroseleccionadas = unidadesoriginal.filter(uni => unidadesseleccionadas.includes(uni.clave_UnidadAprendizaje));
       setunidadesaprendizajeList(filtroseleccionadas);
-    } 
-  }, [clave_PlanEstudios]);
+    }     
+  }, [clave_PlanEstudios,editando]);
+
+  const filtrarUsuariosenUso = () => {
+    return usuariosList.filter(us => {
+        // Excluir usuarios que están en docentesList
+        const estaEnDocentes = docentesList.some(docente => docente.clave_Usuario === us.clave_Usuario);
+        // Incluir el usuario actual si no es null
+        const esUsuarioActual = clave_Usuario !== null && us.clave_Usuario === clave_Usuario;
+        return !estaEnDocentes || esUsuarioActual;
+    });
+  };
 
   const actualizarHorasPorTipoEmpleado = (tipoEmpleadoSeleccionado) => {
     const tipoEmpleado = tiposEmpleados.find(tipo => tipo.clave_TipoEmpleado === tipoEmpleadoSeleccionado);
@@ -374,7 +391,7 @@ const DocenteN = () => {
   //FUNCION PARA QUE SE MUESTRE INFORMACION ESPECIFICA DE LAS LLAVES FORANEAS
   const renderBody = (rowData, field) => {
     if (field === 'clave_Usuario') {
-      const usus = usuarios.find((usus) => usus.clave_Usuario === rowData.clave_Usuario);
+      const usus = usuariosList.find((usus) => usus.clave_Usuario === rowData.clave_Usuario);
       return usus ? `${usus.clave_Usuario} - ${usus.correo}` : '';
     } else if (field === 'clave_TipoEmpleado') {
       const tipo = tiposEmpleados.find((tipo) => tipo.clave_TipoEmpleado === rowData.clave_TipoEmpleado);
@@ -382,8 +399,23 @@ const DocenteN = () => {
     } else if (field === 'clave_GradoEstudio') {
         const grado = gradosEstudio.find((grado) => grado.clave_GradoEstudio === rowData.clave_GradoEstudio);
         return grado ? `${grado.clave_GradoEstudio} - ${grado.nombre_GradoEstudio}` : '';
-    }
-     else {
+    }else if (field === 'unidadesAprendizaje' && rowData && rowData.unidadesAprendizaje) {
+      return rowData.unidadesAprendizaje.split(',').map((unidad, index) => {
+          // Convertir unidad a número usando parseInt
+          const unidadNumero = parseInt(unidad);
+          // Encuentra la unidad correspondiente por su clave
+          const unidadEncontrada = unidadesoriginal.find(unidadLista => unidadLista.clave_UnidadAprendizaje === unidadNumero);
+          if (unidadEncontrada) {
+              return (
+                  <Tag key={index} value={`${unidadEncontrada.clave_UnidadAprendizaje} - ${unidadEncontrada.nombre_UnidadAprendizaje}`} className="mr-2 mb-2" />
+              );
+          } else {
+              return null; // Si no se encuentra la unidad, no se muestra nada
+          }
+      });
+  }
+  
+  else {
       return rowData[field];
     }
   };  
@@ -424,10 +456,8 @@ const DocenteN = () => {
     const unidadesAprendizajeArray = docente.unidadesAprendizaje
     ? docente.unidadesAprendizaje.split(',').map(item => item.trim()).map(Number)
     : [];
-
-    setunidadesoriginal(unidadesAprendizajeArray);
-    setunidadesseleccionadas(unidadesAprendizajeArray);
-
+    
+    setunidadesseleccionadas(unidadesAprendizajeArray);    
     mostrarAdvertencia("Unidades"+docente.unidadesAprendizaje);      
   }
 
@@ -630,7 +660,7 @@ const DocenteN = () => {
                 <Dropdown
                 id="Usuario"
                 value={clave_Usuario} 
-                options={usuariosList} 
+                options={filtrarUsuariosenUso()} 
                 onChange={(e) => {
                     setclave_Usuario(e.value);
                 }} 
@@ -747,7 +777,7 @@ const DocenteN = () => {
               value={clave_PlanEstudios} 
               options={planEstudioList} 
             onChange={(e) => {              
-              setclave_PlanEstudios(e.value);              
+              setclave_PlanEstudios(e.value);                            
             }}     
             showClear         
             optionLabel = {(option) => `${option.nombre_PlanEstudios} - ${option.clave_ProgramaEducativo}`}
@@ -812,7 +842,7 @@ const DocenteN = () => {
           
           header={header}>
           {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
+              return <Column className="scrollable-cell" sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
                filter filterPlaceholder="Buscar"/>;
           })}
           <Column

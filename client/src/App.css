@@ -8,3 +8,9 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
+
+.scrollable-cell {
+  /* Aplica el scroll solo a la celda con la clase "scrollable-cell" */
+  max-height: 10px; /* Altura máxima de la celda */
+  overflow-y: auto; /* Agrega scroll vertical si el contenido es más largo que la altura máxima */
+}
