@@ -239,7 +239,7 @@ const timeEditor = (options) => {
     );
   };
   
-  //EDITAR DROPDOWN (DIA)
+  //EDITAR DROPDOWN (EMPLEADO)
   const EmpleadoEditor = (options) => {
     return (
       <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"

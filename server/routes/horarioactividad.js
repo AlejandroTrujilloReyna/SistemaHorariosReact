@@ -35,7 +35,7 @@ router.post("/registrarHorarioActividad", (req, res) => {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
             }
-            res.status(200).send("Programa educativo registrado con éxito");
+            res.status(200).send("Horario de actividad registrado con éxito");
         });
     });      
 });
@@ -77,7 +77,7 @@ router.put("/modificarHorarioActividad", (req, res) => {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
             }
-            res.status(200).send("Programa educativo registrado con éxito");
+            res.status(200).send("Horario de actividad modificado con éxito");
         });
     });        
 });

@@ -10,7 +10,6 @@ const HorarioActividadService = {
     },
     modificarHorarioActividad:(datos)=>{
         return Axios.put("http://localhost:3001/horarioactividad/modificarHorarioActividad", datos)
-
     }
 }
 

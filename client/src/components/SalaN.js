@@ -245,13 +245,6 @@ const SalaN = () => {
 
   //!!!EXTRAS VALIDACIONES CAMPOS
 
-  const validarTexto = (value) => {
-    // Expresión regular para validar caracteres alfabeticos y espacios
-    const regex = /^[a-zA-Z\s]*$/;
-    // Verificar si el valor coincide con la expresión regular
-    return regex.test(value);
-  };
-
   const validarNumero = (value) => {
     // Expresión regular para validar números enteros positivos
     const regex = /^[0-9]\d*$/;
