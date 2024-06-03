@@ -20,6 +20,7 @@ import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService'
 import ImpartirUnidadAprendizajeService from '../services/ImpartirUnidadAprendizajeService';
 import PlanEstudiosService from '../services/PlanEstudiosService';
+import ToastService from '../services/ToastService';
 import { Toolbar } from 'primereact/toolbar';
 import { Dialog } from 'primereact/dialog';
 import { IconField } from 'primereact/iconfield';
@@ -49,7 +50,7 @@ const DocenteN = () => {
   const [no_EmpleadoDocente, setno_EmpleadoDocente] = useState("");
   const [horas_MinimasDocente,sethoras_MinimasDocente] = useState("");
   const [horas_MaximasDocente,sethoras_MaximasDocente] = useState("");
-  const [horas_Externas,sethoras_Externas] = useState("");
+  const [horas_Externas,sethoras_Externas] = useState(0);
   const [clave_TipoEmpleado,setclave_TipoEmpleado] = useState(null);
   const [clave_GradoEstudio, setclave_GradoEstudio] = useState(null);
   const [clave_Usuario, setclave_Usuario] = useState(null);
@@ -88,7 +89,7 @@ const DocenteN = () => {
   const save = () => {
     setFrmEnviado(true);
     //VALIDACION DE CAMPOS VACIOS
-    if (!no_EmpleadoDocente || !horas_MinimasDocente || !horas_MaximasDocente || !horas_Externas || !clave_TipoEmpleado || !clave_GradoEstudio || !clave_Usuario) {
+    if (!no_EmpleadoDocente || !horas_MinimasDocente || !horas_MaximasDocente || !clave_TipoEmpleado || !clave_GradoEstudio || !clave_Usuario) {
       setFrmEnviado(true);
       mostrarAdvertencia("Existen campos Obligatorios vacíos");
       return;
@@ -247,7 +248,7 @@ const DocenteN = () => {
     setno_EmpleadoDocente("");
     sethoras_MinimasDocente("");    
     sethoras_MaximasDocente("");
-    sethoras_Externas("");
+    sethoras_Externas(0);
     setclave_TipoEmpleado(null);
     setclave_GradoEstudio(null);
     setclave_Usuario(null);
@@ -435,7 +436,14 @@ const DocenteN = () => {
     const regex = /^[0-9]\d*$/;
     // Verificar si el valor coincide con la expresión regular
     return value==='' || regex.test(value);
-  };  
+  };
+  
+  const validarNumerocero = (value) => {
+    // Expresión regular para validar números enteros positivos
+    const regex = /^[0-9]*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return value==='' || regex.test(value);
+  };
 
   //!!!EXTRAS DIALOG GUARDAR (REGISTRAR Y MODIFICAR)
   // Funcion para abrir Dialog para Registrar
@@ -633,7 +641,7 @@ const DocenteN = () => {
         visible={mostrarDialog}
         style={{ width: '32rem' }}
         breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-        header="Docente"
+        header={`${editando ? "Modificar ": "Registrar"} Docente`}
         modal
         className="p-fluid"
         footer={footerDialog}
@@ -762,20 +770,20 @@ const DocenteN = () => {
                 )} 
           </div> 
           <div className="field col">
-              <label htmlFor="horasExternas" className="font-bold">Horas Externas*</label>
+              <label htmlFor="horasExternas" className="font-bold">Horas Externas</label>
               <InputText id="horasExternas" type="text" keyfilter={/^[0-9]*$/} value={horas_Externas} maxLength={2}
                   onChange={(event)=>{
-                    if (validarNumero(event.target.value)) {
+                    if (validarNumerocero(event.target.value)) {
                       sethoras_Externas(event.target.value);
                     }
                   }}                    
                   required
                   placeholder="Ej.5"
-                  className={classNames({ 'p-invalid': frmEnviado && !horas_Externas })}
+                  /*className={classNames({ 'p-invalid': frmEnviado && !horas_Externas })}*/
               />
-              {frmEnviado && !horas_Externas && (
+              {/*frmEnviado && !horas_Externas && (
                     <small className="p-error">Se requiere la Capacidad.</small>
-                )} 
+                )*/} 
           </div>                   
         </div>
         <div className="field col">
