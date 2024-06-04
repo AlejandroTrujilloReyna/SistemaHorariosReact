@@ -166,7 +166,7 @@ const DocenteN = () => {
         no_EmpleadoDocente:no_EmpleadoDocente
       }).then(response => {//CASO EXITOSO
         if (response.status === 200) {
-          mostrarExito("Eliminación Impartir Exitosa");          
+          //mostrarExito("Eliminación Impartir Exitosa");          
         }
       }).catch(error => {//EXCEPCIONES
         if (error.response.status === 500) {
@@ -177,7 +177,7 @@ const DocenteN = () => {
 
   const addUnidadAprendizaje = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    mostrarExito("Registro Exitoso Unidades: "+ unidadesseleccionadas[0]+":" + unidadesseleccionadas[1]+":" + unidadesseleccionadas[2]);
+    //mostrarExito("Registro Exitoso Unidades: "+ unidadesseleccionadas[0]+":" + unidadesseleccionadas[1]+":" + unidadesseleccionadas[2]);
     if(editando){
       if(unidadesseleccionadas === unidadesoriginal){
         mostrarAdvertencia("IGUAL");
@@ -197,9 +197,9 @@ const DocenteN = () => {
       }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
           if(i===unidadesseleccionadas.length-1){
-              mostrarExito("Registro Exitoso Unidades");                            
+              //mostrarExito("Registro Exitoso Unidades");                            
           }
-          mostrarExito("Registro Exitoso Unidades: "+ unidadesseleccionadas[i]);
+          //mostrarExito("Registro Exitoso Unidades: "+ unidadesseleccionadas[i]);
           //get();
           //limpiarCampos();
       }
@@ -474,7 +474,7 @@ const DocenteN = () => {
     : [];
     
     setunidadesseleccionadas(unidadesAprendizajeArray);    
-    mostrarAdvertencia("Unidades"+docente.unidadesAprendizaje);      
+    //mostrarAdvertencia("Unidades"+docente.unidadesAprendizaje);      
   }
 
   // Funcion para contenido de Footer del Dialog Guardado
@@ -662,6 +662,7 @@ const DocenteN = () => {
                   setno_EmpleadoDocente(event.target.value);
                 }
               }} 
+              disabled={editando}
               required            
               maxLength={10}
               placeholder="Ej.12345678"
