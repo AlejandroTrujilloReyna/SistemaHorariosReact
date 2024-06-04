@@ -24,6 +24,7 @@ import { InputIcon } from 'primereact/inputicon';
 
 
 const SalaN = () => {
+  let claveSala = 0;
   //VARIABLES ESTADO PARA LOS DIALOG, ACCIONES Y FILTRO TABLA
     const [mostrarDialog, setMostrarDialog] = useState(false);
     const [mostrarEliminarDialog, setMostrarEliminarDialog] = useState(false);
@@ -98,17 +99,23 @@ const SalaN = () => {
         clave_TipoSala: clave_TipoSala
       }).then(response => {//CASO EXITOSO
         if (response.status === 200) {
-          mostrarExito("Registro Exitoso");
+
+          if(response.data && response.data.clave_Sala){
+
+          clave_Sala = response.data.clave_Sala;
+          mostrarExito("Registro Exitoso"+clave_Sala);
+
           addMaterial();
           get();
           setFrmEnviado(false);
           limpiarCampos();
+          }
         }
       }).catch(error => {//EXCEPCIONES
         if (error.response.status === 401) {
           mostrarAdvertencia("Nombre ya existente en el Edificio");
         } else if (error.response.status === 500) {
-          mostrarError("Error interno del servidor");
+         mostrarError("Error interno del servidor");
         }
       })
     } else {
@@ -159,33 +166,33 @@ const SalaN = () => {
       })
   }
 
-  const addMaterial = ()=>{
-    //VALIDACION DE CAMPOS VACIOS
-    if (!materialesseleccionados) {      
-      mostrarAdvertencia("Existen campos Obligatorios vacíos");
-      return;
-    }
-
-    for (let i = 0; i < materialesseleccionados.length; i++) {                    
-      SalaMaterialService.registrarSalaMaterialdos({
-        clave_Material:materialesseleccionados[i],
-          clave_Sala:5     
-      }).then(response=>{//CASO EXITOSO
-      if (response.status === 200) {
-          if(i===materialesseleccionados.length-1){
-              //mostrarExito("Registro Exitoso");                            
-          }
-          //get();
-          //limpiarCampos();
-      }
-      }).catch(error=>{//EXCEPCIONES
-      if(error.response.status === 500){  
-          mostrarError("Error interno del servidor");
-      }     
-      });  
-    }
-    get();
+  const addMaterial = () => {
+  // VALIDACION DE CAMPOS VACIOS
+  if (!materialesseleccionados || !clave_Sala) {      
+    mostrarAdvertencia("Existen campos obligatorios vacíos");
+    return;
   }
+
+  for (let i = 0; i < materialesseleccionados.length; i++) {                    
+    SalaMaterialService.registrarSalaMaterialdos({
+      clave_Material: materialesseleccionados[i],
+      clave_Sala: claveSala
+    }).then(response => {//CASO EXITOSO
+      if (response.status === 200) {
+        if (i === materialesseleccionados.length - 1) {
+          //mostrarExito("Registro Exitoso");                            
+        }
+        //get();
+        //limpiarCampos();
+      }
+    }).catch(error => {//EXCEPCIONES
+      if (error.response.status === 500) {  
+        mostrarError("Error interno del servidor");
+      }     
+    });  
+  }
+  get();
+}
 
   //FUNCION PARA CONSULTA
   const get = ()=>{
