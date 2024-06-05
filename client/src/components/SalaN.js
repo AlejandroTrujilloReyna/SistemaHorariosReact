@@ -236,8 +236,6 @@ const SalaN = () => {
    
   };
   
-  
-  
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
   useEffect(() => {
     get();

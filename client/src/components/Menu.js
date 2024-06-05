@@ -85,18 +85,6 @@ const Menu = () => {
                 command: () => { window.location.href = '/DocenteN'; } }
             ]
         },
-        { 
-            label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Gestión de Actividades</span>,
-            icon: 'pi pi-building-columns',
-            items: [
-                { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Unidad de Aprendizaje</span>,
-                command: () => { window.location.href = '/UnidadAprendizaje'; } },
-                { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Actividad</span>,
-                command: () => { window.location.href = '/Actividad'; } },
-                { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Horario de Actividad</span>,
-                command: () => { window.location.href = '/HorarioActividad'; } }
-            ]
-        },
         {
             label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Gestión de Actividades</span>,
             icon: 'pi pi-building-columns',

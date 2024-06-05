@@ -58,7 +58,7 @@ router.get("/consultarUnidadAcademica", (req, res) => {
 router.put("/modificarUnidadAcademica", (req, res) => {
     const clave_UnidadAcademica = req.body.clave_UnidadAcademica;
     const nombre_UnidadAcademica = req.body.nombre_UnidadAcademica;
-    db.query('SELECT * FROM unidadacademica WHERE nombre_UnidadAcademica = ?',[nombre_UnidadAcademica], (err, results) => {
+    db.query('SELECT * FROM unidadacademica WHERE nombre_UnidadAcademica = ? AND clave_UnidadAcademica != ?',[nombre_UnidadAcademica,clave_UnidadAcademica], (err, results) => {
         if(err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
