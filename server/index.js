@@ -74,6 +74,12 @@ app.use("/modificarsubgrupos",modificarsubgruposRoutes);
 const horarioRoutes = require("./routes/horario")
 app.use("/horario",horarioRoutes);
 
+const subgrupoRoutes = require("./routes/subgrupo")
+app.use("/subgrupo",subgrupoRoutes)
+
+
+
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });

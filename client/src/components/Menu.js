@@ -117,8 +117,14 @@ const Menu = () => {
                 {
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Grado de Estudios</span>,
                     command: () => { window.location.href = '/GradoEstudio'; }
+                },
+                {
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>SubGrupos</span>,
+                    command: () => { window.location.href = '/SubGrupo'; }
                 }
+            
             ]
+
         }
     ];
 
