@@ -18,7 +18,6 @@ import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 const UnidadAprendizajePlanEstudios = () => {
 
  //VARIABLES PARA EL REGISTRO
- //const [no_EmpleadoDocente, setno_EmpleadoDocente] = useState("");
  const [semestre,setsemestre] = useState("");
  const [clave_ClasificacionUnidadAprendizaje,setclave_ClasificacionUnidadAprendizaje] = useState(null);
  const [clave_Etapa,setclave_Etapa] = useState(null);
@@ -368,7 +367,7 @@ return (
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
       {/*PANEL PARA EL REGISTRO*/}
-      <Panel header="Registrar Docente" className='mt-3' toggleable>        
+      <Panel header="Registrar Unidades de aprendizaje con plan de estudios" className='mt-3' toggleable>        
         <div className="formgrid grid mx-8 justify-content-center">
         <div className="field col-3">
             <label>Unidad de Aprendizaje*</label>
@@ -378,7 +377,6 @@ return (
               onChange={(e) => {
                 setclave_UnidadAprendizaje(e.value);
               }} 
-              //optionLabel="nombre_ProgramaEducativo" 
               optionLabel="nombre_UnidadAprendizaje" 
               optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
               placeholder="Seleccione la Unidad de Aprendizaje"               
