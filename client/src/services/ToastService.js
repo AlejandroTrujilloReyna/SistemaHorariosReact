@@ -11,3 +11,7 @@ export const mostrarAdvertencia = (toast, mensaje) => {
 export const mostrarError = (toast, mensaje) => {
     toast.current.show({severity: 'error', summary: 'Error', detail: mensaje, life: 3000});
 };
+
+export const mostrarInformacion = (toast, mensaje) => {
+    toast.current.show({severity: 'info', summary: 'Detalle', detail: mensaje, life: 3000});
+};

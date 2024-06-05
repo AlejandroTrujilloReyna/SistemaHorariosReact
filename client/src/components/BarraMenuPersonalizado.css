@@ -6,11 +6,12 @@
 
 /*Cuando se da click en el menu y abre el submenu, tendra el color verde de fondo */
 .custom-menubar .p-submenu-list {
+    z-index: 1000;
+    max-width: 100%;
     background-color: #2c8d57; /* Fondo verde para el submenu */
    
 }
-.p-menuitem :hover{
-
+.p-submenu-list :hover{
     background-color: rgba(169, 165, 165, 0.504);
 }
 

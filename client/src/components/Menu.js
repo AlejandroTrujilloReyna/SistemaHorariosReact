@@ -117,7 +117,7 @@ const Menu = () => {
             ]
         },
         {
-            label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Otros</span>,
+            label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif'}}>Otros</span>,
             icon: 'pi pi-building',
             items: [
                 {
@@ -137,7 +137,7 @@ const Menu = () => {
                     command: () => { window.location.href = '/SubGrupo'; }
                 },
                 {
-                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Modificar Subgrupos</span>,
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif'}}>Modificar Subgrupos</span>,
                     command: () => { window.location.href = '/ModificarSubgrupos'; }
                 },                
                 { 
@@ -153,7 +153,7 @@ const Menu = () => {
                     command: () => { window.location.href = '/GradoEstudio'; } 
                 },
                 { 
-                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Material</span>,
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif'}}>Material</span>,
                     command: () => { window.location.href = '/Material'; } 
                 },
                 { 

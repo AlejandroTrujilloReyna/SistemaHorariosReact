@@ -7,28 +7,38 @@ import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { mostrarExito, mostrarAdvertencia, mostrarError } from '../services/ToastService';//AGREGADO
+import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';//AGREGADO
 import { validarTexto, validarNumero} from '../services/ValidacionGlobalService';//AGREGADO
 import { Toolbar } from 'primereact/toolbar';//NUEVO
 import { Dialog } from 'primereact/dialog';//NUEVO
 import { IconField } from 'primereact/iconfield';//NUEVO
 import { InputIcon } from 'primereact/inputicon';//NUEVO
 import UnidadAcademicaService from '../services/UnidadAcademicaService';
+import { FilterMatchMode } from 'primereact/api';
 
 const UnidadAcademica = () => {
   //VARIABLES PARA EL REGISTRO
   const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState("");
   const [nombre_UnidadAcademica,setnombre_UnidadAcademica] = useState("");
-  const [enviado, setEnviado] = useState(false);
   //VARIABLES PARA LA CONSULTA
   const [unidadacademicaList,setunidadacademicaList] = useState([]);
   const [filtrounidadacademica, setfiltrounidadacademica] = useState([]);
-  
-  //VARIABLES PARA EL ERROR
-  const toast = useRef(null);
   const dt = useRef(null);
-  
-  //ABRIR DIALOGS
+  const [lazyState, setlazyState] = useState({
+    filters: {
+      clave_UnidadAcademica: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      nombre_UnidadAcademica: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+    },
+  });
+  //VARIABLES PARA MODIFICACIÓN (SIEMPRE SERA UNA COPIA DE LAS VARIABLES DE REGISTRO PARA REALIZAR COMPARACIONES)
+  const [datosCopia, setDatosCopia] = useState({
+    clave_UnidadAcademica: "",
+    nombre_UnidadAcademica: ""
+  });    
+  //VARIABLES PARA MANEJAR MENSAJES
+  const toast = useRef(null);
+  //ESTADOS PARA CONDICIONES
+  const [enviado, setEnviado] = useState(false);
   const [abrirDialog,setAbrirDialog] = useState(0);
 
   //FUNCION PARA REGISTRAR
@@ -80,7 +90,15 @@ const UnidadAcademica = () => {
       mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
       setEnviado(true);
       return;
-    }    
+    }
+    //VALIDACIONES PARA EL CASO DONDE SE DE CLIC EN GUARDAR PERO NO SE REALICEN CAMBIOS
+    if (clave_UnidadAcademica === datosCopia.clave_UnidadAcademica
+       && nombre_UnidadAcademica === datosCopia.nombre_UnidadAcademica) {
+      mostrarInformacion(toast, "No se han realizado cambios");
+      setAbrirDialog(0);
+      limpiarCampos();
+      return;      
+    }
     UnidadAcademicaService.modificarUnidadAcademica({
       clave_UnidadAcademica:clave_UnidadAcademica,
       nombre_UnidadAcademica:nombre_UnidadAcademica
@@ -104,12 +122,6 @@ const UnidadAcademica = () => {
 
   //!!!EXTRAS DE REGISTRO
 
-  const headerTemplate = (
-    <div className="formgrid grid justify-content-center border-bottom-1 border-300">
-      <h4>Registrar Unidad Academica</h4>
-    </div>
-  );  
-
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
   const limpiarCampos = () =>{
     setclave_UnidadAcademica("");
@@ -120,8 +132,8 @@ const UnidadAcademica = () => {
 
   //COLUMNAS PARA LA TABLA
   const columns = [
-    { field: 'clave_UnidadAcademica', header: 'Clave' },
-    { field: 'nombre_UnidadAcademica', header: 'Nombre' },
+    { field: 'clave_UnidadAcademica', header: 'Clave', filterHeader: 'Filtro por Clave' },
+    { field: 'nombre_UnidadAcademica', header: 'Nombre', filterHeader: 'Filtro por Nombre' },
   ];
 
   //MANDAR A LLAMAR LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -141,17 +153,7 @@ const UnidadAcademica = () => {
     setfiltrounidadacademica(filteredData);
   };
 
-  const headerTabla = (
-    <div className="flex flex-wrap align-items-center justify-content-between">
-      <h4 className="m-0">Lista de Unidades Academicas</h4>
-      <IconField iconPosition="left">
-        <InputIcon className="pi pi-search" />
-        <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch}/>  
-      </IconField>
-  </div>  
-  );
-
-  // Contenido de la columna de Acciones (Modificar y Eliminar)
+  //BOTON PARA MODIFICAR
   const accionesTabla = (rowData) => {
     return (
         <Button
@@ -162,6 +164,10 @@ const UnidadAcademica = () => {
           onClick={() => {
             setclave_UnidadAcademica(rowData.clave_UnidadAcademica);
             setnombre_UnidadAcademica(rowData.nombre_UnidadAcademica);
+            setDatosCopia({
+              clave_UnidadAcademica: rowData.clave_UnidadAcademica,
+              nombre_UnidadAcademica: rowData.nombre_UnidadAcademica
+            });
             setAbrirDialog(2);
           }}
         />
@@ -170,20 +176,40 @@ const UnidadAcademica = () => {
   
   //!!!EXTRAS GENERALES
 
+  //ENCABEZADO DEL DIALOG
+  const headerTemplate = (
+    <div className="formgrid grid justify-content-center border-bottom-1 border-300">
+      <h4>Registrar Unidad Academica</h4>
+    </div>
+  );  
+
+  //LISTA DE OPCIONES DE HERRAMIENTAS
   const Herramientas = () => {
-    return (
-        <div className="flex flex-wrap gap-2">
+    return (<div className="flex justify-content-between flex-wrap gap-2 align-items-center">
             <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={()=>setAbrirDialog(1)}/>
             <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={()=>{dt.current.exportCSV();}}/>
-        </div>
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch}/>  
+              </IconField>
+            </div>              
     );
   };
+  
+  const Titulo = () =>{
+    return(<h2 className="m-0">Unidad Academica</h2>);
+  };
+
+    // Funcion Necesaria para filtrado
+    const onFilter = (event) => {
+      event['first'] = 0;
+      setlazyState(event);
+    };
 
   return (
     <>
-    <h2>Unidad Academica</h2>
       <Toast ref={toast} />
-      <Toolbar start={Herramientas}/>
+      <Toolbar start={Titulo} end={Herramientas}/>
       <Dialog header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
             <div className="field col-2">
@@ -220,12 +246,22 @@ const UnidadAcademica = () => {
         </div>  
       </Dialog>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <DataTable header={headerTabla} ref={dt} value={filtrounidadacademica.length ? filtrounidadacademica :unidadacademicaList} 
-      paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small'>
-         {columns.map(({ field, header }) => {
-              return <Column key={field} field={field} header={header}/>;
+      <DataTable onFilter={onFilter} filters={lazyState.filters} filterDisplay="row" scrollable scrollHeight="78vh"
+      ref={dt} value={filtrounidadacademica.length ? filtrounidadacademica :unidadacademicaList} 
+      size='small'>
+         {columns.map(({ field, header, filterHeader }) => {
+              return <Column style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}} sortable filter filterPlaceholder={filterHeader}
+              filterMatchModeOptions={[
+                { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
+                { label: 'Contiene', value: FilterMatchMode.CONTAINS },
+                { label: 'No contiene', value: FilterMatchMode.NOT_CONTAINS },
+                { label: 'Termina con', value: FilterMatchMode.ENDS_WITH },
+                { label: 'Igual', value: FilterMatchMode.EQUALS },
+                { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
+              ]}
+              key={field} field={field} header={header}/>;
           })}
-          <Column body={accionesTabla} align={'left'}></Column>          
+          <Column body={accionesTabla} alignFrozen={'right'} frozen={true}></Column>          
       </DataTable>          
     </>
   )
