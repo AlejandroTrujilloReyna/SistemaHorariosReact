@@ -148,6 +148,10 @@ const Menu = () => {
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>SubGrupos</span>,
                     command: () => { window.location.href = '/SubGrupo'; }
                 },
+                {
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Modificar Subgrupos</span>,
+                    command: () => { window.location.href = '/ModificarSubgrupos'; }
+                },                
                 { 
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Tipo de Horas de SubGrupo de Unidad de Aprendizaje</span>,
                     command: () => { window.location.href = '/UATipoSubGrupoHoras'; } 
