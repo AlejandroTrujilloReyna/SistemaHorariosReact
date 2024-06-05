@@ -51,9 +51,19 @@ router.post("/registrarDocente", (req, res) => {
         });
     });
 });
-
+/*
 router.get("/consultarDocente", (req, res) => {
     db.query('SELECT * FROM docente ORDER BY no_EmpleadoDocente', (err, results) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).send("Error interno del servidor");
+      }
+      res.status(200).json(results);
+    });
+});*/
+//db.query('SELECT d.*,GROUP_CONCAT(u.clave_UnidadAprendizaje SEPARATOR ", ") AS unidadesAprendizaje FROM bdsistemahorarios.docente d LEFT JOIN bdsistemahorarios.impartirunidadaprendizaje i ON d.no_EmpleadoDocente = i.no_EmpleadoDocente LEFT JOIN bdsistemahorarios.unidadaprendizaje u ON i.clave_UnidadAprendizaje = u.clave_UnidadAprendizaje GROUP BY d.no_EmpleadoDocente, d.horas_MinimasDocente, d.horas_MaximasDocente, d.horas_Externas, d.clave_TipoEmpleado, d.clave_GradoEstudio, d.clave_Usuario ORDER BY d.no_EmpleadoDocente', (err, results) => {
+router.get("/consultarDocente", (req, res) => {
+    db.query('SELECT d.*,GROUP_CONCAT(DISTINCT u.clave_UnidadAprendizaje SEPARATOR ", ") AS unidadesAprendizaje, GROUP_CONCAT(DISTINCT CONCAT(p.clave_ProgramaEducativo, " (Horas: ", p.horas_impartir, ")") SEPARATOR ", ") AS programasEducativos FROM bdsistemahorarios.docente d LEFT JOIN bdsistemahorarios.impartirunidadaprendizaje i ON d.no_EmpleadoDocente = i.no_EmpleadoDocente LEFT JOIN bdsistemahorarios.unidadaprendizaje u ON i.clave_UnidadAprendizaje = u.clave_UnidadAprendizaje LEFT JOIN bdsistemahorarios.programaeducativodocente p ON d.no_EmpleadoDocente = p.no_EmpleadoDocente GROUP BY d.no_EmpleadoDocente, d.horas_MinimasDocente, d.horas_MaximasDocente, d.horas_Externas, d.clave_TipoEmpleado, d.clave_GradoEstudio, d.clave_Usuario ORDER BY d.no_EmpleadoDocente', (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send("Error interno del servidor");

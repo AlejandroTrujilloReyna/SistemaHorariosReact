@@ -9,10 +9,13 @@ import { Dropdown } from 'primereact/dropdown';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
+import { MultiSelect } from 'primereact/multiselect';
 import DocenteService from '../services/DocenteService';
 import GradoEstudioService from '../services/GradoEstudioService';
 import TipoEmpleadoService from '../services/TipoEmpleadoService';
 import UsuarioService from '../services/UsuarioService';
+import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
+import ImpartirUnidadAprendizajeService from '../services/ImpartirUnidadAprendizajeService';
 
 const Docente = () => {
   //VARIABLES PARA EL REGISTRO
@@ -23,7 +26,9 @@ const Docente = () => {
   const [clave_TipoEmpleado,setclave_TipoEmpleado] = useState(null);
   const [clave_GradoEstudio, setclave_GradoEstudio] = useState(null);
   const [clave_Usuario, setclave_Usuario] = useState(null);
+  const [unidadesseleccionadas,setunidadesseleccionadas] = useState([]);
   //VARIABLES PARA LA CONSULTA
+  const [unidadesaprendizajeList,setunidadesaprendizajeList] = useState([]);
   const [docentesList,setdocentesList] = useState([]);
   const [filtroDocente, setfiltroDocente] = useState([]);
   const [gradosEstudio, setGradosEstudio] = useState([]);
@@ -66,6 +71,7 @@ const Docente = () => {
     }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
         mostrarExito("Registro Exitoso");
+        addUnidadAprendizaje();
         get();
         limpiarCampos();
       }
@@ -80,7 +86,53 @@ const Docente = () => {
         mostrarError("Error interno del servidor");
       }     
     });
-  }  
+  } 
+  
+  //FUNCION PARA REGISTRAR
+  const addUnidadAprendizaje = ()=>{
+    //VALIDACION DE CAMPOS VACIOS
+    if (!unidadesseleccionadas) {      
+      mostrarAdvertencia("Existen campos Obligatorios vacíos");
+      return;
+    }
+    //MANDAR A LLAMAR AL REGISTRO SERVICE
+    /*ImpartirUnidadAprendizajeService.registrarImpartirUnidadAprendizaje({
+      no_EmpleadoDocente:no_EmpleadoDocente,
+      unidades_aprendizaje:unidadesseleccionadas
+    }).then(response=>{//CASO EXITOSO
+      if (response.status === 200) {
+        mostrarExito("Registro Exitoso");
+        get();
+        limpiarCampos();
+      }
+    }).catch(error=>{//EXCEPCIONES
+      if(error.response.status === 500){  
+        mostrarError("Error interno del servidor");
+      }     
+    });*/
+    for (let i = 0; i < unidadesseleccionadas.length; i++) {              
+      //MANDAR A LLAMAR AL REGISTRO SERVICE
+      //mostrarAdvertencia("id: "+id_Material+" idp: "+id_Prestamo+" | "+MaterialSeleccionado[0]);
+      ImpartirUnidadAprendizajeService.registrarImpartirUnidadAprendizajedos({
+        clave_UnidadAprendizaje:unidadesseleccionadas[i],
+          no_EmpleadoDocente:no_EmpleadoDocente     
+      }).then(response=>{//CASO EXITOSO
+      if (response.status === 200) {
+          if(i===unidadesseleccionadas.length-1){
+              mostrarExito("Registro Exitoso");              
+          }
+          //get();
+          //limpiarCampos();
+      }
+      }).catch(error=>{//EXCEPCIONES
+      if(error.response.status === 401){
+          mostrarAdvertencia("ID ya existente");        
+      }else if(error.response.status === 500){  
+          mostrarError("Error interno del servidor");
+      }     
+      });
+  }
+  } 
 
   //FUNCION PARA CONSULTA
   const get = ()=>{
@@ -131,11 +183,12 @@ const Docente = () => {
   const columns = [
     {field: 'no_EmpleadoDocente', header: 'NO.Empleado' },
     {field: 'horas_MinimasDocente', header: 'Horas Mínimas' },
-    {field: 'horas_MaximasDocente', header: 'Horas Máximas"' },
+    {field: 'horas_MaximasDocente', header: 'Horas Máximas' },
     {field: 'horas_Externas', header: 'Horas Externas' },
     {field: 'clave_TipoEmpleado', header: 'Tipo Empleado' },
     {field: 'clave_GradoEstudio', header: 'Grado Estudio' },
-    {field: 'clave_Usuario', header: 'Usuario' }
+    {field: 'clave_Usuario', header: 'Usuario' },
+    {field: 'unidadesAprendizaje', header: 'Unidades Aprendizaje' },
   ];
   
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -193,6 +246,17 @@ const Docente = () => {
     UsuarioService.consultarUsuario()
       .then(response => {
         setUsuarios(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching usuarios:", error);
+      });
+  }, []);
+
+  //MANDAR A LLAMAR A LA LISTA DE USUARIOS
+  useEffect(() => {
+    UnidadAprendizajeService.consultarUnidadAprendizaje()
+      .then(response => {
+        setunidadesaprendizajeList(response.data);
       })
       .catch(error => {
         console.error("Error fetching usuarios:", error);
@@ -397,7 +461,7 @@ const Docente = () => {
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
-      {/*PANEL PARA EL REGISTRO*/}
+      {/*PANEL PARA EL REGISTRO*/}      
       <Panel header="Registrar Docente" className='mt-3' toggleable>        
         <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-2">
@@ -485,7 +549,27 @@ const Docente = () => {
                   }} 
                   placeholder="Ej.5" 
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
-          </div>                                                                       
+          </div> 
+          <div className="field col">
+            <label htmlFor="UnidadesAprendizaje" className="font">Unidades Aprendizaje*</label>
+            <MultiSelect 
+            id="UnidadesAprendizaje"
+            value={unidadesseleccionadas} 
+            options={unidadesaprendizajeList} 
+            onChange={(e) => {
+                setunidadesseleccionadas(e.value);
+            }} 
+            required
+            filter
+            optionLabel = {(option) => `${option.clave_UnidadAprendizaje} - ${option.nombre_UnidadAprendizaje}`}
+            optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            placeholder="Unidades de Aprendizaje a Impartir" 
+           /* className={classNames({ 'p-invalid': frmEnviado && !MaterialSeleccionado })}*/
+            />
+            {/*frmEnviado && !MaterialSeleccionado && (
+                <small className="p-error">Se requiere el Material.</small>
+            )*/}
+            </div>                                                                      
         </div>
         <div className="mx-8 mt-4">
           <Button label="Guardar" onClick={add} className="p-button-success" />

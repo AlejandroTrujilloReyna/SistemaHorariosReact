@@ -50,6 +50,16 @@ router.get("/consultarUsuario", (req, res) => {
     });
 });
 
+router.get("/consultarUsuarioSinUsar", (req, res) => {
+    db.query('SELECT u.* FROM usuario u LEFT JOIN docente du ON u.clave_Usuario = du.clave_Usuario WHERE du.clave_Usuario IS NULL ORDER BY u.clave_Usuario', (err, results) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).send("Error interno del servidor");
+      }
+      res.status(200).json(results);
+    });
+});
+
 router.put("/modificarUsuario", (req, res) => {
     const clave_Usuario = req.body.clave_Usuario;
     const nombre_Usuario = req.body.nombre_Usuario;

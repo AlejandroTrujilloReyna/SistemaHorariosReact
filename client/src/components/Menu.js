@@ -76,7 +76,25 @@ const Menu = () => {
                 {
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Docente</span>,
                     command: () => { window.location.href = '/Docente'; }
-                }
+                },
+                {  label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Usuario</span>,
+                command: () => { window.location.href = '/Usuario'; } },
+                {  label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Tipo Empleado</span>,
+                command: () => { window.location.href = '/TipoEmpleado'; } },
+                {  label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Docente</span>,
+                command: () => { window.location.href = '/DocenteN'; } }
+            ]
+        },
+        { 
+            label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Gestión de Actividades</span>,
+            icon: 'pi pi-building-columns',
+            items: [
+                { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Unidad de Aprendizaje</span>,
+                command: () => { window.location.href = '/UnidadAprendizaje'; } },
+                { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Actividad</span>,
+                command: () => { window.location.href = '/Actividad'; } },
+                { label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Horario de Actividad</span>,
+                command: () => { window.location.href = '/HorarioActividad'; } }
             ]
         },
         {

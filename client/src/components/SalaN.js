@@ -587,7 +587,7 @@ const SalaN = () => {
           </div>                    
         </div>
         <div className="field">
-              <label htmlFor="vtraslape" className="font-bold">¿Se debe validar el traslape?* </label>
+              <label htmlFor="vtraslape" className="font-bold mr-2">¿Se debe validar el traslape?* </label>
               <ToggleButton
                 id="vtraslape"
                 onLabel="Si"
@@ -652,7 +652,7 @@ const SalaN = () => {
         </div>
       </Dialog>   
       {/*Barra de herramientas con boton nuevo, boton para anclar la columna de Acciones y Exportar*/} 
-      <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+      <Toolbar className="mt-3" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
       {/*Tabla de Contenido*/}         
       <div className="card">        
         <DataTable ref={dt} value={filtrosala.length ? filtrosala :salaList} scrollable scrollHeight="400px" size='small' tableStyle={{ minWidth: '50rem' }}         

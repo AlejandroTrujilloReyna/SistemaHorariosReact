@@ -57,6 +57,35 @@ router.get("/consultarPlandeestudios", (req, res) => {
     });
 });
 
+router.get("/consultarUnidadAprendizajePlanEstudios", (req, res) => {
+    const clave_PlanEstudios = req.body;
+    db.query('SELECT * FROM unidadaprendizaje WHERE clave_PlanEstudios = ? ORDER BY clave_UnidadAprendizaje',clave_PlanEstudios, (err, results) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).send("Error interno del servidor");
+      }
+      res.status(200).json(results);
+    });
+});
+
+router.get("/consultarUnidadAprendizajePlanEstudiosdos", (req, res) => {
+    const clave_PlanEstudios = req.query.clave_PlanEstudios;    
+
+    db.query('SELECT * FROM unidadaprendizaje WHERE clave_PlanEstudios = ? ORDER BY clave_UnidadAprendizaje', [clave_PlanEstudios], (err, results) => {
+            
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error interno del servidor");
+        }
+        if (results.length == 0) {
+            return res.status(404).send("Sin resultados");
+        }
+        res.status(200).json(results);
+    });
+
+})
+
+
 router.get("/consultarUnidadAprendizaje", (req, res) => {
     db.query('SELECT * FROM unidadaprendizaje ORDER BY clave_UnidadAprendizaje', (err, results) => {
       if (err) {

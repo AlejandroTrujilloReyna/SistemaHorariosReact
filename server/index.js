@@ -86,6 +86,9 @@ app.use("/salamaterial", salamaterialRoutes);
 const grupoRoutes = require("./routes/grupo")
 app.use("/grupo", grupoRoutes);
 
+const impartirunidadaprendizajeRoutes = require("./routes/impartirunidadaprendizaje")
+app.use("/impartirunidadaprendizaje", impartirunidadaprendizajeRoutes);
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");
 });

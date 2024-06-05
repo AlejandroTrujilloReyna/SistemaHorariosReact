@@ -31,7 +31,7 @@ import Horario from './components/Horario';
 import SubGrupo from './components/SubGrupo';
 import Material from './components/Material';
 import Grupo from './components/Grupo';
-
+import DocenteN from './components/DocenteN';
 function App() {
   return (
     <div className="App">
@@ -54,6 +54,7 @@ function App() {
           <Route path='/TipoEmpleado' element={<TipoEmpleado/>}/>
           <Route path='/GradoEstudio' element={<GradoEstudio/>}/>
           <Route path='/Docente' element={<Docente/>}/>
+          <Route path='/DocenteN' element={<DocenteN/>}/>
           <Route path='/Actividad' element={<Actividad/>}/>
           <Route path='/HorarioActividad' element={<HorarioActividad/>}/>
           <Route path='/UsarEdificioo' element={<UsarEdificioo/>}/>
