@@ -10,7 +10,7 @@ const db = mysql.createConnection({
 });
 
 router.post("/registrarSala", (req, res) => {
-    const clave_Sala = req.body.clave_Sala;
+    const clave_Sala = null;
     const nombre_Sala = req.body.nombre_Sala;
     const capacidad_Sala = req.body.capacidad_Sala;
     const validar_Traslape = req.body.validar_Traslape;
@@ -35,7 +35,9 @@ router.post("/registrarSala", (req, res) => {
                     console.log(err);
                     return res.status(500).send("Error interno del servidor");
                 }
-                res.status(200).send("Sala registrada con éxito");
+                const clave_Sala = result.insertId;
+
+                res.status(200).json({ clave_Sala: clave_Sala, message:"Sala registrada con éxito"});
             });
 
     });
@@ -52,16 +54,16 @@ router.get("/consultarTiposala", (req, res) => {
     });
 });
 
-router.get("/consultarSala", (req, res) => {
-    db.query('SELECT * FROM sala ORDER BY clave_Sala', (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("Error interno del servidor");
+router.get("/consultarSala", (req, res) => {//              en u.nombre_Material iba antes: u.clave_Material
+    db.query(`SELECT  d.*, COALESCE(GROUP_CONCAT(DISTINCT u.nombre_Material SEPARATOR ", "), 'Ninguno') AS materiales FROM bdsistemahorarios.sala d LEFT JOIN bdsistemahorarios.salamaterial i ON d.clave_Sala = i.clave_Sala LEFT JOIN bdsistemahorarios.material u ON i.clave_Material = u.clave_Material GROUP BY d.clave_Sala ORDER BY d.clave_Sala`, (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error interno del servidor");
+            }
+            res.status(200).json(results);
         }
-        res.status(200).json(results);
-    });
+    );
 });
-
 router.put("/modificarSala", (req, res) => {
     const clave_Sala = req.body.clave_Sala;
     const nombre_Sala = req.body.nombre_Sala;

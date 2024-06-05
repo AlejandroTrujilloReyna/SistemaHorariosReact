@@ -21,17 +21,7 @@ router.post("/registrarTipoSubGrupo", (req, res) => {
 
         if(results.length > 0) {
             return res.status(401).send("El nombre del Tipo SubGrupo ya existe");
-        }
-        db.query('SELECT * FROM tiposubgrupo WHERE nombre_TipoSubGrupo = ?',[nombre_TipoSubGrupo], (err, results) => {
-            if(err) {
-                console.log(err);
-                return res.status(500).send("Error interno del servidor");
-            }
-    
-            if(results.length > 0) {
-                return res.status(401).send("El Nombre del Tipo SubGrupo ya existe");
-            }
-            
+        }   
             db.query('INSERT INTO tiposubgrupo(clave_TipoSubGrupo, nombre_TipoSubGrupo) VALUES (?, ?)',
             [clave_TipoSubGrupo, nombre_TipoSubGrupo], (err, result) => {
                 if (err) {
@@ -42,7 +32,6 @@ router.post("/registrarTipoSubGrupo", (req, res) => {
             });  
         });  
     });
-});
 
 router.get("/consultarTipoSubGrupo", (req, res) => {
     db.query('SELECT * FROM tiposubgrupo ORDER BY clave_TipoSubGrupo', (err, results) => {
@@ -73,7 +62,7 @@ router.put("/modificarTipoSubGrupo", (req, res) => {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
             }
-            res.status(200).send("SubGrupo modificado con exito");        
+            res.status(200).send("Tipo SubGrupo modificado con exito");        
         });
     });    
 });

@@ -77,8 +77,14 @@ app.use("/horario",horarioRoutes);
 const subgrupoRoutes = require("./routes/subgrupo")
 app.use("/subgrupo",subgrupoRoutes)
 
+const materialRoutes = require("./routes/material")
+app.use("/material", materialRoutes);
 
+const salamaterialRoutes = require("./routes/salamaterial")
+app.use("/salamaterial", salamaterialRoutes);
 
+const grupoRoutes = require("./routes/grupo")
+app.use("/grupo", grupoRoutes);
 
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001");

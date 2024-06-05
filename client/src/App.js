@@ -29,6 +29,9 @@ import UnidadAprendizajePlanEstudios from './components/UnidadAprendizajePlanEst
 import ModificarSubgrupos from './components/ModificarSubgrupos';
 import Horario from './components/Horario';
 import SubGrupo from './components/SubGrupo';
+import Material from './components/Material';
+import Grupo from './components/Grupo';
+
 function App() {
   return (
     <div className="App">
@@ -59,7 +62,8 @@ function App() {
           <Route path='/Horario' element={<Horario/>}/>
           <Route path='/SubGrupo' element={<SubGrupo/>}/> 
           <Route path='/Inicio' element={<Inicio/>}/>
-        
+          <Route path='/Material' element={<Material/>}/>
+          <Route path='/Grupo' element={<Grupo/>}/>
         </Routes>
       </BrowserRouter>    
     </div>

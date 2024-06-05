@@ -50,6 +50,14 @@ const Menu = () => {
                 {
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Tipo Sala</span>,
                     command: () => { window.location.href = '/TipoSala'; }
+                },
+                { 
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Sala</span>,
+                    command: () => { window.location.href = '/SalaN'; } 
+                },
+                { 
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Tipo Sala</span>,
+                    command: () => { window.location.href = '/TipoSala'; } 
                 }
             ]
         },
@@ -121,11 +129,29 @@ const Menu = () => {
                 {
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>SubGrupos</span>,
                     command: () => { window.location.href = '/SubGrupo'; }
-                }
-            
+                },
+                { 
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Tipo de Horas de SubGrupo de Unidad de Aprendizaje</span>,
+                    command: () => { window.location.href = '/UATipoSubGrupoHoras'; } 
+                },
+                { 
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Tipo SubGrupo</span>,
+                    command: () => { window.location.href = '/TipoSubGrupo'; } 
+                },
+                { 
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Grado de Estudios</span>,
+                    command: () => { window.location.href = '/GradoEstudio'; } 
+                },
+                { 
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Material</span>,
+                    command: () => { window.location.href = '/Material'; } 
+                },
+                { 
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2",fontFamily: 'Arial, sans-serif' }}>Grupo</span>,
+                    command: () => { window.location.href = '/Grupo'; } 
+                }          
             ]
-
-        }
+        }         
     ];
 
     const start = <img alt="logo" src="https://comunicacioninstitucional.uabc.mx/wp-content/uploads/2024/03/escudo-actualizado-2022-w1000px-751x1024.png" height="40" className="mr-2"></img>;

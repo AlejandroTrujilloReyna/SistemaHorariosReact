@@ -23,7 +23,7 @@ router.post("/registrarUATipoSubGrupoHoras", (req, res) => {
             }
     
             if(results.length > 0) {
-                return res.status(401).send("Tipo de subgrupo existente en la Unidad de Aprendizaje");
+                return res.status(401).send("UA Tipo de subgrupo existente en la Unidad de Aprendizaje");
             }
             db.query('INSERT INTO uatiposubgrupohoras(clave_UATipoSubGrupoHoras, horas, clave_UnidadAprendizaje, clave_TipoSubGrupo) VALUES (?, ?, ?, ?)',
             [clave_UATipoSubGrupoHoras, horas, clave_UnidadAprendizaje, clave_TipoSubGrupo], (err, result) => {
@@ -31,7 +31,7 @@ router.post("/registrarUATipoSubGrupoHoras", (req, res) => {
                     console.log(err);
                     return res.status(500).send("Error interno del servidor");
                 }
-                res.status(200).send("SubGrupo registrado con éxito");
+                res.status(200).send("UA Tipo SubGrupo registrado con éxito");
             });
         });      
     
@@ -59,7 +59,7 @@ router.put("/modificarUATipoSubGrupoHoras", (req, res) => {
         }
 
         if(results.length > 0) {
-            return res.status(401).send("Tipo de subgrupo existente en el programa educativo");
+            return res.status(401).send("UA Tipo de subgrupo existente en el programa educativo");
         }
         db.query('UPDATE uatiposubgrupohoras SET horas = ?, clave_UnidadAprendizaje = ?, clave_TipoSubGrupo = ?  WHERE clave_UATipoSubGrupoHoras = ?',
         [horas, clave_UnidadAprendizaje,clave_TipoSubGrupo,clave_UATipoSubGrupoHoras],(err,result) =>{
@@ -67,7 +67,7 @@ router.put("/modificarUATipoSubGrupoHoras", (req, res) => {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
             }
-            res.status(200).send("SubGrupo modificado con exito");        
+            res.status(200).send("UA Tipo SubGrupo modificado con exito");        
         });
     });    
 });
