@@ -24,7 +24,7 @@ router.post("/registrarUnidadAprendizaje",(req,res)=>{
             return res.status(400).send("La clave de la Unidad de Aprendizaje ya existe");
         }
 
-        db.query('SELECT * FROM unidadaprendizaje WHERE nombre_UnidadAprendizaje = ? AND clave_PlanEstudios = ?',[nombre_UnidadAprendizaje,clave_PlanEstudios], (err, results) => {
+        db.query('SELECT * FROM unidadaprendizaje WHERE nombre_UnidadAprendizaje = ? AND clave_PlanEstudios = ? AND clave_UnidadAprendizaje != ? ',[nombre_UnidadAprendizaje,clave_PlanEstudios,clave_UnidadAprendizaje], (err, results) => {
             if(err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
