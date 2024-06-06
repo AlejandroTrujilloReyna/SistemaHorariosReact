@@ -71,7 +71,7 @@ const ProgramaEducativo = () => {
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo) {
-      mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
+      mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
       setEnviado(true);
       return;
     }
@@ -96,7 +96,7 @@ const ProgramaEducativo = () => {
       if (error.response.status === 400) {
         mostrarAdvertencia(toast,"Clave ya Existente");
       } else if (error.response.status === 401) {
-        mostrarAdvertencia(toast,"Nombre ya Existente");      
+        mostrarAdvertencia(toast,"Nombre ya existente en la misma Unidad Académica ");      
       }else if(error.response.status === 500){          
         mostrarError(toast,"Error interno del servidor");
       }     
@@ -119,7 +119,7 @@ const ProgramaEducativo = () => {
   //FUNCION PARA LA MODIFICACION
   const put = () =>{
   if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo) {
-    mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
+    mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
     setEnviado(true);
     return;
   }
@@ -151,7 +151,7 @@ const ProgramaEducativo = () => {
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 401){
-        mostrarAdvertencia(toast,"Nombre ya Existente");
+        mostrarAdvertencia(toast,"Nombre del Programa Educativo ya existente en la Unidad Académica");
         get();
       }else if(error.response.status === 500){
         mostrarError(toast,"Error del sistema");
@@ -179,7 +179,7 @@ const ProgramaEducativo = () => {
     {field: 'clave_ProgramaEducativo', header: 'Clave', filterHeader: 'Filtro por Clave' },
     {field: 'nombre_ProgramaEducativo', header: 'Nombre', filterHeader: 'Filtro por Nombre' },
     {field: 'banco_Horas', header: 'Banco de Horas', filterHeader: 'Filtro por Banco de Horas'},
-    {field: 'clave_UnidadAcademica', header: 'Unidad Académica',filterHeader: 'Filtro por Unidad Academica'}    
+    {field: 'clave_UnidadAcademica', header: 'Unidad Académica',filterHeader: 'Filtro por Unidad Académica'}    
   ];
   
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -191,12 +191,13 @@ const ProgramaEducativo = () => {
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredData = programaeducativoList.filter((item) => {
+      const Acade = unidadesAcademicas.find(Acade => Acade.clave_UnidadAcademica === item.clave_UnidadAcademica)?.nombre_UnidadAcademica || '';
         return (
-            item.clave_UnidadAcademica.toString().includes(value) ||
             item.clave_ProgramaEducativo.toString().includes(value) ||
             item.nombre_ProgramaEducativo.toLowerCase().includes(value) ||
             item.asignaturas_horas.toString().includes(value) ||
-            item.banco_Horas.toString().includes(value)            
+            item.banco_Horas.toString().includes(value)    ||
+            Acade.toLowerCase().includes(value)         
         );
     });
     setfiltroprogramaeducativo(filteredData);
@@ -289,6 +290,20 @@ const ProgramaEducativo = () => {
       {/*PANEL PARA EL REGISTRO*/}
       <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
+        <div className="field col-8">
+              <label>Unidad Académica*</label>
+            <Dropdown className="w-full"
+              invalid={enviado===true && !clave_UnidadAcademica}
+              value={clave_UnidadAcademica} 
+              options={unidadesAcademicas} 
+              onChange={(e) => {
+                setclave_UnidadAcademica(e.value);
+              }} 
+              optionLabel="nombre_UnidadAcademica" 
+              optionValue="clave_UnidadAcademica" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+              placeholder="Seleccione una Unidad Académica" 
+            />
+          </div> 
           <div className="field col-2">
               <label className='font-bold'>Clave*</label>
               <InputText disabled={abrirDialog===2} invalid={enviado===true && !clave_ProgramaEducativo} type="text" keyfilter="pint" value={clave_ProgramaEducativo} maxLength={10}
@@ -300,7 +315,7 @@ const ProgramaEducativo = () => {
               placeholder="Ej.6"
               className="w-full"/>
           </div>
-          <div className="field col-4">
+          <div className="field col-8">
               <label>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_ProgramaEducativo} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_ProgramaEducativo} maxLength={255}
                   onChange={(event)=>{
@@ -322,20 +337,7 @@ const ProgramaEducativo = () => {
                   placeholder="Ej.120"  
               className="w-full"/>
           </div>
-          <div className="field col-8">
-              <label>Unidad Académica*</label>
-            <Dropdown className="w-full"
-              invalid={enviado===true && !clave_UnidadAcademica}
-              value={clave_UnidadAcademica} 
-              options={unidadesAcademicas} 
-              onChange={(e) => {
-                setclave_UnidadAcademica(e.value);
-              }} 
-              optionLabel="nombre_UnidadAcademica" 
-              optionValue="clave_UnidadAcademica" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-              placeholder="Seleccione una Unidad Académica" 
-            />
-          </div>                                                                           
+                                                                                   
         </div>
         <div className="formgrid grid justify-content-end">
           <Button label="Cancelar" icon="pi pi-times" outlined className='m-2' onClick={() => {setAbrirDialog(0); setEnviado(false); limpiarCampos();}} severity='secondary' />

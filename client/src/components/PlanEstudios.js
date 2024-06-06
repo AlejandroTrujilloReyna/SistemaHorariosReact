@@ -9,6 +9,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
+import { mostrarExito, mostrarAdvertencia, mostrarError } from '../services/ToastService';
 import PlanEstudiosService from '../services/PlanEstudiosService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
 
@@ -28,26 +29,12 @@ const PlanEstudios = () => {
   //VARIABLES PARA EL ERROR
   const toast = useRef(null);
 
-  //MENSAJE DE EXITO
-  const mostrarExito = (mensaje) => {
-    toast.current.show({ severity: 'success', summary: 'Exito', detail: mensaje, life: 3000 });
-  }
-
-  //MENSAJE DE ADVERTENCIA
-  const mostrarAdvertencia = (mensaje) => {
-    toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: mensaje, life: 3000 });
-  }
-
-  //MENSAJE DE ERROR
-  const mostrarError = (mensaje) => {
-    toast.current.show({ severity: 'error', summary: 'Error', detail: mensaje, life: 3000 });
-  }
 
   //FUNCION PARA REGISTRAR
   const add = () => {
   //VALIDACION DE CAMPOS VACIOS
   if (!nombre_PlanEstudios || !clave_ProgramaEducativo || !cant_semestres) {
-    mostrarAdvertencia("Existen campos Obligatorios vacíos");
+    mostrarAdvertencia("Existen campos obligatorios vacíos");
     return;
   }
 
@@ -59,20 +46,20 @@ const PlanEstudios = () => {
     }).then(response => {
     // Caso exitoso
     if (response.status === 200) {
-      mostrarExito("Registro Exitoso");
+      mostrarExito(toast,"Registro Exitoso");
       get();
       limpiarCampos();
     }
     }).catch(error => {
         // Excepciones
         if (error.response.status === 400) {
-            mostrarAdvertencia("Nombre ya existente en este Programa Educativo");
+            mostrarAdvertencia(toast, "Nombre ya existente en este Programa Educativo");
         } else if (error.response.status === 500) {
-            mostrarError("Error interno del servidor");
+            mostrarError(toast, "Error interno del servidor");
         }
     })
   }
-
+  
  //FUNCION PARA CONSULTA
  const get = ()=>{
     PlanEstudiosService.consultarPlanestudios().then((response)=>{//CASO EXITOSO
@@ -88,14 +75,14 @@ const PlanEstudios = () => {
 const put = (rowData) =>{
     PlanEstudiosService.modificarPlanEstudios(rowData).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificación Exitosa");
+        mostrarExito(toast, "Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
-      if(error.response.status === 400){
-        mostrarAdvertencia("Nombre ya Existente en este Programa Educativo");
+      if(error.response.status === 401){
+        mostrarAdvertencia(toast, "Nombre ya Existente en este programa educativo");
         get();
       }else if(error.response.status === 500){
-        mostrarError("Error del sistema");
+        mostrarError(toast, "Error del sistema");
       }
     })
   }
@@ -126,9 +113,10 @@ const put = (rowData) =>{
 const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredData = planestudiosList.filter((item) => {
+      const proed = ProgramasEducativos.find(proed => proed.clave_ProgramaEducativo === item.clave_ProgramaEducativo)?.nombre_ProgramaEducativo || '';
         return (
           item.nombre_PlanEstudios.toLowerCase().includes(value) ||
-          item.clave_ProgramaEducativo.toString().includes(value) ||
+          proed.toLowerCase().includes(value)  ||
           item.cant_semestres.toString().includes(value)          
         );
     });
@@ -305,7 +293,7 @@ const TipoProgramaEducativoEditor = (options) => {
                 </div>
             </Panel>
              {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Planes de Etudios" className='mt-3' toggleable>
+      <Panel header="Consultar Planes de Estudios" className='mt-3' toggleable>
       <div className="mx-8 mb-4">
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>  
