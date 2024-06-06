@@ -117,7 +117,7 @@ const Grupo = () => {
 
   //FUNCION PARA LA MODIFICACION
   const put = () =>{
-  if (!clave_PlanEstudios || !nombre_Grupo || !semestre || !uso) {
+  if (!clave_PlanEstudios || !nombre_Grupo || !semestre || !uso || !clave_Grupo) {
     mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
     setEnviado(true);
     return;
