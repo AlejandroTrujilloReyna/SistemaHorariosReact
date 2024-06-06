@@ -2,13 +2,20 @@ import React from 'react';
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from 'react';
-import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
+import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
+import { validarTexto, validarNumero} from '../services/ValidacionGlobalService';//AGREGADO
+import { Toolbar } from 'primereact/toolbar';//NUEVO
+import { Dialog } from 'primereact/dialog';//NUEVO
+import { IconField } from 'primereact/iconfield';//NUEVO
+import { InputIcon } from 'primereact/inputicon';//NUEVO
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
+import { FilterMatchMode } from 'primereact/api';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
 import UnidadAcademicaService from '../services/UnidadAcademicaService';
 
@@ -17,37 +24,58 @@ const ProgramaEducativo = () => {
   const [clave_ProgramaEducativo,setclave_ProgramaEducativo] = useState("");
   const [nombre_ProgramaEducativo,setnombre_ProgramaEducativo] = useState("");
   const [banco_Horas,setbanco_Horas] = useState("");
-  const [asignaturas_horas,setasignaturas_horas] = useState("");
+  const [asignaturas_horas,setasignaturas_horas] = useState(0);
   const [clave_UnidadAcademica,setclave_UnidadAcademica] = useState(null);
   //VARIABLES PARA LA CONSULTA
   const [programaeducativoList,setprogramaeducativoList] = useState([]);
   const [filtroprogramaeducativo, setfiltroprogramaeducativo] = useState([]);
   const [unidadesAcademicas, setUnidadesAcademicas] = useState([]);
+  const dt = useRef(null);
+  const [lazyState, setlazyState] = useState({
+    filters: {
+      clave_ProgramaEducativo: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      nombre_ProgramaEducativo: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      banco_Horas: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      asignaturas_horas: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      clave_UnidadAcademica: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+    },
+  });  
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
-  const [editando,seteditando] = useState(false);
+  const [datosCopia, setDatosCopia] = useState({
+    clave_ProgramaEducativo: "",
+    nombre_ProgramaEducativo: "",
+    banco_Horas: "",
+    asignaturas_horas: 0,
+    clave_UnidadAcademica: ""
+  }); 
   //VARIABLES PARA EL ERROR
   const toast = useRef(null);
+  //ESTADOS PARA CONDICIONES
+  const [enviado, setEnviado] = useState(false);
+  const [abrirDialog,setAbrirDialog] = useState(0);  
 
-  //MENSAJE DE EXITO
-  const mostrarExito = (mensaje) => {
-    toast.current.show({severity:'success', summary: 'Exito', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ADVERTENCIA
-  const mostrarAdvertencia = (mensaje) => {
-      toast.current.show({severity:'warn', summary: 'Advertencia', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ERROR
-  const mostrarError = (mensaje) => {
-    toast.current.show({severity:'error', summary: 'Error', detail:mensaje, life: 3000});
-  }   
+  const confirmar1 = (action) => {
+    confirmDialog({
+      message: '¿Seguro que quieres proceder?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'accept',
+      accept: action,
+      reject: () => mostrarAdvertencia(toast, "Cancelado")
+    });
+  };  
 
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo || !asignaturas_horas) {
-      mostrarAdvertencia("Existen campos Obligatorios vacíos");
+    if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo) {
+      mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
+      setEnviado(true);
       return;
     }
+    const action = () => {
     //MANDAR A LLAMAR AL REGISTRO SERVICE
     ProgramaEducativoService.registrarProgramaEducativo({
       clave_ProgramaEducativo:clave_ProgramaEducativo,
@@ -58,19 +86,23 @@ const ProgramaEducativo = () => {
       clave_UnidadAcademica:clave_UnidadAcademica      
     }).then(response=>{
       if (response.status === 200) {//CASO EXITOSO
-        mostrarExito("Registro Exitoso");
+        mostrarExito(toast,"Registro Exitoso");
         get();
         limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
-        mostrarAdvertencia("Clave ya Existente");
+        mostrarAdvertencia(toast,"Clave ya Existente");
       } else if (error.response.status === 401) {
-        mostrarAdvertencia("Nombre ya Existente");      
+        mostrarAdvertencia(toast,"Nombre ya Existente");      
       }else if(error.response.status === 500){          
-        mostrarError("Error interno del servidor");
+        mostrarError(toast,"Error interno del servidor");
       }     
-    });
+    });    
+    };
+    confirmar1(action);
   }  
 
   //FUNCION PARA CONSULTA
@@ -85,41 +117,69 @@ const ProgramaEducativo = () => {
   }
 
   //FUNCION PARA LA MODIFICACION
-  const put = (rowData) =>{
-    ProgramaEducativoService.modificarProgramaEducativo(rowData).then(response=>{//CASO EXITOSO
+  const put = () =>{
+  if (!clave_UnidadAcademica || !clave_ProgramaEducativo || !nombre_ProgramaEducativo) {
+    mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
+    setEnviado(true);
+    return;
+  }
+  if (clave_UnidadAcademica === datosCopia.clave_UnidadAcademica
+    && clave_ProgramaEducativo === datosCopia.clave_ProgramaEducativo
+    && banco_Horas === datosCopia.banco_Horas
+    && asignaturas_horas === datosCopia.asignaturas_horas
+    && nombre_ProgramaEducativo === datosCopia.nombre_ProgramaEducativo) {
+    mostrarInformacion(toast, "No se han realizado cambios");
+    setAbrirDialog(0);
+    limpiarCampos();
+    return;
+  }
+  const action = () => {  
+  ProgramaEducativoService.modificarProgramaEducativo({
+    clave_ProgramaEducativo:clave_ProgramaEducativo,
+    nombre_ProgramaEducativo:nombre_ProgramaEducativo,
+    //VALIDACION PARA EL CAMPO NUMERICO NO OBLIGATORIO BANCO DE HORAS
+    banco_Horas:banco_Horas.trim !== '' ? banco_Horas : 0,
+    asignaturas_horas:asignaturas_horas,
+    clave_UnidadAcademica:clave_UnidadAcademica        
+    }).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificación Exitosa");
+        mostrarExito(toast, "Modificación Exitosa");
+        get();
+        limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya Existente");
+        mostrarAdvertencia(toast,"Nombre ya Existente");
         get();
       }else if(error.response.status === 500){
-        mostrarError("Error del sistema");
+        mostrarError(toast,"Error del sistema");
       }
     })
+  };
+  confirmar1(action);    
   }
 
   //!!!EXTRAS DE REGISTRO
 
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
   const limpiarCampos = () =>{
-    setclave_ProgramaEducativo(0);
+    setclave_ProgramaEducativo("");
     setnombre_ProgramaEducativo("");
-    setbanco_Horas(0);
+    setbanco_Horas("");
     setasignaturas_horas(0);
-    setclave_UnidadAcademica(0);
+    setclave_UnidadAcademica(null);
   }
   
   //!!!EXTRAS DE CONSULTA
 
   //COLUMNAS PARA LA TABLA
   const columns = [
-    {field: 'clave_ProgramaEducativo', header: 'Clave' },
-    {field: 'nombre_ProgramaEducativo', header: 'Nombre' },
-    {field: 'asignaturas_horas', header: 'Horas de Asignatura'},
-    {field: 'banco_Horas', header: 'Banco de Horas'},
-    {field: 'clave_UnidadAcademica', header: 'Unidad Académica'}    
+    {field: 'clave_ProgramaEducativo', header: 'Clave', filterHeader: 'Filtro por Clave' },
+    {field: 'nombre_ProgramaEducativo', header: 'Nombre', filterHeader: 'Filtro por Nombre' },
+    {field: 'banco_Horas', header: 'Banco de Horas', filterHeader: 'Filtro por Banco de Horas'},
+    {field: 'clave_UnidadAcademica', header: 'Unidad Académica',filterHeader: 'Filtro por Unidad Academica'}    
   ];
   
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -140,7 +200,35 @@ const ProgramaEducativo = () => {
         );
     });
     setfiltroprogramaeducativo(filteredData);
-  }; 
+  };
+  
+  //BOTON PARA MODIFICAR
+  const accionesTabla = (rowData) => {
+    return (<>
+        <Button
+          icon="pi pi-pencil"
+          rounded
+          outlined
+          className="m-1"
+          onClick={() => {
+            setclave_ProgramaEducativo(rowData.clave_ProgramaEducativo);
+            setnombre_ProgramaEducativo(rowData.nombre_ProgramaEducativo);
+            setbanco_Horas(rowData.banco_Horas);
+            setasignaturas_horas(rowData.asignaturas_horas);
+            setclave_UnidadAcademica(rowData.clave_UnidadAcademica);
+            setDatosCopia({
+              clave_ProgramaEducativo: rowData.clave_ProgramaEducativo,
+              nombre_ProgramaEducativo: rowData.nombre_ProgramaEducativo,
+              banco_Horas: rowData.banco_Horas,
+              asignaturas_horas: rowData.asignaturas_horas,
+              clave_UnidadAcademica: rowData.clave_UnidadAcademica
+            });
+            setAbrirDialog(2);
+          }}          
+        />     
+        </>
+    );
+  };    
 
   //MANDAR A LLAMAR A LA LISTA DE UNIDADES ACADEMICAS
   useEffect(() => {
@@ -163,169 +251,81 @@ const ProgramaEducativo = () => {
     }
   };
   
-  //!!!EXTRAS DE MODIFICACION
+  //!!!EXTRAS GENERALES
 
-  //ACTIVAR EDICION DE CELDA
-  const cellEditor = (options) => {
-    switch (options.field) {
-      case 'nombre_ProgramaEducativo':
-        return textEditor(options);
-      case 'asignaturas_horas':
-        return numberEditor(options);
-      case 'banco_Horas':
-        return numberEditor(options);
-      case 'clave_UnidadAcademica':
-        return UnidadAcademicaEditor(options);
-      default:
-        return textEditor(options);  
-    }
-  };
-
-  //EDITAR TEXTO
-  const textEditor = (options) => {
-    return <InputText keyfilter={/[a-zA-Z\s]/} maxLength={255} type="text" value={options.value} 
-    onChange={(e) =>{ 
-      if (validarTexto(e.target.value)) { 
-        options.editorCallback(e.target.value)
-      }
-    }}
-    onKeyDown={(e) => e.stopPropagation()} />;
+  //ENCABEZADO DEL DIALOG
+  const headerTemplate = (
+    <div className="formgrid grid justify-content-center border-bottom-1 border-300">
+      {abrirDialog===1 && (<h4>Registrar Programa Educativo</h4>)}
+      {abrirDialog===2 && (<h4>Modificar Programa Educativo</h4>)}
+    </div>
+  );
+  
+  //LISTA DE OPCIONES DE HERRAMIENTAS
+  const Herramientas = () => {
+    return (<div className="flex justify-content-between flex-wrap gap-2 align-items-center">
+            <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={()=>setAbrirDialog(1)}/>
+            <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={()=>{dt.current.exportCSV();}}/>
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch}/>  
+              </IconField>
+            </div>              
+    );
   };
   
-  //EDITAR NUMEROS
-  const numberEditor = (options) => {
-    return <InputText keyfilter="int"  type="text" maxLength={6} value={options.value} 
-    onChange={(e) => {
-      if (validarNumero(e.target.value)) { 
-        options.editorCallback(e.target.value)
-      }
-    }} onKeyDown={(e) => e.stopPropagation()} />;
-  };
-
-  //EDITAR DROPDOWN (UNIDAD ACADEMICA)
-  const UnidadAcademicaEditor = (options) => {
-    return (
-      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={options.value} 
-                options={unidadesAcademicas}  
-                onChange={(e) => options.editorCallback(e.value)}
-                optionLabel="nombre_UnidadAcademica" 
-                optionValue="clave_UnidadAcademica" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-                placeholder="Selecciona una Unidad Académica" 
-      />
-    );
-  };    
-
-  //COMPLETAR MODIFICACION
-  const onCellEditComplete = (e) => {
-      let { rowData, newValue, field, originalEvent: event } = e;
-      switch (field) {
-        //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
-        case 'nombre_ProgramaEducativo':
-          if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
-            rowData[field] = newValue; put(rowData);
-          }
-          else{
-            event.preventDefault();
-          } 
-          break;
-        case 'asignaturas_horas':
-          if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-            rowData[field] = newValue; put(rowData);
-          }else{
-            event.preventDefault();
-          }
-          break;
-        case 'banco_Horas':
-          if(newValue >= 0 && newValue !== '' && newValue !== rowData[field]){
-            rowData[field] = newValue; put(rowData);
-          }else{
-            event.preventDefault();
-          }
-          break;
-        case 'clave_UnidadAcademica':
-          if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-            rowData[field] = newValue; put(rowData);
-          }else{
-            event.preventDefault();
-          }
-          break;  
-        default:
-        break;
-      }
-      seteditando(false);
-  };
-
-  //!!!EXTRAS CAMPOS
-
-  const validarTexto = (value) => {
-    // Expresión regular para validar caracteres alfabeticos y espacios
-    const regex = /^[a-zA-Z\s]*$/;
-    // Verificar si el valor coincide con la expresión regular
-    return regex.test(value);
-  };
-
-  const validarNumero = (value) => {
-    // Expresión regular para validar números enteros positivos
-    const regex = /^[0-9]\d*$/;
-    // Verificar si el valor coincide con la expresión regular
-    return value==='' || regex.test(value);
+  //FUNCION PARA ACTIVAR EL FILTRADO
+  const onFilter = (event) => {
+    event['first'] = 0;
+    setlazyState(event);
   };  
 
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
+    <Toolbar start={<h2 className="m-0">Programa Educativo</h2>} end={Herramientas}/>
+    <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Panel header="Registrar Programa Educativo" className='mt-3' toggleable>
-        <div className="formgrid grid mx-8 justify-content-center">
+      <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+        <div className="formgrid grid justify-content-center">
           <div className="field col-2">
-              <label>Clave*</label>
-              <InputText type="text" keyfilter="pint" value={clave_ProgramaEducativo} maxLength={10}
+              <label className='font-bold'>Clave*</label>
+              <InputText disabled={abrirDialog===2} invalid={enviado===true && !clave_ProgramaEducativo} type="text" keyfilter="pint" value={clave_ProgramaEducativo} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {  
                       setclave_ProgramaEducativo(event.target.value);
                     }
                   }}  
-                  placeholder="Ej.6"
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
+              placeholder="Ej.6"
+              className="w-full"/>
           </div>
-          <div className="field col-10">
+          <div className="field col-4">
               <label>Nombre*</label>
-              <InputText type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_ProgramaEducativo} maxLength={255}
+              <InputText invalid={enviado===true && !nombre_ProgramaEducativo} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_ProgramaEducativo} maxLength={255}
                   onChange={(event)=>{
                     if (validarTexto(event.target.value)) {  
                       setnombre_ProgramaEducativo(event.target.value);
                     }
                   }}  
-                  placeholder="Ej.Licenciatura en Sistemas Computacionales" 
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
+                  placeholder="Ej.Licenciatura en Sistemas" 
+              className="w-full"/>              
           </div>
           <div className="field col-2">
               <label>Banco de horas</label>
-              <InputText type="text" keyfilter="pint" value={banco_Horas} maxLength={10}
+              <InputText invalid={enviado===true && !banco_Horas} type="text" keyfilter="pint" value={banco_Horas} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
                       	setbanco_Horas(event.target.value);
                     }
                   }}
                   placeholder="Ej.120"  
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
+              className="w-full"/>
           </div>
-          <div className="field col-2">
-              <label>Horas de asignatura*</label>
-              <InputText type="text" keyfilter="pint" value={asignaturas_horas} maxLength={10}
-                  onChange={(event)=>{
-                    if (validarNumero(event.target.value)) {    
-                      setasignaturas_horas(event.target.value);
-                    }
-                  }} 
-                  placeholder="N/A esto no se registra" 
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
-          </div>
-          <div className="field col-6">
+          <div className="field col-8">
               <label>Unidad Académica*</label>
-            <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+            <Dropdown className="w-full"
+              invalid={enviado===true && !clave_UnidadAcademica}
               value={clave_UnidadAcademica} 
               options={unidadesAcademicas} 
               onChange={(e) => {
@@ -337,23 +337,36 @@ const ProgramaEducativo = () => {
             />
           </div>                                                                           
         </div>
-        <div className="mx-8 mt-4">
-          <Button label="Guardar" onClick={add} className="p-button-success" />
-        </div>   
-      </Panel>    
-      {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Programas Educativos" className='mt-3' toggleable>
-      <div className="mx-8 mb-4">
-        <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} 
-        className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
-      </div>  
-        <DataTable value={filtroprogramaeducativo.length ? filtroprogramaeducativo :programaeducativoList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
-          {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
-              editor={field === 'clave_ProgramaEducativo' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
+        <div className="formgrid grid justify-content-end">
+          <Button label="Cancelar" icon="pi pi-times" outlined className='m-2' onClick={() => {setAbrirDialog(0); setEnviado(false); limpiarCampos();}} severity='secondary' />
+          {abrirDialog===1 && (
+            <Button label="Guardar" icon="pi pi-check" className='m-2' onClick={add} severity='success' />
+          )}
+          {abrirDialog===2 && (
+            <Button label="Editar" icon="pi pi-check" className='m-2' onClick={put} severity='success' />
+          )}          
+        </div> 
+      </Dialog>  
+        <DataTable 
+        onFilter={onFilter} filters={lazyState.filters} filterDisplay="row" 
+        scrollable scrollHeight="78vh"
+        ref={dt}         
+        value={filtroprogramaeducativo.length ? filtroprogramaeducativo :programaeducativoList} 
+        size='small'>
+          {columns.map(({ field, header, filterHeader }) => {
+              return <Column style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}} sortable filter filterPlaceholder={filterHeader}
+              filterMatchModeOptions={[
+                { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
+                { label: 'Contiene', value: FilterMatchMode.CONTAINS },
+                { label: 'No contiene', value: FilterMatchMode.NOT_CONTAINS },
+                { label: 'Termina con', value: FilterMatchMode.ENDS_WITH },
+                { label: 'Igual', value: FilterMatchMode.EQUALS },
+                { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
+              ]} 
+              key={field} field={field} header={header} body={(rowData) => renderBody(rowData, field)}/>;
           })}
-        </DataTable>
-      </Panel>  
+          <Column body={accionesTabla} alignFrozen={'right'} frozen={true}></Column>    
+        </DataTable>  
     </>
   )
 }

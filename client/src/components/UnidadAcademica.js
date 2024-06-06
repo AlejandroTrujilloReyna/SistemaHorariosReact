@@ -42,7 +42,7 @@ const UnidadAcademica = () => {
   const [enviado, setEnviado] = useState(false);
   const [abrirDialog,setAbrirDialog] = useState(0);
 
-  const confirm1 = (action) => {
+  const confirmar1 = (action) => {
     confirmDialog({
       message: '¿Seguro que quieres proceder?',
       header: 'Confirmar',
@@ -84,7 +84,7 @@ const UnidadAcademica = () => {
         }
       });
     };
-    confirm1(action);
+    confirmar1(action);
   };
 
   //FUNCION PARA LA CONSULTA
@@ -100,7 +100,6 @@ const UnidadAcademica = () => {
 
   //FUNCION PARA LA MODIFICACION
   const put = () => {
-    const action = () => {
       if (!clave_UnidadAcademica || !nombre_UnidadAcademica) {
         mostrarAdvertencia(toast, "Existen campos obligatorios vacíos");
         setEnviado(true);
@@ -113,6 +112,7 @@ const UnidadAcademica = () => {
         limpiarCampos();
         return;
       }
+      const action = () => {
       UnidadAcademicaService.modificarUnidadAcademica({
         clave_UnidadAcademica: clave_UnidadAcademica,
         nombre_UnidadAcademica: nombre_UnidadAcademica
@@ -133,7 +133,7 @@ const UnidadAcademica = () => {
         }
       });
     };
-    confirm1(action);
+    confirmar1(action);
   };
 
   const delet = (id)=>{
@@ -149,7 +149,7 @@ const UnidadAcademica = () => {
       }
     });
     }
-    confirm1(action);
+    confirmar1(action);
   }
 
   //!!!EXTRAS DE REGISTRO
@@ -240,20 +240,16 @@ const UnidadAcademica = () => {
     );
   };
   
-  const Titulo = () =>{
-    return(<h2 className="m-0">Unidad Academica</h2>);
+  //FUNCION PARA ACTIVAR EL FILTRADO
+  const onFilter = (event) => {
+    event['first'] = 0;
+    setlazyState(event);
   };
-
-    // Funcion Necesaria para filtrado
-    const onFilter = (event) => {
-      event['first'] = 0;
-      setlazyState(event);
-    };
 
   return (
     <>
       <Toast ref={toast} />
-      <Toolbar start={Titulo} end={Herramientas}/>
+      <Toolbar start={<h2 className="m-0">Unidad Academica</h2>} end={Herramientas}/>
       <ConfirmDialog />
       <Dialog header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
@@ -290,9 +286,11 @@ const UnidadAcademica = () => {
           )}          
         </div>  
       </Dialog>
-      {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <DataTable onFilter={onFilter} filters={lazyState.filters} filterDisplay="row" scrollable scrollHeight="78vh"
-      ref={dt} value={filtrounidadacademica.length ? filtrounidadacademica :unidadacademicaList} 
+      <DataTable 
+      onFilter={onFilter} filters={lazyState.filters} filterDisplay="row" 
+      scrollable scrollHeight="78vh"
+      ref={dt} 
+      value={filtrounidadacademica.length ? filtrounidadacademica :unidadacademicaList} 
       size='small'>
          {columns.map(({ field, header, filterHeader }) => {
               return <Column style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}} sortable filter filterPlaceholder={filterHeader}
