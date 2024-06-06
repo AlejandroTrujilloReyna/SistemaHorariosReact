@@ -25,14 +25,14 @@ router.post("/registrarProgramaEducativo", (req, res) => {
         if(results.length > 0) {
             return res.status(400).send("La clave del Programa Educativo ya existe");
         }
-        db.query('SELECT * FROM programaeducativo WHERE nombre_ProgramaEducativo = ?',[nombre_ProgramaEducativo], (err, results) => {
+        db.query('SELECT * FROM programaeducativo WHERE nombre_ProgramaEducativo = ? AND clave_UnidadAcademica = ? ',[nombre_ProgramaEducativo, clave_UnidadAcademica], (err, results) => {
             if(err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
             }
     
             if(results.length > 0) {
-                return res.status(401).send("El Nombre del Programa Educativo ya existe");
+                return res.status(401).send("El Nombre del Programa Educativo ya existe en esta Unidad Academica");
             }
             
             db.query('INSERT INTO programaeducativo(clave_ProgramaEducativo, nombre_ProgramaEducativo, banco_Horas, asignaturas_horas, clave_UnidadAcademica) VALUES (?, ?, ?, ?, ?)',
@@ -63,14 +63,14 @@ router.put("/modificarProgramaEducativo", (req, res) => {
     const banco_Horas = req.body.banco_Horas;
     const asignaturas_horas = req.body.asignaturas_horas;
     const clave_UnidadAcademica = req.body.clave_UnidadAcademica;
-    db.query('SELECT * FROM programaeducativo WHERE nombre_ProgramaEducativo = ? AND clave_ProgramaEducativo != ?',[nombre_ProgramaEducativo,clave_ProgramaEducativo], (err, results) => {
+    db.query('SELECT * FROM programaeducativo WHERE nombre_ProgramaEducativo = ? AND clave_UnidadAcademica = ? AND clave_ProgramaEducativo != ?',[nombre_ProgramaEducativo,clave_UnidadAcademica,clave_ProgramaEducativo], (err, results) => {
         if(err) {
             console.log(err);
             return res.status(500).send("Error interno del servidor");
         }
 
         if(results.length > 0) {
-            return res.status(401).send("El Nombre del Programa Educativo ya existe");
+            return res.status(401).send("El Nombre del Programa Educativo ya existe dentro de la Unidad Academica");
         }
         db.query('UPDATE programaeducativo SET nombre_ProgramaEducativo = ?, banco_Horas = ?, asignaturas_horas = ?, clave_UnidadAcademica = ?  WHERE clave_ProgramaEducativo = ?',
         [nombre_ProgramaEducativo,banco_Horas, asignaturas_horas,clave_UnidadAcademica,clave_ProgramaEducativo],(err,result) =>{

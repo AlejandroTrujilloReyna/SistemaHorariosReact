@@ -11,7 +11,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 import PlanEstudiosService from '../services/PlanEstudiosService';
-
+import { mostrarExito, mostrarAdvertencia, mostrarError } from '../services/ToastService';
 const UnidadAprendizaje = () => {
   //VARIABLES PARA EL REGISTRO
   const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState("");
@@ -26,24 +26,11 @@ const UnidadAprendizaje = () => {
   //VARIABLES PARA EL ERROR
   const toast = useRef(null);
 
-  //MENSAJE DE EXITO
-  const mostrarExito = (mensaje) => {
-    toast.current.show({severity:'success', summary: 'Exito', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ADVERTENCIA
-  const mostrarAdvertencia = (mensaje) => {
-      toast.current.show({severity:'warn', summary: 'Advertencia', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ERROR
-  const mostrarError = (mensaje) => {
-    toast.current.show({severity:'error', summary: 'Error', detail:mensaje, life: 3000});
-  }     
-
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_UnidadAprendizaje || !nombre_UnidadAprendizaje || !clave_PlanEstudios) {
-      mostrarAdvertencia("Existen campos Obligatorios vacíos");
+      mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -53,17 +40,17 @@ const UnidadAprendizaje = () => {
       clave_PlanEstudios:clave_PlanEstudios
     }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
-        mostrarExito("Registro exitoso");
+        mostrarExito(toast,"Registro exitoso");
         get();
         limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
-        mostrarAdvertencia("Clave ya Existente");
+        mostrarAdvertencia(toast,"Clave ya Existente");
       } else if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya Existente");
+        mostrarAdvertencia(toast,"Nombre ya Existente");
       } else if(error.response.status === 500){
-        mostrarError("Error en el sistema");   
+        mostrarError(toast, "Error en el sistema");   
       }  
     });
   }
@@ -83,15 +70,15 @@ const UnidadAprendizaje = () => {
   const put = (rowData) =>{
     UnidadAprendizajeService.modificarUnidadAprendizaje(rowData).then((response)=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito("Modificación Exitosa");
+        mostrarExito(toast, "Modificación exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
-        mostrarAdvertencia("Nombre ya Existente");
+        mostrarAdvertencia(toast, "Nombre ya Existente en el Plan de Estudios");
         get();
       }
       else if (error.response.status === 500) {
-        mostrarError("Error del sistema");
+        mostrarError(toast, "Error del sistema");
       }
     });
   }
@@ -123,10 +110,13 @@ const UnidadAprendizaje = () => {
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredData = unidadaprendizajeList.filter((item) => {
+      const plaes = planesdeestudios.find(plaes => plaes.clave_PlanEstudios === item.clave_PlanEstudios)?.nombre_PlanEstudios || '';
+      
         return (
             item.clave_PlanEstudios.toString().includes(value) ||
             item.clave_UnidadAprendizaje.toString().includes(value) ||
-            item.nombre_UnidadAprendizaje.toLowerCase().includes(value)        
+            item.nombre_UnidadAprendizaje.toLowerCase().includes(value) ||
+            plaes.toLowerCase().includes(value)         
         )
     });
     setfiltrounidadaprendizaje(filteredData);
@@ -241,7 +231,20 @@ const UnidadAprendizaje = () => {
       {/*PANEL PARA EL REGISTRO*/}
       <Panel header="Registrar Unidad Aprendizaje" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
-          <div className="field col-2">
+        <div className="field col-6">
+            <label>Plan de Estudios*</label>
+              <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                value={clave_PlanEstudios} 
+                options={planesdeestudios}  
+                onChange={(e) => {
+                  setclave_PlanEstudios(e.value);
+                }} 
+                optionLabel="nombre_PlanEstudios" 
+                optionValue="clave_PlanEstudios" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+                placeholder="Selecciona un Plan de Estudios" 
+              />
+          </div>
+          <div className="field col-4">
                   <label>Clave*</label>
                   <InputText type="text" keyfilter="pint" value={clave_UnidadAprendizaje} maxLength={6}
                       onChange={(event)=>{
@@ -249,7 +252,7 @@ const UnidadAprendizaje = () => {
                           setclave_UnidadAprendizaje(event.target.value);
                         }                        
                       }}
-                      placeholder="Ej.33556"  
+                      placeholder="Ej.44173"  
                   className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
           </div>
           <div className="field col-10">
@@ -264,19 +267,7 @@ const UnidadAprendizaje = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
           />              
           </div>                            
-          <div className="field col-4">
-            <label>Plan de Estudios*</label>
-              <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={clave_PlanEstudios} 
-                options={planesdeestudios}  
-                onChange={(e) => {
-                  setclave_PlanEstudios(e.value);
-                }} 
-                optionLabel="nombre_PlanEstudios" 
-                optionValue="clave_PlanEstudios" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-                placeholder="Selecciona un Plan de Estudios" 
-              />
-          </div>
+         
           </div>
         <div className="mx-8 mt-4">
           <Button label="Guardar" onClick={add} className="p-button-success" />
