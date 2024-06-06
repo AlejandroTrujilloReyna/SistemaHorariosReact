@@ -9,6 +9,9 @@ const UnidadAcademicaService = {
     },
     modificarUnidadAcademica: (datos)=>{
         return Axios.put("http://localhost:3001/unidadacademica/modificarUnidadAcademica", datos);
+    },
+    eliminarUnidadAcademica:(datos)=>{
+        return Axios.delete(`http://localhost:3001/unidadacademica/eliminarUnidadAcademica/${datos}`);
     }    
 }
 

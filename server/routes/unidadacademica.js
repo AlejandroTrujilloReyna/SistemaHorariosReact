@@ -78,4 +78,29 @@ router.put("/modificarUnidadAcademica", (req, res) => {
     });
 });
 
+router.delete("/eliminarUnidadAcademica/:clave_UnidadAcademica", (req, res) => {
+    const clave_UnidadAcademica = req.params.clave_UnidadAcademica;
+
+    const checkQuery = 'SELECT COUNT(*) AS count FROM programaeducativo WHERE clave_UnidadAcademica=?';
+    db.query(checkQuery, [clave_UnidadAcademica], (err, result) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error en el servidor");
+        }
+        if (result[0].count > 0) {
+            return res.status(400).send("No se puede eliminar, existen registros asociados");
+        } else {
+            const deleteQuery = 'DELETE FROM unidadacademica WHERE clave_UnidadAcademica=?';
+            db.query(deleteQuery, [clave_UnidadAcademica], (err, result) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send("Error en el servidor");
+                } else {
+                    return res.status(200).send("Unidad académica eliminada con éxito");
+                }
+            });
+        }
+    });
+});
+
 module.exports = router;

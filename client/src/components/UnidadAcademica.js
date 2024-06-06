@@ -13,6 +13,7 @@ import { Toolbar } from 'primereact/toolbar';//NUEVO
 import { Dialog } from 'primereact/dialog';//NUEVO
 import { IconField } from 'primereact/iconfield';//NUEVO
 import { InputIcon } from 'primereact/inputicon';//NUEVO
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
 import UnidadAcademicaService from '../services/UnidadAcademicaService';
 import { FilterMatchMode } from 'primereact/api';
 
@@ -41,36 +42,50 @@ const UnidadAcademica = () => {
   const [enviado, setEnviado] = useState(false);
   const [abrirDialog,setAbrirDialog] = useState(0);
 
+  const confirm1 = (action) => {
+    confirmDialog({
+      message: '¿Seguro que quieres proceder?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'accept',
+      accept: action,
+      reject: () => mostrarAdvertencia(toast, "Cancelado")
+    });
+  };
+
   //FUNCION PARA REGISTRAR
-  const add = ()=>{
-    //VALIDACION DE CAMPOS VACIOS
+  const add = () => {
     if (!clave_UnidadAcademica || !nombre_UnidadAcademica) {
-      mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
+      mostrarAdvertencia(toast, "Existen campos obligatorios vacíos");
       setEnviado(true);
       return;
     }
-    //MANDAR A LLAMAR AL REGISTRO SERVICE
-    UnidadAcademicaService.registrarUnidadAcademica({
-      clave_UnidadAcademica:clave_UnidadAcademica,
-      nombre_UnidadAcademica:nombre_UnidadAcademica
-    }).then(response=>{//CASO EXITOSO
-      if (response.status === 200) {
-        mostrarExito(toast,"Registro Exitoso");
-        get();
-        limpiarCampos();
-        setEnviado(false);
-        setAbrirDialog(0);
-      }
-    }).catch(error=>{//EXCEPCIONES
-      if (error.response.status === 400) {
-        mostrarAdvertencia(toast,"Clave ya Existente");
-      }else if(error.response.status === 401){
-        mostrarAdvertencia(toast,"Nombre ya Existente");
-      }else if(error.response.status === 500){
-        mostrarError(toast,"Error interno del servidor");
-      }     
-    });
-  }
+    const action = () => {
+      UnidadAcademicaService.registrarUnidadAcademica({
+        clave_UnidadAcademica: clave_UnidadAcademica,
+        nombre_UnidadAcademica: nombre_UnidadAcademica
+      }).then(response => {
+        if (response.status === 200) {
+          mostrarExito(toast, "Registro Exitoso");
+          get();
+          limpiarCampos();
+          setEnviado(false);
+          setAbrirDialog(0);
+        }
+      }).catch(error => {
+        if (error.response.status === 400) {
+          mostrarAdvertencia(toast, "Clave ya Existente");
+        } else if (error.response.status === 401) {
+          mostrarAdvertencia(toast, "Nombre ya Existente");
+        } else if (error.response.status === 500) {
+          mostrarError(toast, "Error interno del servidor");
+        }
+      });
+    };
+    confirm1(action);
+  };
 
   //FUNCION PARA LA CONSULTA
   const get = ()=>{
@@ -84,40 +99,57 @@ const UnidadAcademica = () => {
   }
 
   //FUNCION PARA LA MODIFICACION
-  const put = () =>{
-    //VALIDACION DE CAMPOS VACIOS
-    if (!clave_UnidadAcademica || !nombre_UnidadAcademica) {
-      mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
-      setEnviado(true);
-      return;
-    }
-    //VALIDACIONES PARA EL CASO DONDE SE DE CLIC EN GUARDAR PERO NO SE REALICEN CAMBIOS
-    if (clave_UnidadAcademica === datosCopia.clave_UnidadAcademica
-       && nombre_UnidadAcademica === datosCopia.nombre_UnidadAcademica) {
-      mostrarInformacion(toast, "No se han realizado cambios");
-      setAbrirDialog(0);
-      limpiarCampos();
-      return;      
-    }
-    UnidadAcademicaService.modificarUnidadAcademica({
-      clave_UnidadAcademica:clave_UnidadAcademica,
-      nombre_UnidadAcademica:nombre_UnidadAcademica
-    }).then(response=>{//CASO EXITOSO
-      if(response.status === 200){
-        mostrarExito(toast,"Modificación Exitosa");
-        get();
-        limpiarCampos();
-        setEnviado(false);
-        setAbrirDialog(0);
+  const put = () => {
+    const action = () => {
+      if (!clave_UnidadAcademica || !nombre_UnidadAcademica) {
+        mostrarAdvertencia(toast, "Existen campos obligatorios vacíos");
+        setEnviado(true);
+        return;
       }
-    }).catch(error=>{//EXCEPCIONES
-      if(error.response.status === 401){
-        mostrarAdvertencia(toast,"Nombre ya Existente");
+      if (clave_UnidadAcademica === datosCopia.clave_UnidadAcademica
+        && nombre_UnidadAcademica === datosCopia.nombre_UnidadAcademica) {
+        mostrarInformacion(toast, "No se han realizado cambios");
+        setAbrirDialog(0);
+        limpiarCampos();
+        return;
+      }
+      UnidadAcademicaService.modificarUnidadAcademica({
+        clave_UnidadAcademica: clave_UnidadAcademica,
+        nombre_UnidadAcademica: nombre_UnidadAcademica
+      }).then(response => {
+        if (response.status === 200) {
+          mostrarExito(toast, "Modificación Exitosa");
+          get();
+          limpiarCampos();
+          setEnviado(false);
+          setAbrirDialog(0);
+        }
+      }).catch(error => {
+        if (error.response.status === 401) {
+          mostrarAdvertencia(toast, "Nombre ya Existente");
+          get();
+        } else if (error.response.status === 401) {
+          mostrarError(toast, "Error del sistema");
+        }
+      });
+    };
+    confirm1(action);
+  };
+
+  const delet = (id)=>{
+    const action = () => {
+    UnidadAcademicaService.eliminarUnidadAcademica(id).then(()=>{
+      get();
+      mostrarExito(toast, "Eliminación Exitosa");
+      limpiarCampos();
+    }).catch(error => {
+      if (error.response.status === 400) {
+        mostrarError(toast, "Existen registros asociados a este elemento");
         get();
-      }else if(error.response.status === 401){
-        mostrarError(toast,"Error del sistema");
       }
     });
+    }
+    confirm1(action);
   }
 
   //!!!EXTRAS DE REGISTRO
@@ -155,7 +187,7 @@ const UnidadAcademica = () => {
 
   //BOTON PARA MODIFICAR
   const accionesTabla = (rowData) => {
-    return (
+    return (<>
         <Button
           icon="pi pi-pencil"
           rounded
@@ -169,8 +201,19 @@ const UnidadAcademica = () => {
               nombre_UnidadAcademica: rowData.nombre_UnidadAcademica
             });
             setAbrirDialog(2);
-          }}
+          }}          
         />
+        <Button
+          icon="pi pi-trash"
+          severity='danger'
+          rounded
+          outlined
+          className="m-1"
+          onClick={() => {
+            delet(rowData.clave_UnidadAcademica);
+          }}          
+        />        
+        </>
     );
   };  
   
@@ -179,7 +222,8 @@ const UnidadAcademica = () => {
   //ENCABEZADO DEL DIALOG
   const headerTemplate = (
     <div className="formgrid grid justify-content-center border-bottom-1 border-300">
-      <h4>Registrar Unidad Academica</h4>
+      {abrirDialog===1 && (<h4>Registrar Unidad Academica</h4>)}
+      {abrirDialog===2 && (<h4>Modificar Unidad Academica</h4>)}
     </div>
   );  
 
@@ -210,6 +254,7 @@ const UnidadAcademica = () => {
     <>
       <Toast ref={toast} />
       <Toolbar start={Titulo} end={Herramientas}/>
+      <ConfirmDialog />
       <Dialog header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
             <div className="field col-2">
