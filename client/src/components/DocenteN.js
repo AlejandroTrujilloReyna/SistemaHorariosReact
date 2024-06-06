@@ -542,7 +542,7 @@ const DocenteN = () => {
   //!!!EXTRAS TABLA
   //COLUMNAS PARA LA TABLA
   const columns = [
-    {field: 'no_EmpleadoDocente', header: 'NO.Empleado' },
+    {field: 'no_EmpleadoDocente', header: 'No.Empleado' },
     {field: 'horas_MinimasDocente', header: 'Horas Mínimas' },
     {field: 'horas_MaximasDocente', header: 'Horas Máximas' },
     {field: 'horas_Externas', header: 'Horas Externas' },

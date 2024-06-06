@@ -40,7 +40,7 @@ const SalaN = () => {
         nota_Descriptiva: { value: '', matchMode: 'contains' },
         clave_Edificio: { value: '', matchMode: 'startsWith' },
         clave_TipoSala: { value: '', matchMode: 'startsWith' },
-        materiales: { value: '', matchMode: 'contains' }
+        materialesNombre: { value: '', matchMode: 'contains' }
 
       },
     });    
@@ -102,11 +102,12 @@ const SalaN = () => {
         if (response.status === 200) {
           claveSala = response.data.clave_Sala;          
           mostrarExito("Registro Exitoso");                  
-          addMaterial();          
+          if(materialesseleccionados.length>0){
+            addMaterial();
+          }          
           get();
           setFrmEnviado(false);
-          limpiarCampos();
-          mostrarAdvertencia("LLEGO2");
+          limpiarCampos();          
         }
       }).catch(error => {//EXCEPCIONES
         if (error.response.status === 401) {
@@ -129,7 +130,9 @@ const SalaN = () => {
         if (response.status === 200) {
           claveSala = clave_Sala;
           eliminarImpartir();
-          addMaterial();
+          if(materialesseleccionados.length>0){
+            addMaterial();
+          }          
           mostrarExito("Modificación Exitosa");
           setFrmEnviado(false);
           seteditando(false);
@@ -609,25 +612,20 @@ const SalaN = () => {
               className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
         </div>
         <div className="field col">
-            <label htmlFor="Materiales" className="font-bold">Materiales*</label>
+            <label htmlFor="Materiales" className="font-bold">Materiales</label>
             <MultiSelect 
             id="Materiales"
             value={materialesseleccionados} 
             options={materialesList} 
             onChange={(e) => {
                 setmaterialesseleccionados(e.value);
-            }} 
-            required
+            }}             
             filter
             optionLabel = {(option) => `${option.clave_Material} - ${option.nombre_Material}`}
             optionValue="clave_Material" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
             placeholder="Materiales para seleccionar" 
-            display="chip"
-            className={classNames({ 'p-invalid': frmEnviado && !materialesseleccionados.length })}
-            />
-            {frmEnviado && !materialesseleccionados && (
-                <small className="p-error">Se requiere almenos un Material.</small>
-            )}
+            display="chip"            
+            />            
           </div>
       </Dialog>
       {/*Dialog para Confirmación de eliminar*/} 
