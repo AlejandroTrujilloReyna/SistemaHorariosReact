@@ -129,6 +129,10 @@ const Menu = () => {
                 {
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Material</span>,
                     command: () => { window.location.href = '/Material'; }
+                },
+                {
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Grupo</span>,
+                    command: () => { window.location.href = '/Grupo'; }
                 }
             ]
         }
