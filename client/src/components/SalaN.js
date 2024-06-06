@@ -11,6 +11,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
 import { ToggleButton } from 'primereact/togglebutton';
 import { Toast } from 'primereact/toast';
+import { Tag } from 'primereact/tag';
 import SalaService from '../services/SalaService';
 import EdificiosService from '../services/EdificioService';
 import TipoSalaService from '../services/TipoSalaService';
@@ -99,23 +100,19 @@ const SalaN = () => {
         clave_TipoSala: clave_TipoSala
       }).then(response => {//CASO EXITOSO
         if (response.status === 200) {
-
-          if(response.data && response.data.clave_Sala){
-
-          clave_Sala = response.data.clave_Sala;
-          mostrarExito("Registro Exitoso"+clave_Sala);
-
-          addMaterial();
+          claveSala = response.data.clave_Sala;          
+          mostrarExito("Registro Exitoso");                  
+          addMaterial();          
           get();
           setFrmEnviado(false);
           limpiarCampos();
-          }
+          mostrarAdvertencia("LLEGO2");
         }
       }).catch(error => {//EXCEPCIONES
         if (error.response.status === 401) {
           mostrarAdvertencia("Nombre ya existente en el Edificio");
         } else if (error.response.status === 500) {
-         mostrarError("Error interno del servidor");
+          mostrarError("Error interno del servidor");
         }
       })
     } else {
@@ -130,8 +127,9 @@ const SalaN = () => {
       }
       ).then(response => {//CASO EXITOSO
         if (response.status === 200) {
-          addMaterial();
+          claveSala = clave_Sala;
           eliminarImpartir();
+          addMaterial();
           mostrarExito("Modificación Exitosa");
           setFrmEnviado(false);
           seteditando(false);
@@ -168,8 +166,8 @@ const SalaN = () => {
 
   const addMaterial = () => {
   // VALIDACION DE CAMPOS VACIOS
-  if (!materialesseleccionados || !clave_Sala) {      
-    mostrarAdvertencia("Existen campos obligatorios vacíos");
+  if (materialesseleccionados.length < 1 || !claveSala) {      
+    mostrarAdvertencia("Existen campos obligatorios vacíos Material");
     return;
   }
 
@@ -206,6 +204,7 @@ const SalaN = () => {
   }  
   // FUNCION PARA ELIMINAR NOTA: delete parece ser una variable reservada
   const eliminar = ()=>{
+    eliminarImpartir();
     SalaService.eliminarSala({
       clave_Sala:clave_Sala
     }).then(response => {//CASO EXITOSO
@@ -299,6 +298,10 @@ const SalaN = () => {
     }else if (field === 'clave_TipoSala'){
       const tiposala = tiposalas.find((tiposala) => tiposala.clave_TipoSala === rowData.clave_TipoSala);
       return tiposala ? `${tiposala.nombre_TipoSala}` : '';
+    }else if (field === 'materialesNombre' && rowData.materialesNombre) {
+      return rowData.materialesNombre.split(',').map((unidad, index) => (
+        <Tag key={index} value={unidad.trim()} className="mr-2 mb-2" />
+      ));      
     }else if (field === 'validar_Traslape') {
       return (
         <ToggleButton
@@ -349,8 +352,7 @@ const SalaN = () => {
     setclave_TipoSala(sala.clave_TipoSala);    
     const MaterialArray = sala.materiales
     ? sala.materiales.split(',').map(Number)
-    : [];
-
+    : [];    
     setmaterialesseleccionados(MaterialArray);
   }
 
@@ -426,7 +428,8 @@ const SalaN = () => {
     {field: 'nota_Descriptiva', header: 'Nota Descriptiva'},
     {field: 'clave_Edificio', header: 'Edificio'},    
     {field: 'clave_TipoSala', header: 'Tipo Sala'},
-    {field: 'materiales', header: 'Materiales' }    
+    {field: 'materiales', header: 'Materiales' },
+    {field: 'materialesNombre', header: 'Materiales' }    
   ];
 
   //Cabecera de la Tabla
@@ -660,6 +663,9 @@ const SalaN = () => {
           
           header={header}>
           {columns.map(({ field, header }) => {
+              if (field === 'materiales') {
+                return null;
+              }
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
                filter filterPlaceholder="Buscar"/>;
           })}
