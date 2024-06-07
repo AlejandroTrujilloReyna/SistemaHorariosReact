@@ -2,29 +2,64 @@ import React from 'react';
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from 'react';
-import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
+import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
+import { validarTexto, validarNumero} from '../services/ValidacionGlobalService';//AGREGADO
+import { Toolbar } from 'primereact/toolbar';//NUEVO
+import { Dialog } from 'primereact/dialog';//NUEVO
+import { IconField } from 'primereact/iconfield';//NUEVO
+import { InputIcon } from 'primereact/inputicon';//NUEVO
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
+import { FilterMatchMode } from 'primereact/api';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 import PlanEstudiosService from '../services/PlanEstudiosService';
 
 const UnidadAprendizaje = () => {
   //VARIABLES PARA EL REGISTRO
-  const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState("");
-  const [nombre_UnidadAprendizaje,setnombre_UnidadAprendizaje] = useState("");
   const [clave_PlanEstudios,setclave_PlanEstudios] = useState(null);
+  const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState(0);
+  const [nombre_UnidadAprendizaje,setnombre_UnidadAprendizaje] = useState("");
   //VARIABLES PARA LA CONSULTA
   const [unidadaprendizajeList,setunidadaprendizajeList] = useState([]);
   const [filtrounidadaprendizaje, setfiltrounidadaprendizaje] = useState([]);
-  const [planesdeestudios, setplanesdeestudios] = useState([]);
+  const [planes, setplanes] = useState([]);
+  const dt = useRef(null);
+  const [lazyState, setlazyState] = useState({
+    filters: {
+      clave_PlanEstudios: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      clave_UnidadAprendizaje: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      nombre_UnidadAprendizaje: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+    },
+  });  
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
-  const [editando,seteditando] = useState(false);
+  const [datosCopia, setDatosCopia] = useState({
+    clave_PlanEstudios: "",
+    clave_UnidadAprendizaje: 0,
+    nombre_UnidadAprendizaje: ""
+  }); 
   //VARIABLES PARA EL ERROR
   const toast = useRef(null);
+  //ESTADOS PARA CONDICIONES
+  const [enviado, setEnviado] = useState(false);
+  const [abrirDialog,setAbrirDialog] = useState(0);  
+
+  const confirmar1 = (action) => {
+    confirmDialog({
+      message: '¿Seguro que quieres proceder?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'accept',
+      accept: action,
+      reject: () => mostrarAdvertencia(toast, "Cancelado")
+    });
+  };  
 
   //MENSAJE DE EXITO
   const mostrarExito = (mensaje) => {
@@ -42,23 +77,40 @@ const UnidadAprendizaje = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
+<<<<<<< Updated upstream
     if (!clave_UnidadAprendizaje || !nombre_UnidadAprendizaje || !clave_PlanEstudios) {
       mostrarAdvertencia("Existen campos Obligatorios vacíos");
+=======
+    if (!clave_PlanEstudios || !clave_UnidadAprendizaje || !nombre_UnidadAprendizaje) {
+      mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
+      setEnviado(true);
+>>>>>>> Stashed changes
       return;
     }
+    const action = () => {
     //MANDAR A LLAMAR AL REGISTRO SERVICE
     UnidadAprendizajeService.registrarUnidadAprendizaje({
+      clave_PlanEstudios:clave_PlanEstudios,
       clave_UnidadAprendizaje:clave_UnidadAprendizaje,
       nombre_UnidadAprendizaje:nombre_UnidadAprendizaje,
+<<<<<<< Updated upstream
       clave_PlanEstudios:clave_PlanEstudios
     }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
         mostrarExito("Registro exitoso");
+=======
+    }).then(response=>{
+      if (response.status === 200) {//CASO EXITOSO
+        mostrarExito(toast,"Registro Exitoso");
+>>>>>>> Stashed changes
         get();
         limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
+<<<<<<< Updated upstream
         mostrarAdvertencia("Clave ya Existente");
       } else if(error.response.status === 401){
         mostrarAdvertencia("Nombre ya Existente");
@@ -67,8 +119,20 @@ const UnidadAprendizaje = () => {
       }  
     });
   }
+=======
+        mostrarAdvertencia(toast,"Clave ya Existente");
+      } else if (error.response.status === 401) {
+        mostrarAdvertencia(toast,"Nombre ya existente");      
+      }else if(error.response.status === 500){          
+        mostrarError(toast,"Error interno del servidor");
+      }     
+    });    
+    };
+    confirmar1(action);
+  }  
+>>>>>>> Stashed changes
 
-  //FUNCION PARA LA CONSULTA
+  //FUNCION PARA CONSULTA
   const get = ()=>{
     UnidadAprendizajeService.consultarUnidadAprendizaje().then((response)=>{//CASO EXITOSO
       setunidadaprendizajeList(response.data);  
@@ -80,165 +144,187 @@ const UnidadAprendizaje = () => {
   }
 
   //FUNCION PARA LA MODIFICACION
-  const put = (rowData) =>{
-    UnidadAprendizajeService.modificarUnidadAprendizaje(rowData).then((response)=>{//CASO EXITOSO
+  const put = () =>{
+  if (!clave_PlanEstudios || !clave_UnidadAprendizaje || !nombre_UnidadAprendizaje) {
+    mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
+    setEnviado(true);
+    return;
+  }
+  if (clave_PlanEstudios === datosCopia.clave_PlanEstudios
+    && clave_UnidadAprendizaje === datosCopia.clave_UnidadAprendizaje
+    && nombre_UnidadAprendizaje === datosCopia.nombre_UnidadAprendizaje) {
+    mostrarInformacion(toast, "No se han realizado cambios");
+    setAbrirDialog(0);
+    limpiarCampos();
+    return;
+  }
+  const action = () => {  
+  UnidadAprendizajeService.modificarUnidadAprendizaje({
+    clave_PlanEstudios:clave_PlanEstudios,
+    clave_UnidadAprendizaje:clave_UnidadAprendizaje,
+    nombre_UnidadAprendizaje:nombre_UnidadAprendizaje
+    }).then(response=>{//CASO EXITOSO
       if(response.status === 200){
+<<<<<<< Updated upstream
         mostrarExito("Modificación Exitosa");
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
         mostrarAdvertencia("Nombre ya Existente");
+=======
+        mostrarExito(toast, "Modificación Exitosa");
         get();
+        limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);
       }
+    }).catch(error=>{//EXCEPCIONES
+      if(error.response.status === 401){
+        mostrarAdvertencia(toast,"Nombre ya existente");
+>>>>>>> Stashed changes
+        get();
+      }else if(error.response.status === 500){
+        mostrarError(toast,"Error del sistema");
+      }
+<<<<<<< Updated upstream
       else if (error.response.status === 500) {
         mostrarError("Error del sistema");
       }
     });
+=======
+    })
+  };
+  confirmar1(action);    
+>>>>>>> Stashed changes
   }
 
   //!!!EXTRAS DE REGISTRO
 
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
   const limpiarCampos = () =>{
+    setclave_PlanEstudios(null);
     setclave_UnidadAprendizaje(0);
     setnombre_UnidadAprendizaje("");
-    setclave_PlanEstudios("");
-  } 
+  }
   
   //!!!EXTRAS DE CONSULTA
 
   //COLUMNAS PARA LA TABLA
   const columns = [
-    { field: 'clave_UnidadAprendizaje', header: 'Clave' },
-    { field: 'nombre_UnidadAprendizaje', header: 'Nombre' },
-    {field: 'clave_PlanEstudios', header: 'Plan de Estudios'},
+    {field: 'clave_PlanEstudios', header: 'Plan Estudios', filterHeader: 'Filtro por Plan Estudios' },
+    {field: 'clave_UnidadAprendizaje', header: 'Clave', filterHeader: 'Filtro por Clave' },
+    {field: 'nombre_UnidadAprendizaje', header: 'Nombre', filterHeader: 'Filtro por Nombre'}
   ];
   
-  //MANDAR A LLAMAR LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
+  //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
   useEffect(() => {
     get();
-  }, []);  
-  
+  }, []);
+
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredData = unidadaprendizajeList.filter((item) => {
+<<<<<<< Updated upstream
         return (
             item.clave_PlanEstudios.toString().includes(value) ||
             item.clave_UnidadAprendizaje.toString().includes(value) ||
             item.nombre_UnidadAprendizaje.toLowerCase().includes(value)        
         )
+=======
+      const Acade = planes.find(Acade => Acade.clave_PlanEstudios === item.clave_PlanEstudios)?.nombre_PlanEstudios || '';
+        return (
+            item.clave_PlanEstudios.toString().includes(value) ||
+            item.clave_UnidadAprendizaje.toLowerCase().includes(value) ||
+            item.nombre_UnidadAprendizaje.toString().includes(value) ||
+            Acade.toLowerCase().includes(value)         
+          );
+>>>>>>> Stashed changes
     });
     setfiltrounidadaprendizaje(filteredData);
-  };   
+  };
+  
+  //BOTON PARA MODIFICAR
+  const accionesTabla = (rowData) => {
+    return (<>
+        <Button
+          icon="pi pi-pencil"
+          rounded
+          outlined
+          className="m-1"
+          onClick={() => {
+            setclave_PlanEstudios(rowData.clave_PlanEstudios);
+            setclave_UnidadAprendizaje(rowData.clave_UnidadAprendizaje);
+            setnombre_UnidadAprendizaje(rowData.nombre_UnidadAprendizaje);
+            setDatosCopia({
+              clave_PlanEstudios: rowData.clave_PlanEstudios,
+              clave_UnidadAprendizaje: rowData.clave_UnidadAprendizaje,
+              nombre_UnidadAprendizaje: rowData.nombre_UnidadAprendizaje,
+            });
+            setAbrirDialog(2);
+          }}          
+        />     
+        </>
+    );
+  };    
 
-  //MANDAR A LLAMAR A LA LISTA DE PLANES DE ESTUDIOS
   useEffect(() => {
     PlanEstudiosService.consultarPlanestudios()
       .then(response => {
-        setplanesdeestudios(response.data);
+        setplanes(response.data);
       })
       .catch(error => {
-        console.error("Error fetching unidades académicas:", error);
+        console.error("Error fetching:", error);
       });
-  }, []);    
-
-  //!!!EXTRAS DE MODIFICACION
-
-  //ACTIVAR EDICION DE CELDA
-  const cellEditor = (options) => {
-    switch (options.field) {      
-      case 'nombre_UnidadAprendizaje':
-        return textEditor(options);                
-      case 'clave_PlanEstudios':
-        return PlanEstudiosEditor(options);                  
-      default:
-        return textEditor(options); 
-    }  
-  }
-
-  //EDITAR TEXTO
-  const textEditor = (options) => {
-    return <InputText keyfilter={/^[a-zA-Z\s]*$/} type="text"  maxLength={255} value={options.value} 
-      onChange={(e) => {
-        if (validarTexto(e.target.value)) {
-          options.editorCallback(e.target.value)
-        }
-      }}
-      onKeyDown={(e) => e.stopPropagation()} />;
-  };
-
-  //EDITAR DROPDOWN (PLAN DE ESTUDIOS)
-  const PlanEstudiosEditor = (options) => {
-    return (
-      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={options.value} 
-                options={planesdeestudios}  
-                onChange={(e) => options.editorCallback(e.value)}
-                optionLabel="nombre_PlanEstudios" 
-                optionValue="clave_PlanEstudios" // Aquí especificamos que la clave del plan de estudios se utilice como el valor de la opción seleccionada
-                placeholder="Selecciona un Plan de Estudios" 
-      />
-    );
-  };  
-
- //COMPLETAR MODIFICACION
- const onCellEditComplete = (e) => {
-  let { rowData, newValue, field, originalEvent: event } = e;
-  switch (field) {
-    //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
-    case 'nombre_UnidadAprendizaje':
-      if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
-        rowData[field] = newValue; put(rowData);
-      }else{
-        event.preventDefault();
-      } 
-    break;
-    case 'clave_PlanEstudios':
-      if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
-        rowData[field] = newValue; put(rowData);
-      }else{
-        event.preventDefault();          
-      } 
-    break;
-    default:
-    break;
-  }
-  seteditando(false);
-  };
+  }, []);
 
   //FUNCION PARA QUE SE MUESTRE INFORMACION ESPECIFICA DE LAS LLAVES FORANEAS
   const renderBody = (rowData, field) => {
     if (field === 'clave_PlanEstudios') {
-      const plan = planesdeestudios.find((plan) => plan.clave_PlanEstudios === rowData.clave_PlanEstudios);
+      const plan = planes.find((plan) => plan.clave_PlanEstudios === rowData.clave_PlanEstudios);
       return plan ? `${plan.nombre_PlanEstudios}` : '';
     }else {
       return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
     }
   };
   
-  //!!!EXTRAS CAMPOS
+  //!!!EXTRAS GENERALES
 
-  const validarTexto = (value) => {
-    // Expresión regular para validar caracteres alfabeticos y espacios
-    const regex = /^[a-zA-Z\s]*$/;
-    // Verificar si el valor coincide con la expresión regular
-    return regex.test(value);
-  };
-
-  const validarNumero = (value) => {
-    // Expresión regular para validar números enteros positivos
-    const regex = /^[0-9]\d*$/;
-    // Verificar si el valor coincide con la expresión regular
-    return value==='' || regex.test(value);
+  //ENCABEZADO DEL DIALOG
+  const headerTemplate = (
+    <div className="formgrid grid justify-content-center border-bottom-1 border-300">
+      {abrirDialog===1 && (<h4>Registrar Unidad Aprendizaje</h4>)}
+      {abrirDialog===2 && (<h4>Modificar Unidad Aprendizaje</h4>)}
+    </div>
+  );
+  
+  //LISTA DE OPCIONES DE HERRAMIENTAS
+  const Herramientas = () => {
+    return (<div className="flex justify-content-between flex-wrap gap-2 align-items-center">
+            <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={()=>setAbrirDialog(1)}/>
+            <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={()=>{dt.current.exportCSV();}}/>
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch}/>  
+              </IconField>
+            </div>              
+    );
   };
   
+  //FUNCION PARA ACTIVAR EL FILTRADO
+  const onFilter = (event) => {
+    event['first'] = 0;
+    setlazyState(event);
+  };  
 
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
+    <Toolbar start={<h2 className="m-0">Unidad Aprendizaje</h2>} end={Herramientas}/>
+    <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
+<<<<<<< Updated upstream
       <Panel header="Registrar Unidad Aprendizaje" className='mt-3' toggleable>
         <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-2">
@@ -291,10 +377,78 @@ const UnidadAprendizaje = () => {
           {columns.map(({ field, header }) => {
               return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} body={(rowData) => renderBody(rowData, field)}
               editor={field === 'clave_UnidadAprendizaje' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
+=======
+      <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+        <div className="formgrid grid justify-content-center">
+        <div className="field col-8">
+              <label>Plan Estudios*</label>
+            <Dropdown className="w-full"
+              invalid={enviado===true && !clave_PlanEstudios}
+              value={clave_PlanEstudios} 
+              options={planes} 
+              onChange={(e) => {
+                setclave_PlanEstudios(e.value);
+              }} 
+              optionLabel="nombre_PlanEstudios" 
+              optionValue="clave_PlanEstudios"
+              placeholder="Seleccione un Plan Estudios" 
+            />
+          </div> 
+          <div className="field col-2">
+              <label className='font-bold'>Clave*</label>
+              <InputText disabled={abrirDialog===2} invalid={enviado===true && !clave_UnidadAprendizaje} type="text" keyfilter="pint" value={clave_UnidadAprendizaje} maxLength={10}
+                  onChange={(event)=>{
+                    if (validarNumero(event.target.value)) {  
+                      setclave_UnidadAprendizaje(event.target.value);
+                    }
+                  }}  
+              placeholder="Ej.6"
+              className="w-full"/>
+          </div>
+          <div className="field col-8">
+              <label>Nombre*</label>
+              <InputText invalid={enviado===true && !nombre_UnidadAprendizaje} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_UnidadAprendizaje} maxLength={255}
+                  onChange={(event)=>{
+                    if (validarTexto(event.target.value)) {  
+                      setnombre_UnidadAprendizaje(event.target.value);
+                    }
+                  }}  
+                  placeholder="Ej. Algoritmos y Estructura de Datos" 
+              className="w-full"/>              
+          </div>                                                                                   
+        </div>
+        <div className="formgrid grid justify-content-end">
+          <Button label="Cancelar" icon="pi pi-times" outlined className='m-2' onClick={() => {setAbrirDialog(0); setEnviado(false); limpiarCampos();}} severity='secondary' />
+          {abrirDialog===1 && (
+            <Button label="Guardar" icon="pi pi-check" className='m-2' onClick={add} severity='success' />
+          )}
+          {abrirDialog===2 && (
+            <Button label="Editar" icon="pi pi-check" className='m-2' onClick={put} severity='success' />
+          )}          
+        </div> 
+      </Dialog>  
+        <DataTable 
+        onFilter={onFilter} filters={lazyState.filters} filterDisplay="row" 
+        scrollable scrollHeight="78vh"
+        ref={dt}         
+        value={filtrounidadaprendizaje.length ? filtrounidadaprendizaje :unidadaprendizajeList} 
+        size='small'>
+          {columns.map(({ field, header, filterHeader }) => {
+              return <Column style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}} sortable filter filterPlaceholder={filterHeader}
+              filterMatchModeOptions={[
+                { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
+                { label: 'Contiene', value: FilterMatchMode.CONTAINS },
+                { label: 'No contiene', value: FilterMatchMode.NOT_CONTAINS },
+                { label: 'Termina con', value: FilterMatchMode.ENDS_WITH },
+                { label: 'Igual', value: FilterMatchMode.EQUALS },
+                { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
+              ]} 
+              key={field} field={field} header={header} body={(rowData) => renderBody(rowData, field)}/>;
+>>>>>>> Stashed changes
           })}
-        </DataTable>
-      </Panel> 
-  </>
+          <Column body={accionesTabla} alignFrozen={'right'} frozen={true}></Column>    
+        </DataTable>  
+    </>
   )
 }
 

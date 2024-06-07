@@ -84,10 +84,40 @@ const Edificio = () => {
   }
 
   //FUNCION PARA LA MODIFICACION
+<<<<<<< Updated upstream
   const put = (rowData) =>{
     EdificioService.modificarEdificio(rowData).then((response)=>{//CASO EXITOSO
       if (response.status === 200) {
         mostrarExito("Modificación Exitosa");        
+=======
+  const put = () =>{
+  if (!clave_Edificio || !nombre_Edificio || !clave_ProgramaEducativo || !clave_UnidadAcademica) {
+    mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
+    setEnviado(true);
+    return;
+  }
+  if (clave_Edificio === datosCopia.clave_Edificio
+    && nombre_Edificio === datosCopia.nombre_Edificio
+    && clave_ProgramaEducativo === datosCopia.clave_ProgramaEducativo
+    && clave_UnidadAcademica === datosCopia.clave_UnidadAcademica){
+    mostrarInformacion(toast, "No se han realizado cambios");
+    setAbrirDialog(0);
+    limpiarCampos();
+    return;
+  }
+  const action = () => {  
+  EdificioService.modificarEdificio({
+    nombre_Edificio:nombre_Edificio,
+    clave_ProgramaEducativo:clave_ProgramaEducativo,
+    clave_UnidadAcademica:clave_UnidadAcademica
+    }).then(response=>{//CASO EXITOSO
+      if(response.status === 200){
+        mostrarExito(toast, "Modificación Exitosa");
+        get();
+        limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);
+>>>>>>> Stashed changes
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
@@ -112,10 +142,17 @@ const Edificio = () => {
   
   //COLUMNAS PARA LA TABLA
   const columns = [
+<<<<<<< Updated upstream
     {field: 'clave_Edificio', header: 'Clave' },
     {field: 'nombre_Edificio', header: 'Nombre' },
     {field: 'clave_ProgramaEducativo', header: 'Programa Educativo' },
     {field: 'clave_UnidadAcademica', header: 'Unidad Académica' }      
+=======
+    {field: 'clave_Edificio', header: 'Clave', filterHeader: 'Filtro por Clave' },
+    {field: 'nombre_Edificio', header: 'Nombre', filterHeader: 'Filtro por Nombre' },
+    {field: 'clave_ProgramaEducativo', header: 'Programa Educativo', filterHeader: 'Filtro por Programa Educativo'},
+    {field: 'clave_UnidadAcademica', header: 'Unidad Academica', filterHeader: 'Filtro por Unidad Academica'}
+>>>>>>> Stashed changes
   ];
   
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -140,8 +177,50 @@ const Edificio = () => {
             nombre_UnidadAcademica.toLowerCase().includes(value)
         );
     });
+<<<<<<< Updated upstream
     setfiltroEdificio(filteredData);
   };  
+=======
+    setfiltroedificio(filteredData);
+  };
+  
+  //BOTON PARA MODIFICAR
+  const accionesTabla = (rowData) => {
+    return (<>
+        <Button
+          icon="pi pi-pencil"
+          rounded
+          outlined
+          className="m-1"
+          onClick={() => {
+            setclave_Edificio(rowData.clave_Edificio);
+            setnombre_Edificio(rowData.nombre_Edificio);
+            setclave_ProgramaEducativo(rowData.clave_ProgramaEducativo);
+            setclave_UnidadAcademica(rowData.clave_UnidadAcademica);
+            setDatosCopia({
+              clave_Edificio: rowData.clave_Edificio,
+              nombre_Edificio: rowData.nombre_Edificio,
+              clave_ProgramaEducativo: rowData.clave_ProgramaEducativo,
+              clave_UnidadAcademica: rowData.clave_UnidadAcademica
+            });
+            setAbrirDialog(2);
+          }}          
+        />     
+        </>
+    );
+  };    
+
+  //MANDAR A LLAMAR A LA LISTA DE UNIDADES ACADEMICAS
+  useEffect(() => {
+    ProgramaEducativoService.consultarProgramaEducativo()
+      .then(response => {
+        setprogramas(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching:", error);
+      });
+  }, []);
+>>>>>>> Stashed changes
 
   //MANDAR A LLAMAR A LA LISTA DE UNIDADES ACADEMICAS
   useEffect(() => {
