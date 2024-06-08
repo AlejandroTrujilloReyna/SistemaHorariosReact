@@ -12,6 +12,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { ToggleButton } from 'primereact/togglebutton';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
+import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
 import SalaService from '../services/SalaService';
 import EdificiosService from '../services/EdificioService';
 import TipoSalaService from '../services/TipoSalaService';
@@ -22,28 +23,52 @@ import { Toolbar } from 'primereact/toolbar';
 import { Dialog } from 'primereact/dialog';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
-
+import { FilterMatchMode } from 'primereact/api';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
 
 const SalaN = () => {
   let claveSala = 0;
   //VARIABLES ESTADO PARA LOS DIALOG, ACCIONES Y FILTRO TABLA
     const [mostrarDialog, setMostrarDialog] = useState(false);
     const [mostrarEliminarDialog, setMostrarEliminarDialog] = useState(false);
-    const [frmEnviado, setFrmEnviado] = useState(false);
-    const [accionesFrozen, setAccionesFrozen] = useState(false);    
+    const [frmEnviado, setFrmEnviado] = useState(false); 
     const [lazyState, setlazyState] = useState({
       filters: {
-        clave_Sala: { value: '', matchMode: 'startsWith' },
-        validar_Traslape: { value: '', matchMode: 'equals' },
-        nombre_Sala: { value: '', matchMode: 'contains' },
-        capacidad_Sala: { value: '', matchMode: 'startsWith' },
-        nota_Descriptiva: { value: '', matchMode: 'contains' },
-        clave_Edificio: { value: '', matchMode: 'startsWith' },
-        clave_TipoSala: { value: '', matchMode: 'startsWith' },
-        materialesNombre: { value: '', matchMode: 'contains' }
-
+        clave_Sala: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        validar_Traslape: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        nombre_Sala: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        capacidad_Sala: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        nota_Descriptiva: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        clave_Edificio: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        clave_TipoSala: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        materialesNombre: { value: '', matchMode: FilterMatchMode.STARTS_WITH }
       },
-    });    
+    }); 
+  //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
+  const [datosCopia, setDatosCopia] = useState({
+    clave_Sala: "",
+    nombre_Sala: "",
+    capacidad_Sala: "",
+    validar_Traslape: "",
+    nota_Descriptiva: "",
+    clave_Edificio: "",
+    clave_TipoSala: "",
+    materialesseleccionados: []
+  });
+  
+  const confirmar1 = (action) => {
+    confirmDialog({
+      message: '¿Seguro que quieres proceder?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'accept',
+      accept: action,
+      reject: () => mostrarAdvertencia(toast, "Cancelado")
+    });
+  }; 
+
   //VARIABLES PARA EL REGISTRO
   const [clave_Sala,setclave_Sala] = useState("");
   const [nombre_Sala,setnombre_Sala] = useState("");
@@ -66,31 +91,18 @@ const SalaN = () => {
   const toast = useRef(null);
   const dt = useRef(null);
 
-  //MENSAJE DE EXITO
-  const mostrarExito = (mensaje) => {
-    toast.current.show({severity:'success', summary: 'Exito', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ADVERTENCIA
-  const mostrarAdvertencia = (mensaje) => {
-      toast.current.show({severity:'warn', summary: 'Advertencia', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ERROR
-  const mostrarError = (mensaje) => {
-    toast.current.show({severity:'error', summary: 'Error', detail:mensaje, life: 3000});
-  }   
-
   //FUNCION PARA REGISTRAR
   const save = () => {
     setFrmEnviado(true);
     //VALIDACION DE CAMPOS VACIOS
     if (!nombre_Sala || !capacidad_Sala || !clave_Edificio || !clave_TipoSala) {
       setFrmEnviado(true);
-      mostrarAdvertencia("Existen campos Obligatorios vacíos");
+      mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
     if (!editando) {
-
+      const action = () => {
       SalaService.registrarSala({
         nombre_Sala: nombre_Sala,
         capacidad_Sala: capacidad_Sala,
@@ -101,22 +113,38 @@ const SalaN = () => {
       }).then(response => {//CASO EXITOSO
         if (response.status === 200) {
           claveSala = response.data.clave_Sala;          
-          mostrarExito("Registro Exitoso");                  
+          mostrarExito(toast,"Registro Exitoso");                  
           if(materialesseleccionados.length>0){
             addMaterial();
           }          
           get();
           setFrmEnviado(false);
-          limpiarCampos();          
+          limpiarCampos();
+          setMostrarDialog(false);          
         }
       }).catch(error => {//EXCEPCIONES
         if (error.response.status === 401) {
-          mostrarAdvertencia("Nombre ya existente en el Edificio");
+          mostrarAdvertencia(toast,"Nombre ya existente en el Edificio");
         } else if (error.response.status === 500) {
-          mostrarError("Error interno del servidor");
+          mostrarError(toast,"Error interno del servidor");
         }
       })
-    } else {
+    }; confirmar1(action);
+  } else {
+      if (clave_Sala === datosCopia.clave_Sala
+        && nombre_Sala === datosCopia.nombre_Sala
+        && capacidad_Sala === datosCopia.capacidad_Sala
+        && validar_Traslape === datosCopia.validar_Traslape
+        && nota_Descriptiva === datosCopia.nota_Descriptiva
+        && clave_Edificio === datosCopia.clave_Edificio
+        && clave_TipoSala === datosCopia.clave_TipoSala) {
+        mostrarInformacion(toast, "No se han realizado cambios");
+        seteditando(false);
+        setMostrarDialog(false);
+        limpiarCampos();
+        return;
+      }
+      const action = () => {
       SalaService.modificarSala({
         clave_Sala: clave_Sala,
         nombre_Sala: nombre_Sala,
@@ -133,7 +161,7 @@ const SalaN = () => {
           if(materialesseleccionados.length>0){
             addMaterial();
           }          
-          mostrarExito("Modificación Exitosa");
+          mostrarExito(toast,"Modificación Exitosa");
           setFrmEnviado(false);
           seteditando(false);
           setMostrarDialog(false);
@@ -141,12 +169,12 @@ const SalaN = () => {
         }
       }).catch(error => {//EXCEPCIONES
         if (error.response.status === 401) {
-          mostrarAdvertencia("Nombre ya Existente en el Edificio");
+          mostrarAdvertencia(toast,"Nombre ya Existente en el Edificio");
           get();
         } else if (error.response.status === 500) {
-          mostrarError("Error del sistema");
+          mostrarError(toast,"Error del sistema");
         }
-      })
+      })};confirmar1(action);
     }
   }
 
@@ -162,7 +190,7 @@ const SalaN = () => {
         }
       }).catch(error => {//EXCEPCIONES
         if (error.response.status === 500) {
-          mostrarError("Error interno del servidor");
+          mostrarError(toast,"Error interno del servidor");
         }
       })
   }
@@ -170,7 +198,7 @@ const SalaN = () => {
   const addMaterial = () => {
   // VALIDACION DE CAMPOS VACIOS
   if (materialesseleccionados.length < 1 || !claveSala) {      
-    mostrarAdvertencia("Existen campos obligatorios vacíos Material");
+    mostrarAdvertencia(toast,"Existen campos obligatorios vacíos Material");
     return;
   }
 
@@ -188,7 +216,7 @@ const SalaN = () => {
       }
     }).catch(error => {//EXCEPCIONES
       if (error.response.status === 500) {  
-        mostrarError("Error interno del servidor");
+        mostrarError(toast,"Error interno del servidor");
       }     
     });  
   }
@@ -212,14 +240,14 @@ const SalaN = () => {
       clave_Sala:clave_Sala
     }).then(response => {//CASO EXITOSO
       if (response.status === 200) {
-        mostrarExito("Eliminación Exitosa");
+        mostrarExito(toast,"Eliminación Exitosa");
         get();
         setMostrarEliminarDialog(false);
         limpiarCampos();
       }
     }).catch(error => {//EXCEPCIONES
       if (error.response.status === 500) {
-        mostrarError("Error interno del servidor");
+        mostrarError(toast,"Error interno del servidor");
       }
     })
 
@@ -357,12 +385,23 @@ const SalaN = () => {
     ? sala.materiales.split(',').map(Number)
     : [];    
     setmaterialesseleccionados(MaterialArray);
+
+    setDatosCopia({
+      clave_Sala:sala.clave_Sala,
+      clave_Edificio:sala.clave_Edificio,
+      nombre_Sala:sala.nombre_Sala,
+      capacidad_Sala:sala.capacidad_Sala,
+      validar_Traslape:sala.validar_Traslape,
+      nota_Descriptiva:sala.nota_Descriptiva,
+      clave_TipoSala:sala.clave_TipoSala,
+      materialesseleccionados: MaterialArray
+    });
   }
 
   // Funcion para contenido de Footer del Dialog Guardado
   const footerDialog = (
     <React.Fragment>
-      <Button label="Cancelar" icon="pi pi-times" outlined onClick={esconderDialog}></Button>
+      <Button label="Cancelar" severity='secondary' icon="pi pi-times" outlined onClick={esconderDialog}></Button>
       <Button label="Guardar" icon="pi pi-check" onClick={save} />
     </React.Fragment>
   );
@@ -378,18 +417,23 @@ const SalaN = () => {
   const exportCSV = () => {
     dt.current.exportCSV();
   };
-  //Lado Izquierdo del Toolbar, boton Nuevo y boton para congelar columna acciones
-  const leftToolbarTemplate = () => {
-    return (
-        <div className="flex flex-wrap gap-2">
-            <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={abrirNuevo}/>  
-            <ToggleButton checked={accionesFrozen} onChange={(e) => setAccionesFrozen(e.value)} onIcon="pi pi-lock" offIcon="pi pi-lock-open" onLabel="Acciones" offLabel="Acciones" />          
-        </div>
-    );
-  };
   //Lado Derecho del Toolbar, boton Exportar
   const rightToolbarTemplate = () => {
-    return <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={exportCSV}/>;
+    return (
+      <div className="flex flex-wrap gap-2">
+          <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={abrirNuevo}/>
+          <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={exportCSV}/>
+          <IconField iconPosition="left">
+        <InputIcon className="pi pi-search" />
+        <InputText
+          type="search"
+          //onInput={(e) => setGlobalFilter(e.target.value)}
+        onInput={(e) => onSearch(e)}
+          placeholder="Buscar..."
+        />
+      </IconField>              
+      </div>
+  );
   };
   
   //!!!EXTRAS DIALOG DE CONFIRMACION DE ELIMINAR
@@ -435,24 +479,6 @@ const SalaN = () => {
     {field: 'materialesNombre', header: 'Materiales' }    
   ];
 
-  //Cabecera de la Tabla
-  const header = (
-    <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-      <h4 className="m-0">Salas</h4>                              
-        
-      <IconField iconPosition="left">
-        <InputIcon className="pi pi-search" />
-        <InputText
-          type="search"
-          //onInput={(e) => setGlobalFilter(e.target.value)}
-        onInput={(e) => onSearch(e)}
-          placeholder="Buscar..."
-        />
-      </IconField>
-    </div>
-    
-  );
-
   // Contenido de la columna de Acciones (Modificar y Eliminar)
   const accionesTabla = (rowData) => {
     return (
@@ -476,18 +502,6 @@ const SalaN = () => {
     );
   };
 
-  /*const toggleFilter = ({ value, onChange }) => {
-    return(<ToggleButton
-      id="vtraslape"
-      onLabel="Si"
-      onIcon="pi pi-check"
-      offIcon="pi pi-times"
-      checked={validar_Traslape === 1}
-      onChange={(e) => setvalidar_Traslape(e.value ? 1 : 0)}
-      className="w-8rem"
-    />);
-  };*/
-
   // Funcion Necesaria para filtrado
   const onFilter = (event) => {
     event['first'] = 0;
@@ -497,18 +511,21 @@ const SalaN = () => {
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
-    <Toast ref={toast} />            
+    <Toast ref={toast} /> 
+    <ConfirmDialog />           
       {/*Dialog para Registrar y Modificar Sala*/} 
       <Dialog
         visible={mostrarDialog}
         style={{ width: '32rem' }}
         breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-        header="Sala"
+        header={    <div className="formgrid grid justify-content-center border-bottom-1 border-300">
+          {(mostrarDialog===true && !editando) && (<h4>Registrar Sala</h4>)}
+          {(mostrarDialog===true && editando) && (<h4>Modificar Sala</h4>)}
+        </div>}
         modal
         className="p-fluid"
         footer={footerDialog}
-        onHide={esconderDialog}
-      >    
+        onHide={esconderDialog}>    
         <div className="formgrid grid">
             <div className="field col">
                 <label htmlFor="Edificios" className="font-bold">Edificio*</label>
@@ -651,28 +668,35 @@ const SalaN = () => {
         </div>
       </Dialog>   
       {/*Barra de herramientas con boton nuevo, boton para anclar la columna de Acciones y Exportar*/} 
-      <Toolbar className="mt-3" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+      <Toolbar start={<h2 className="m-0">Sala</h2>} end={rightToolbarTemplate}></Toolbar>
       {/*Tabla de Contenido*/}         
       <div className="card">        
-        <DataTable ref={dt} value={filtrosala.length ? filtrosala :salaList} scrollable scrollHeight="400px" size='small' tableStyle={{ minWidth: '50rem' }}         
+        <DataTable ref={dt} value={filtrosala.length ? filtrosala :salaList} scrollable scrollHeight="78vh" size='small' tableStyle={{ minWidth: '50rem' }}         
         filterDisplay="row"         
         onFilter={onFilter}       
-        filters={lazyState.filters}
-          
-          header={header}>
+        filters={lazyState.filters}>
           {columns.map(({ field, header }) => {
               if (field === 'materiales') {
                 return null;
               }
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
-               filter filterPlaceholder="Buscar"/>;
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}} body={(rowData) => renderBody(rowData, field)}
+               filter filterPlaceholder="Buscar"
+               filterMatchModeOptions={[
+                { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
+                { label: 'Contiene', value: FilterMatchMode.CONTAINS },
+                { label: 'No contiene', value: FilterMatchMode.NOT_CONTAINS },
+                { label: 'Termina con', value: FilterMatchMode.ENDS_WITH },
+                { label: 'Igual', value: FilterMatchMode.EQUALS },
+                { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
+              ]} 
+               />;
           })}
           <Column
             body={accionesTabla}
             exportable={false}
             style={{ minWidth: '15%' }}
             alignFrozen="right" 
-            frozen={accionesFrozen}
+            frozen={true}
           ></Column>
         </DataTable>
       </div>            
