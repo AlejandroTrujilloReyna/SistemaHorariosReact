@@ -19,6 +19,7 @@ import MaterialService from '../services/MaterialService';
 
 const Material = () => {
   //VARIABLES PARA EL REGISTRO
+  const [clave_Material,setclave_Material] = useState("");
   const [nombre_Material,setnombre_Material] = useState("");
   //VARIABLES PARA LA CONSULTA
   const [materialList,setmaterialList] = useState([]);
@@ -26,11 +27,13 @@ const Material = () => {
   const dt = useRef(null);
   const [lazyState, setlazyState] = useState({
     filters: {
+        clave_Material: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
         nombre_Material: { value: '', matchMode: FilterMatchMode.STARTS_WITH }
       },
   });  
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
   const [datosCopia, setDatosCopia] = useState({
+    clave_Material:"",
     nombre_Material: "",
   }); 
   //VARIABLES PARA EL ERROR
@@ -110,6 +113,7 @@ const Material = () => {
   }
   const action = () => {  
   MaterialService.modificarMaterial({
+    clave_Material:clave_Material,
     nombre_Material:nombre_Material,
     }).then(response=>{//CASO EXITOSO
       if(response.status === 200){
@@ -171,8 +175,10 @@ const Material = () => {
           outlined
           className="m-1"
           onClick={() => {
+            setclave_Material(rowData.clave_Material);
             setnombre_Material(rowData.nombre_Material);
             setDatosCopia({
+                clave_Material: rowData.clave_Material,
                 nombre_Material: rowData.nombre_Material
             });
             setAbrirDialog(2);
@@ -218,12 +224,12 @@ const Material = () => {
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
-    <Toolbar start={<h2 className="m-0">Grupo</h2>} end={Herramientas}/>
+    <Toolbar start={<h2 className="m-0">Material</h2>} end={Herramientas}/>
     <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+      <Dialog className='w-2' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
-          <div className="field col-4">
+          <div className="field col-12">
               <label>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_Material} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_Material} maxLength={255}
                   onChange={(event)=>{
