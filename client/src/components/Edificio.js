@@ -84,12 +84,6 @@ const Edificio = () => {
   }
 
   //FUNCION PARA LA MODIFICACION
-<<<<<<< Updated upstream
-  const put = (rowData) =>{
-    EdificioService.modificarEdificio(rowData).then((response)=>{//CASO EXITOSO
-      if (response.status === 200) {
-        mostrarExito("Modificación Exitosa");        
-=======
   const put = () =>{
   if (!clave_Edificio || !nombre_Edificio || !clave_ProgramaEducativo || !clave_UnidadAcademica) {
     mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
@@ -117,7 +111,6 @@ const Edificio = () => {
         limpiarCampos();
         setEnviado(false);
         setAbrirDialog(0);
->>>>>>> Stashed changes
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
@@ -127,7 +120,7 @@ const Edificio = () => {
         mostrarError("Error del sistema");
       }
     });
-  }
+  }}
 
   //!!!EXTRAS DE REGISTRO
 
@@ -142,17 +135,10 @@ const Edificio = () => {
   
   //COLUMNAS PARA LA TABLA
   const columns = [
-<<<<<<< Updated upstream
-    {field: 'clave_Edificio', header: 'Clave' },
-    {field: 'nombre_Edificio', header: 'Nombre' },
-    {field: 'clave_ProgramaEducativo', header: 'Programa Educativo' },
-    {field: 'clave_UnidadAcademica', header: 'Unidad Académica' }      
-=======
     {field: 'clave_Edificio', header: 'Clave', filterHeader: 'Filtro por Clave' },
     {field: 'nombre_Edificio', header: 'Nombre', filterHeader: 'Filtro por Nombre' },
     {field: 'clave_ProgramaEducativo', header: 'Programa Educativo', filterHeader: 'Filtro por Programa Educativo'},
     {field: 'clave_UnidadAcademica', header: 'Unidad Academica', filterHeader: 'Filtro por Unidad Academica'}
->>>>>>> Stashed changes
   ];
   
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -177,10 +163,6 @@ const Edificio = () => {
             nombre_UnidadAcademica.toLowerCase().includes(value)
         );
     });
-<<<<<<< Updated upstream
-    setfiltroEdificio(filteredData);
-  };  
-=======
     setfiltroedificio(filteredData);
   };
   
@@ -220,7 +202,6 @@ const Edificio = () => {
         console.error("Error fetching:", error);
       });
   }, []);
->>>>>>> Stashed changes
 
   //MANDAR A LLAMAR A LA LISTA DE UNIDADES ACADEMICAS
   useEffect(() => {

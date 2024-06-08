@@ -14,32 +14,20 @@ import ProgramaEducativoService from '../services/ProgramaEducativoService';
 
 const PlanEstudios = () => {
   //VARIABLES PARA EL REGISTRO
-<<<<<<< Updated upstream
-  const [nombre_PlanEstudios, setnombre_PlanEstudios] = useState("");
-  const [cant_semestres, setcant_semestres] = useState("");
-  const [clave_ProgramaEducativo, setclave_ProgramaEducativo] = useState(0);
-
-=======
   const [clave_PlanEstudios,setclave_PlanEstudios] = useState(0);
   const [nombre_PlanEstudios,setnombre_PlanEstudios] = useState("");
   const [clave_ProgramaEducativo,setclave_ProgramaEducativo] = useState(null);
   const [cantidad_Semestres,setcantidad_Semestres] = useState(0);
->>>>>>> Stashed changes
   //VARIABLES PARA LA CONSULTA
   const [planestudiosList, setplanestudiosList] = useState([]);
   const [filtroplanestudios, setfiltroplanestudios] = useState([]);
   const [ProgramasEducativos, setProgramasEducativos] = useState([]);
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
-<<<<<<< Updated upstream
-  const [editando,seteditando] = useState(false);
-    
-=======
   const [datosCopia, setDatosCopia] = useState({
     nombre_PlanEstudios: "",
     clave_ProgramaEducativo: null,
     cantidad_Semestres: 0
   }); 
->>>>>>> Stashed changes
   //VARIABLES PARA EL ERROR
   const toast = useRef(null);
 
@@ -99,11 +87,6 @@ const PlanEstudios = () => {
     });    
   }  
 
-<<<<<<< Updated upstream
-//FUNCION PARA LA MODIFICACION
-const put = (rowData) =>{
-    PlanEstudiosService.modificarPlanEstudios(rowData).then(response=>{//CASO EXITOSO
-=======
   //FUNCION PARA LA MODIFICACION
   const put = () =>{
   if (!nombre_PlanEstudios || !clave_ProgramaEducativo || !cantidad_Semestres) {
@@ -125,7 +108,6 @@ const put = (rowData) =>{
     clave_ProgramaEducativo:clave_ProgramaEducativo,
     cantidad_Semestres:cantidad_Semestres
     }).then(response=>{//CASO EXITOSO
->>>>>>> Stashed changes
       if(response.status === 200){
         mostrarExito("Modificación Exitosa");
       }
@@ -137,25 +119,10 @@ const put = (rowData) =>{
         mostrarError("Error del sistema");
       }
     })
-  }
+  }}
 //!!!EXTRAS DE REGISTRO
 
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
-<<<<<<< Updated upstream
-    const limpiarCampos = () => {
-        setnombre_PlanEstudios("");
-        setcant_semestres("");
-        setclave_ProgramaEducativo(0);
-    };
- //!!!EXTRAS DE CONSULTA
-
-  //COLUMNAS PARA LA TABLA
-  const columns = [
-    {field: 'clave_PlanEstudios', header: 'Clave' },
-    {field: 'nombre_PlanEstudios', header: 'Nombre' },
-    {field: 'cant_semestres', header: 'Cantidad de Semestres'},
-    {field: 'clave_ProgramaEducativo', header: 'Clave Programa Educativo'},          
-=======
   const limpiarCampos = () =>{
     setnombre_PlanEstudios("");
     setclave_ProgramaEducativo(null);
@@ -170,7 +137,6 @@ const put = (rowData) =>{
     {field: 'nombre_PlanEstudios', header: 'Nombre', filterHeader: 'Filtro por Nombre' },
     {field: 'cant_semestres', header: 'Cantidad semestres', filterHeader: 'Filtro por Semestres'},
     {field: 'clave_ProgramaEducativo', header: 'Programa Educativo', filterHeader: 'Filtro por Programa Educativo'}
->>>>>>> Stashed changes
   ];
 
    //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -190,11 +156,6 @@ const onSearch = (e) => {
     });
     setfiltroplanestudios(filteredData);
   };
-<<<<<<< Updated upstream
-
- //MANDAR A LLAMAR A LA LISTA DE PROGRAMA EDUCATIVO
- useEffect(() => {
-=======
   
   //BOTON PARA MODIFICAR
   const accionesTabla = (rowData) => {
@@ -223,7 +184,6 @@ const onSearch = (e) => {
   };    
 
   useEffect(() => {
->>>>>>> Stashed changes
     ProgramaEducativoService.consultarProgramaEducativo()
     .then(response => {
         setProgramasEducativos(response.data);
@@ -408,4 +368,4 @@ const TipoProgramaEducativoEditor = (options) => {
     );
 }
 
-export default PlanEstudios;
+export default PlanEstudios

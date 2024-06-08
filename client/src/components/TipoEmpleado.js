@@ -222,7 +222,6 @@ const put = (rowData) =>{
     return value==='' || regex.test(value);
   };
 
-    
     return (
 <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}

@@ -37,6 +37,7 @@ const UnidadAprendizaje = () => {
     },
   });  
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
+  const [editando,seteditando] = useState(false);
   const [datosCopia, setDatosCopia] = useState({
     clave_PlanEstudios: "",
     clave_UnidadAprendizaje: 0,
@@ -77,14 +78,9 @@ const UnidadAprendizaje = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-<<<<<<< Updated upstream
-    if (!clave_UnidadAprendizaje || !nombre_UnidadAprendizaje || !clave_PlanEstudios) {
-      mostrarAdvertencia("Existen campos Obligatorios vacíos");
-=======
     if (!clave_PlanEstudios || !clave_UnidadAprendizaje || !nombre_UnidadAprendizaje) {
       mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
       setEnviado(true);
->>>>>>> Stashed changes
       return;
     }
     const action = () => {
@@ -93,16 +89,9 @@ const UnidadAprendizaje = () => {
       clave_PlanEstudios:clave_PlanEstudios,
       clave_UnidadAprendizaje:clave_UnidadAprendizaje,
       nombre_UnidadAprendizaje:nombre_UnidadAprendizaje,
-<<<<<<< Updated upstream
-      clave_PlanEstudios:clave_PlanEstudios
-    }).then(response=>{//CASO EXITOSO
-      if (response.status === 200) {
-        mostrarExito("Registro exitoso");
-=======
     }).then(response=>{
       if (response.status === 200) {//CASO EXITOSO
         mostrarExito(toast,"Registro Exitoso");
->>>>>>> Stashed changes
         get();
         limpiarCampos();
         setEnviado(false);
@@ -110,16 +99,6 @@ const UnidadAprendizaje = () => {
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
-<<<<<<< Updated upstream
-        mostrarAdvertencia("Clave ya Existente");
-      } else if(error.response.status === 401){
-        mostrarAdvertencia("Nombre ya Existente");
-      } else if(error.response.status === 500){
-        mostrarError("Error en el sistema");   
-      }  
-    });
-  }
-=======
         mostrarAdvertencia(toast,"Clave ya Existente");
       } else if (error.response.status === 401) {
         mostrarAdvertencia(toast,"Nombre ya existente");      
@@ -130,7 +109,6 @@ const UnidadAprendizaje = () => {
     };
     confirmar1(action);
   }  
->>>>>>> Stashed changes
 
   //FUNCION PARA CONSULTA
   const get = ()=>{
@@ -165,13 +143,6 @@ const UnidadAprendizaje = () => {
     nombre_UnidadAprendizaje:nombre_UnidadAprendizaje
     }).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-<<<<<<< Updated upstream
-        mostrarExito("Modificación Exitosa");
-      }
-    }).catch(error=>{//EXCEPCIONES
-      if (error.response.status === 401) {
-        mostrarAdvertencia("Nombre ya Existente");
-=======
         mostrarExito(toast, "Modificación Exitosa");
         get();
         limpiarCampos();
@@ -181,21 +152,13 @@ const UnidadAprendizaje = () => {
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 401){
         mostrarAdvertencia(toast,"Nombre ya existente");
->>>>>>> Stashed changes
         get();
       }else if(error.response.status === 500){
         mostrarError(toast,"Error del sistema");
       }
-<<<<<<< Updated upstream
-      else if (error.response.status === 500) {
-        mostrarError("Error del sistema");
-      }
-    });
-=======
     })
   };
   confirmar1(action);    
->>>>>>> Stashed changes
   }
 
   //!!!EXTRAS DE REGISTRO
@@ -225,13 +188,6 @@ const UnidadAprendizaje = () => {
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredData = unidadaprendizajeList.filter((item) => {
-<<<<<<< Updated upstream
-        return (
-            item.clave_PlanEstudios.toString().includes(value) ||
-            item.clave_UnidadAprendizaje.toString().includes(value) ||
-            item.nombre_UnidadAprendizaje.toLowerCase().includes(value)        
-        )
-=======
       const Acade = planes.find(Acade => Acade.clave_PlanEstudios === item.clave_PlanEstudios)?.nombre_PlanEstudios || '';
         return (
             item.clave_PlanEstudios.toString().includes(value) ||
@@ -239,7 +195,6 @@ const UnidadAprendizaje = () => {
             item.nombre_UnidadAprendizaje.toString().includes(value) ||
             Acade.toLowerCase().includes(value)         
           );
->>>>>>> Stashed changes
     });
     setfiltrounidadaprendizaje(filteredData);
   };
@@ -324,60 +279,6 @@ const UnidadAprendizaje = () => {
     <Toolbar start={<h2 className="m-0">Unidad Aprendizaje</h2>} end={Herramientas}/>
     <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-<<<<<<< Updated upstream
-      <Panel header="Registrar Unidad Aprendizaje" className='mt-3' toggleable>
-        <div className="formgrid grid mx-8 justify-content-center">
-          <div className="field col-2">
-                  <label>Clave*</label>
-                  <InputText type="text" keyfilter="pint" value={clave_UnidadAprendizaje} maxLength={6}
-                      onChange={(event)=>{
-                        if (validarNumero(event.target.value)) {
-                          setclave_UnidadAprendizaje(event.target.value);
-                        }                        
-                      }}
-                      placeholder="Ej.33556"  
-                  className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
-          </div>
-          <div className="field col-10">
-          <label>Nombre*</label>
-          <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_UnidadAprendizaje} maxLength={255}
-              onChange={(event) => {
-                if (validarTexto(event.target.value)) {
-                  setnombre_UnidadAprendizaje(event.target.value);
-                }        
-              }}
-              placeholder="Ej.Ingeniería Económica"  
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-          />              
-          </div>                            
-          <div className="field col-4">
-            <label>Plan de Estudios*</label>
-              <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={clave_PlanEstudios} 
-                options={planesdeestudios}  
-                onChange={(e) => {
-                  setclave_PlanEstudios(e.value);
-                }} 
-                optionLabel="nombre_PlanEstudios" 
-                optionValue="clave_PlanEstudios" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-                placeholder="Selecciona un Plan de Estudios" 
-              />
-          </div>
-          </div>
-        <div className="mx-8 mt-4">
-          <Button label="Guardar" onClick={add} className="p-button-success" />
-        </div>      
-      </Panel>
-      {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Unidades de Aprendizaje" className='mt-3' toggleable>
-      <div className="mx-8 mb-4">
-        <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
-      </div>  
-        <DataTable value={filtrounidadaprendizaje.length ? filtrounidadaprendizaje :unidadaprendizajeList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
-          {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} body={(rowData) => renderBody(rowData, field)}
-              editor={field === 'clave_UnidadAprendizaje' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
-=======
       <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
         <div className="field col-8">
@@ -444,7 +345,6 @@ const UnidadAprendizaje = () => {
                 { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
               ]} 
               key={field} field={field} header={header} body={(rowData) => renderBody(rowData, field)}/>;
->>>>>>> Stashed changes
           })}
           <Column body={accionesTabla} alignFrozen={'right'} frozen={true}></Column>    
         </DataTable>  
