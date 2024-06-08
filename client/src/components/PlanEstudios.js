@@ -8,7 +8,6 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
-import { ToggleButton } from 'primereact/togglebutton';
 import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
 import { validarTexto, validarNumero} from '../services/ValidacionGlobalService';
 import { Toolbar } from 'primereact/toolbar';
@@ -22,9 +21,10 @@ import ProgramaEducativoService from '../services/ProgramaEducativoService';
 
 const PlanEstudios = () => {
   //VARIABLES PARA EL REGISTRO
+  const [clave_PlanEstudios,setclave_PlanEstudios] = useState("");
   const [nombre_PlanEstudios,setnombre_PlanEstudios] = useState("");
   const [clave_ProgramaEducativo,setclave_ProgramaEducativo] = useState("");
-  const [cantidad_Semestres,setcantidad_Semestres] = useState("");
+  const [cant_semestres,setcant_semestres] = useState("");
   //VARIABLES PARA LA CONSULTA
   const [planestudiosList,setplanestudiosList] = useState([]);
   const [filtroplanestudios, setfiltroplanestudios] = useState([]);
@@ -32,16 +32,18 @@ const PlanEstudios = () => {
   const dt = useRef(null);
   const [lazyState, setlazyState] = useState({
     filters: {
+      clave_PlanEstudios: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
         nombre_PlanEstudios: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
         clave_ProgramaEducativo: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
-        cantidad_Semestres: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        cant_semestres: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
     },
   });  
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
   const [datosCopia, setDatosCopia] = useState({
+    clave_PlanEstudios: "",
     nombre_PlanEstudios: "",
     clave_ProgramaEducativo: "",
-    cantidad_Semestres: ""
+    cant_semestres: ""
   }); 
   //VARIABLES PARA EL ERROR
   const toast = useRef(null);
@@ -65,7 +67,7 @@ const PlanEstudios = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    if (!nombre_PlanEstudios || !clave_ProgramaEducativo || !cantidad_Semestres) {
+    if (!nombre_PlanEstudios || !clave_ProgramaEducativo || !cant_semestres) {
       mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
       setEnviado(true);
       return;
@@ -75,7 +77,7 @@ const PlanEstudios = () => {
     PlanEstudiosService.registrarPlanEstudios({
       nombre_PlanEstudios:nombre_PlanEstudios,
       clave_ProgramaEducativo:clave_ProgramaEducativo,
-      cantidad_Semestres:cantidad_Semestres,
+      cant_semestres:cant_semestres,
     }).then(response=>{
       if (response.status === 200) {//CASO EXITOSO
         mostrarExito(toast,"Registro Exitoso");
@@ -109,14 +111,14 @@ const PlanEstudios = () => {
 
   //FUNCION PARA LA MODIFICACION
   const put = () =>{
-  if (!nombre_PlanEstudios || !clave_ProgramaEducativo || !cantidad_Semestres) {
+  if (!nombre_PlanEstudios || !clave_ProgramaEducativo || !cant_semestres) {
     mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
     setEnviado(true);
     return;
   }
   if (nombre_PlanEstudios === datosCopia.nombre_PlanEstudios
     && clave_ProgramaEducativo === datosCopia.clave_ProgramaEducativo
-    && cantidad_Semestres === datosCopia.cantidad_Semestres){
+    && cant_semestres === datosCopia.cant_semestres){
     mostrarInformacion(toast, "No se han realizado cambios");
     setAbrirDialog(0);
     limpiarCampos();
@@ -124,9 +126,10 @@ const PlanEstudios = () => {
   }
   const action = () => {  
   PlanEstudiosService.modificarPlanEstudios({
+    clave_PlanEstudios:clave_PlanEstudios,
     nombre_PlanEstudios:nombre_PlanEstudios,
     clave_ProgramaEducativo:clave_ProgramaEducativo,
-    cantidad_Semestres:cantidad_Semestres,
+    cant_semestres:cant_semestres,
     }).then(response=>{//CASO EXITOSO
       if(response.status === 200){
         mostrarExito(toast, "Modificación Exitosa");
@@ -153,7 +156,7 @@ const PlanEstudios = () => {
   const limpiarCampos = () =>{
     setnombre_PlanEstudios("");
     setclave_ProgramaEducativo(null);
-    setcantidad_Semestres("");
+    setcant_semestres("");
   }
   
   //!!!EXTRAS DE CONSULTA
@@ -163,7 +166,7 @@ const PlanEstudios = () => {
     {field: 'clave_PlanEstudios', header: 'Clave', filterHeader: 'Filtro por Clave' },
     {field: 'nombre_PlanEstudios', header: 'Nombre', filterHeader: 'Filtro por Nombre' },
     {field: 'clave_ProgramaEducativo', header: 'Programa Educativo', filterHeader: 'Filtro por Programa Educativo'},
-    {field: 'cant_semestres', header: 'Uso', filterHeader: 'Filtro por Semestres'}
+    {field: 'cant_semestres', header: 'Cantidad de semestres', filterHeader: 'Filtro por Semestres'}
   ];
   
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -177,8 +180,8 @@ const PlanEstudios = () => {
     const filteredData = planestudiosList.filter((item) => {
         return (
             item.clave_PlanEstudios.toString().includes(value) ||
-            item.nombre_Grupo.toLowerCase().includes(value) ||
-            item.cantidad_Semestres.toString().includes(value) ||
+            item.nombre_PlanEstudios.toLowerCase().includes(value) ||
+            item.cant_semestres.toString().includes(value) ||
             item.clave_ProgramaEducativo.toString().includes(value)
         );
     });
@@ -194,13 +197,14 @@ const PlanEstudios = () => {
           outlined
           className="m-1"
           onClick={() => {
+            setclave_PlanEstudios(rowData.clave_PlanEstudios);
             setnombre_PlanEstudios(rowData.nombre_PlanEstudios);
-            setcantidad_Semestres(rowData.cantidad_Semestres);
+            setcant_semestres(rowData.cant_semestres);
             setclave_ProgramaEducativo(rowData.clave_ProgramaEducativo);
             setDatosCopia({
               clave_PlanEstudios: rowData.clave_PlanEstudios,
               nombre_PlanEstudios: rowData.nombre_PlanEstudios,
-              cantidad_Semestres: rowData.cantidad_Semestres,
+              cant_semestres: rowData.cant_semestres,
               clave_ProgramaEducativo: rowData.clave_ProgramaEducativo
             });
             setAbrirDialog(2);
@@ -280,10 +284,10 @@ const PlanEstudios = () => {
           </div>
           <div className="field col-2">
               <label>Cantidad Semestres*</label>
-              <InputText invalid={enviado===true && !cantidad_Semestres} type="text" keyfilter="pint" value={cantidad_Semestres} maxLength={10}
+              <InputText invalid={enviado===true && !cant_semestres} type="text" keyfilter="pint" value={cant_semestres} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
-                      	setcantidad_Semestres(event.target.value);
+                      	setcant_semestres(event.target.value);
                     }
                   }}
                   placeholder="Ej.120"  
