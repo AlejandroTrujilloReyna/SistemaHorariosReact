@@ -9,7 +9,7 @@ import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
-import { validarTexto, validarNumero} from '../services/ValidacionGlobalService';
+import { validarAlfanumerico, validarNumero} from '../services/ValidacionGlobalService';
 import { Toolbar } from 'primereact/toolbar';
 import { Dialog } from 'primereact/dialog';
 import { IconField } from 'primereact/iconfield';
@@ -269,20 +269,20 @@ const PlanEstudios = () => {
     <Toolbar start={<h2 className="m-0">Plan Estudios</h2>} end={Herramientas}/>
     <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+      <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
-          <div className="field col-4">
+          <div className="field col-6">
               <label>Nombre*</label>
-              <InputText invalid={enviado===true && !nombre_PlanEstudios} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_PlanEstudios} maxLength={255}
+              <InputText invalid={enviado===true && !nombre_PlanEstudios} type="text" keyfilter={/^[0-9a-zA-Z\-/]*$/} value={nombre_PlanEstudios} maxLength={255}
                   onChange={(event)=>{
-                    if (validarTexto(event.target.value)) {  
+                    if (validarAlfanumerico(event.target.value)) {  
                       setnombre_PlanEstudios(event.target.value);
                     }
                   }}  
                   placeholder="Nombre" 
               className="w-full"/>              
           </div>
-          <div className="field col-2">
+          <div className="field col-6">
               <label>Cantidad Semestres*</label>
               <InputText invalid={enviado===true && !cant_semestres} type="text" keyfilter="pint" value={cant_semestres} maxLength={10}
                   onChange={(event)=>{
@@ -293,7 +293,7 @@ const PlanEstudios = () => {
                   placeholder="Ej.120"  
               className="w-full"/>
           </div>
-          <div className="field col-8">
+          <div className="field col-12">
               <label>Programa Educativo*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_ProgramaEducativo}

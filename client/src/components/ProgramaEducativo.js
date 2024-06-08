@@ -288,7 +288,7 @@ const ProgramaEducativo = () => {
     <Toolbar start={<h2 className="m-0">Programa Educativo</h2>} end={Herramientas}/>
     <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+      <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
         <div className="field col-8">
               <label>Unidad Académica*</label>
@@ -304,7 +304,7 @@ const ProgramaEducativo = () => {
               placeholder="Seleccione una Unidad Académica" 
             />
           </div> 
-          <div className="field col-2">
+          <div className="field col-4">
               <label className='font-bold'>Clave*</label>
               <InputText disabled={abrirDialog===2} invalid={enviado===true && !clave_ProgramaEducativo} type="text" keyfilter="pint" value={clave_ProgramaEducativo} maxLength={10}
                   onChange={(event)=>{
@@ -326,7 +326,7 @@ const ProgramaEducativo = () => {
                   placeholder="Ej.Licenciatura en Sistemas" 
               className="w-full"/>              
           </div>
-          <div className="field col-2">
+          <div className="field col-4">
               <label>Banco de horas</label>
               <InputText invalid={enviado===true && !banco_Horas} type="text" keyfilter="pint" value={banco_Horas} maxLength={10}
                   onChange={(event)=>{

@@ -8,7 +8,6 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
-import { ToggleButton } from 'primereact/togglebutton';
 import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
 import { validarTexto, validarNumero} from '../services/ValidacionGlobalService';
 import { Toolbar } from 'primereact/toolbar';
@@ -71,7 +70,7 @@ const Edificio = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    if (!clave_Edificio || !nombre_Edificio || !clave_ProgramaEducativo || !clave_UnidadAcademica) {
+    if (!clave_Edificio || !nombre_Edificio || !clave_UnidadAcademica) {
       mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
       setEnviado(true);
       return;
@@ -116,7 +115,7 @@ const Edificio = () => {
 
   //FUNCION PARA LA MODIFICACION
   const put = () =>{
-  if (!nombre_Edificio || !clave_ProgramaEducativo || !clave_UnidadAcademica) {
+  if (!nombre_Edificio || !clave_UnidadAcademica) {
     mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
     setEnviado(true);
     return;
@@ -131,6 +130,7 @@ const Edificio = () => {
   }
   const action = () => {  
   EdificioService.modificarEdificio({
+    clave_Edificio:clave_Edificio,
     nombre_Edificio:nombre_Edificio,
     clave_ProgramaEducativo:clave_ProgramaEducativo,
     clave_UnidadAcademica:clave_UnidadAcademica,
@@ -170,7 +170,7 @@ const Edificio = () => {
     {field: 'clave_Edificio', header: 'Clave', filterHeader: 'Filtro por Clave' },
     {field: 'nombre_Edificio', header: 'Nombre', filterHeader: 'Filtro por Nombre' },
     {field: 'clave_ProgramaEducativo', header: 'Programa Educativo', filterHeader: 'Filtro por Programa Educativo'},
-    {field: 'cant_UnidadAcademica', header: 'Uso', filterHeader: 'Filtro por Unidad Academica'}
+    {field: 'clave_UnidadAcademica', header: 'Unidad Academica', filterHeader: 'Filtro por Unidad Academica'}
   ];
   
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -182,10 +182,11 @@ const Edificio = () => {
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredData = edificioList.filter((item) => {
+      const nombreProgramaEducativo = programas.find(prog => prog.clave_ProgramaEducativo === item.clave_ProgramaEducativo)?.nombre_ProgramaEducativo || '';
         return (
             item.clave_Edificio.toString().includes(value) ||
             item.nombre_Edificio.toLowerCase().includes(value) ||
-            item.clave_ProgramaEducativo.toString().includes(value) ||
+            nombreProgramaEducativo.toLowerCase().includes(value) ||
             item.clave_UnidadAcademica.toString().includes(value)
         );
     });
@@ -201,10 +202,12 @@ const Edificio = () => {
           outlined
           className="m-1"
           onClick={() => {
+            setclave_Edificio(rowData.clave_Edificio);
             setnombre_Edificio(rowData.nombre_Edificio);
             setclave_ProgramaEducativo(rowData.clave_ProgramaEducativo);
             setclave_UnidadAcademica(rowData.clave_UnidadAcademica);
             setDatosCopia({
+              clave_Edificio:rowData.clave_Edificio,
               nombre_Edificio: rowData.nombre_Edificio,
               clave_ProgramaEducativo: rowData.clave_ProgramaEducativo,
               clave_UnidadAcademica: rowData.clave_UnidadAcademica
@@ -246,7 +249,7 @@ const Edificio = () => {
     } 
     if (field === 'clave_UnidadAcademica') {
       const unidad = unidades.find((unidad) => unidad.clave_UnidadAcademica === rowData.clave_UnidadAcademica);
-      return unidad ? `${unidad.nombre_UnidadAdademica}` : '';
+      return unidad ? `${unidad.nombre_UnidadAcademica}` : '';
     } else {
       return rowData[field]; 
     }
@@ -286,11 +289,11 @@ const Edificio = () => {
     <Toolbar start={<h2 className="m-0">Edificio</h2>} end={Herramientas}/>
     <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+      <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
-        <div className="field col-2">
+        <div className="field col-3">
               <label>Clave*</label>
-              <InputText invalid={enviado===true && !clave_Edificio} type="text" keyfilter="pint" value={clave_Edificio} maxLength={10}
+              <InputText disabled={abrirDialog===2} invalid={enviado===true && !clave_Edificio} type="text" keyfilter="pint" value={clave_Edificio} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
                       	setclave_Edificio(event.target.value);
@@ -299,7 +302,7 @@ const Edificio = () => {
                   placeholder="Ej.120"  
               className="w-full"/>
           </div>
-          <div className="field col-4">
+          <div className="field col-9">
               <label>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_Edificio} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_Edificio} maxLength={255}
                   onChange={(event)=>{
@@ -310,10 +313,9 @@ const Edificio = () => {
                   placeholder="Nombre" 
               className="w-full"/>              
           </div>
-          <div className="field col-8">
+          <div className="field col-12">
               <label>Programa Educativo*</label>
-            <Dropdown className="w-full"
-              invalid={enviado===true && !clave_ProgramaEducativo}
+            <Dropdown className="w-full"showClear
               value={clave_ProgramaEducativo} 
               options={programas} 
               onChange={(e) => {
@@ -324,7 +326,7 @@ const Edificio = () => {
               placeholder="Seleccione una Programa Educativo" 
             />
           </div>                              
-          <div className="field col-8">
+          <div className="field col-12">
               <label>Unidad Academica*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_UnidadAcademica}

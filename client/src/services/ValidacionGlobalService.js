@@ -11,3 +11,10 @@ export const validarNumero = (value) => {
     // Verificar si el valor coincide con la expresión regular
     return value==='' || regex.test(value);
 };
+
+export const validarAlfanumerico = (value) => {
+    // Expresión regular para validar caracteres alfabeticos y espacios
+    const regex = /^[0-9a-zA-Z\-/]*$/;
+    // Verificar si el valor coincide con la expresión regular
+    return regex.test(value); 
+};
