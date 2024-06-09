@@ -18,3 +18,11 @@ export const validarAlfanumerico = (value) => {
     // Verificar si el valor coincide con la expresión regular
     return regex.test(value); 
 };
+export const validarCorreo = (value) => {
+    // Expresión regular para validar el formato de un correo electrónico
+    const regex = /^[a-zA-Z0-9\s@.]*$/;
+    // Verificar si el correo coincide con la expresión regular
+    return value==='' || regex.test(value);
+  //FUNCION PARA ACTIVAR EL FILTRADO
+
+  }; 
