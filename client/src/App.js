@@ -33,7 +33,7 @@ import Material from './components/Material';
 import Grupo from './components/Grupo';
 import DocenteN from './components/DocenteN';
 import HorarioN from './components/HorarioN';
-import HorarioNC from './components/HorarioNCuadricula';
+import HorarioNCuadricula from './components/HorarioNCuadricula';
 import HorarioNdos from './components/HorarioNdos.js';
 function App() {
   return (
@@ -70,7 +70,7 @@ function App() {
           <Route path='/Grupo' element={<Grupo/>}/>
           <Route path='/HorarioN' element={<HorarioN/>}/>
           <Route path='/HorarioNdos' element={<HorarioNdos/>}/>
-          <Route path='/HorarioNC' element={<HorarioNC/>}/>
+          <Route path='/HorarioNCuadricula' element={<HorarioNCuadricula/>}/>
         </Routes>
       </BrowserRouter>    
     </div>

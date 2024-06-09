@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { useRef } from 'react';
@@ -18,19 +18,26 @@ import DocenteService from '../services/DocenteService';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 import TipoSubGrupoService from '../services/TipoSubGrupoService';
 import { validarNumero} from '../services/ValidacionGlobalService';
+import { InputNumber } from 'primereact/inputnumber';
 
 const HorarioNdos = () => {
   //VARIABLES PARA EL REGISTRO  
+  let intercambioedit = 0;
+  let horario = {
+    hora_Entradain:"",
+    hora_Salidain:"",
+    salain:null
+  };
   const [clave_Grupo,setclave_Grupo] = useState(null);
   const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState(null);
   const [no_Empleado_Docente,setno_Empleado_Docente] = useState(null);
   const [clave_TipoSubGrupo,setclave_TipoSubGrupo] = useState(null);
-  const [hora_Entrada,sethora_Entrada] = useState();
-  const [hora_Salida,sethora_Salida] = useState();
+  const [hora_Entrada,sethora_Entrada] = useState('');
+  const [hora_Salida,sethora_Salida] = useState('');
   const [clave_Dia,setclave_Dia] = useState(null);
   const [clave_SubGrupo,setclave_SubGrupo] = useState(null);
   const [clave_Sala,setclave_Sala] = useState(null);
-  const [capacidad_SubGrupo,setcapacidad_SubGrupo] = useState(null);
+  const [capacidad_SubGrupo,setcapacidad_SubGrupo] = useState("");
   //VARIABLES PARA LA CONSULTA
   const [horariolist,sethorariolist] = useState([]);
   const [filtrohorario,setfiltrohorario] = useState([]);
@@ -156,11 +163,11 @@ const HorarioNdos = () => {
 
     //COLUMNAS PARA LA TABLA
     const columns = [
-      {field: 'clave_SubGrupo', header: 'Clave SubGrupo' },
-      {field: 'clave_Horario', header: 'Clave Horario' },
-      {field: 'clave_UnidadAprendizaje', header: 'Clave Unidad Aprendizaje' },
+      {field: 'clave_SubGrupo', header: 'Clave SubGrupo', hidden: true, exportable: true },
+      {field: 'clave_Horario', header: 'Clave Horario', hidden: true, exportable: true },
+      {field: 'clave_UnidadAprendizaje', header: 'Clave Unidad Aprendizaje', hidden: true, exportable: true },
       {field: 'unidadAprendizaje', header: 'Unidad Aprendizaje' },
-      {field: 'no_Empleado_Docente', header: 'NoEmpleado Docente' },  
+      {field: 'no_Empleado_Docente', header: 'NoEmpleado Docente', hidden: true, exportable: true },  
       {field: 'docente', header: 'Docente' }, 
       {field: 'clave_TipoSubGrupo', header: 'Tipo de SubGrupo' },
       {field: 'capacidad_SubGrupo', header: 'Capacidad' },
@@ -323,24 +330,144 @@ const HorarioNdos = () => {
   //!!!EXTRAS DE MODIFICACION
 
   //ACTIVAR EDICION DE CELDA
-  const cellEditor = (options) => {
-    switch (options.field) {
-      case 'hora_Entrada':
-        return timeEditor(options);
-      case 'hora_Salida':
-        return timeEditor(options);
-      case 'clave_Dia':
-        return DiaEditor(options);
-      case 'clave_SubGrupo':
-        return SubgrupoEditor(options);
-      case 'clave_Sala':
-        return SalaEditor(options);        
-      default:
-        return 0;
-    }
+const cellEditor = (options) => {
+  switch (options.field) {
+    case 'hora_Entrada':
+      horario.hora_Entradain = options;
+      return timeEditor(options);
+    case 'hora_Salida':
+      horario.hora_Salidain = options;
+      return timeEditor(options);
+    case 'clave_Dia':
+      horario.salain = options;
+      return DiaEditor(options);
+    case 'clave_SubGrupo':
+      return SubgrupoEditor(options);
+    case 'clave_Sala':
+      return SalaEditor(options); 
+    case 'clave_UnidadAprendizaje':
+      intercambioedit = options;
+      return UnidadAprendizajeEditor(options); 
+    case 'unidadAprendizaje':
+      return UnidadAprendizajeEditor(intercambioedit); 
+    case 'no_Empleado_Docente':
+      intercambioedit = options;
+      return DocenteEditor(options); 
+    case 'docente':
+      return DocenteEditor(intercambioedit); 
+    case 'clave_TipoSubGrupo':
+      return TipoSubGurpoEditor(options);
+    case 'capacidad_SubGrupo':
+      return CapacidadEditor(options);         
+    case '1':
+      return horarioEditor(options);
+    default:
+      return 0;
+  }
+};
+/*
+  
+  const horarioEditor = (options) => {
+    return (
+    <React.Fragment>
+      <InputText type="time" value={hora_Entrada} maxLength={10}
+        onChange={(e) => options.hora_Entradain.editorCallback(e.value)}
+        className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>          
+      <InputText type="time" value={hora_Salida} maxLength={10}
+        onChange={(e) => options.hora_Salidain.editorCallback(e.value)}
+        className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>          
+      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+        value={clave_Sala} 
+        options={salas} 
+        onChange={(e) => options.salain.editorCallback(e.value)}
+        optionLabel = {(option) => `${option.clave_Sala} - ${option.nombre_Sala}`} 
+        optionValue="clave_Sala" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+        placeholder="Seleccione una Salas" 
+      />
+    </React.Fragment>)
+  };
+*/
+
+  const horarioEditor = (options) => {
+    return (
+      <React.Fragment>        
+        <InputText type="time" value={hora_Entrada} maxLength={10}
+          onChange={(event)=>{
+            sethora_Entrada(event.target.value);
+          }}  
+          className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>          
+        <InputText type="time" value={hora_Salida} maxLength={10}
+          onChange={(event)=>{
+            sethora_Salida(event.target.value);
+          }}  
+          className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>                  
+        <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+          value={clave_Sala} 
+          options={salas} 
+          onChange={(e) => {
+            setclave_Sala(e.value);
+          }} 
+          optionLabel="nombre_Sala" 
+          optionValue="clave_Sala" 
+          placeholder="Seleccione una Salas" 
+        />
+      </React.Fragment>
+    )
   };
 
+  //EDITAR DROPDOWN (DIA)
+  const CapacidadEditor = (options) => {
+    return (
+      
+      <InputNumber value={options.value} 
+      onChange={(e) => options.editorCallback(e.value)}
+      mode="decimal" showButtons min={0} max={200} 
+      placeholder="Selecciona una Unidad Aprendizaje" />
+    );
+  };
   
+  //EDITAR DROPDOWN (DIA)
+  const UnidadAprendizajeEditor = (options) => {
+    return (
+      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+        value={options.value} 
+        options={unidadesAprendizajeList}  
+        onChange={(e) => options.editorCallback(e.value)}
+        optionLabel = {(option) => `${option.clave_UnidadAprendizaje} - ${option.nombre_UnidadAprendizaje}`}
+        optionValue="clave_UnidadAprendizaje"
+        placeholder="Selecciona una Unidad Aprendizaje" 
+      />
+    );
+  };
+
+  //EDITAR DROPDOWN (DIA)
+  const DocenteEditor = (options) => {
+    return (
+      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+        value={options.value} 
+        options={docenteList}  
+        onChange={(e) => options.editorCallback(e.value)}
+        optionLabel = {(option) => `${option.no_EmpleadoDocente}`}
+        optionValue="no_EmpleadoDocente"
+        placeholder="Selecciona un Docente" 
+      />
+    );
+  };
+
+  //EDITAR DROPDOWN (DIA)
+  const TipoSubGurpoEditor = (options) => {
+    return (
+      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+        value={options.value} 
+        options={tipoSubGrupoList}  
+        onChange={(e) => options.editorCallback(e.value)}
+        optionLabel = "nombre_TipoSubGrupo"
+        optionValue="clave_TipoSubGrupo"
+        placeholder="Selecciona un Tipo de Clase" 
+      />
+    );
+  };
+
   // EDITOR DE TIEMPO
   const timeEditor = (options) => {
     return <InputText type="time" value={options.value} 
@@ -382,62 +509,29 @@ const HorarioNdos = () => {
   const SalaEditor = (options) => {
     return (
       <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={options.value} 
-                options={salas}  
-                onChange={(e) => options.editorCallback(e.value)}
-                optionLabel="nombre_Sala" 
-                optionValue="clave_Sala"
-                placeholder="Selecciona una Sala" 
+        value={options.value} 
+        options={salas}  
+        onChange={(e) => options.editorCallback(e.value)}
+        optionLabel="nombre_Sala" 
+        optionValue="clave_Sala"
+        placeholder="Selecciona una Sala" 
       />
     );
   };
+   
+  const allowEdit = (rowData) => {
+    return rowData;
+  };
+
+  const onRowEditComplete = (e) => {
+    let updatedHorarios = [...horariolist]; // Crear una copia del estado actual de los horarios
+    let { newData, index } = e; // Obtener los datos editados y el índice de la fila editada
   
-  //COMPLETAR MODIFICACION
-  const onCellEditComplete = (e) => {
-    let { rowData, newValue, field, originalEvent: event } = e;
-    switch (field) {
-      //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
-      case 'hora_Entrada':
-        if(newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;
-      case 'hora_Salida':
-        if(newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;
-      case 'clave_Dia':
-        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;
-      case 'clave_SubGrupo':
-        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;  
-      case 'clave_Sala':
-        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;        
-      default:
-      break;
-    }
-    seteditando(false);
-  };   
-    
+    updatedHorarios[index] = newData; // Actualizar los datos en la copia de los horarios
+  
+    sethorariolist(updatedHorarios); // Actualizar el estado de los horarios con los datos editados
+  };
+  
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
@@ -571,10 +665,15 @@ const HorarioNdos = () => {
         <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} 
         className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
       </div>
-      <DataTable value={filtrohorario.length ? filtrohorario :horariolist} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
-          {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
-              editor={field === 'clave_Horario' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
+      <DataTable value={filtrohorario.length ? filtrohorario :horariolist} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode="row" dataKey="id" onRowEditComplete={onRowEditComplete} size='small' tableStyle={{ minWidth: '50rem' }}>
+          <Column
+            rowEditor={allowEdit}
+            headerStyle={{ width: '10%', minWidth: '8rem' }}
+            bodyStyle={{ textAlign: 'center' }}
+          ></Column>
+          {columns.map(({ field, hidden, header }) => {
+              return <Column sortable={editando === false} key={field} field={field} header={header} style={hidden ? { display: 'none' } : { minWidth: '40vh' }} body={(rowData) => renderBody(rowData, field)}
+              editor={field === 'clave_Horario' ? null : (options) => cellEditor(options)}/>;
           })}
       </DataTable>                
       </Panel>        
