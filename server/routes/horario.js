@@ -93,4 +93,91 @@ router.get("/CONSULTARSG", (req, res) => {
     });
 });
 
+router.get("/consultaCompletaHorario", (req, res) => {
+    db.query('SELECT h.* ,s.*,sal.*, tsp.nombre_TipoSubGrupo, CONCAT(s.no_Empleado_Docente, " - ", u.nombre_Usuario," ", u.apellidoP_Usuario, " ", u.apellidoM_Usuario) AS docente, CONCAT(s.clave_UnidadAprendizaje, " - ", ua.nombre_UnidadAprendizaje) AS unidadAprendizaje FROM horario AS h LEFT JOIN subgrupo AS s ON s.clave_SubGrupo = h.clave_SubGrupo LEFT JOIN docente AS d ON s.no_Empleado_Docente = d.no_EmpleadoDocente LEFT JOIN usuario AS u ON d.clave_Usuario = u.clave_Usuario LEFT JOIN tiposubgrupo AS tsp ON s.clave_TipoSubGrupo = tsp.clave_TipoSubGrupo LEFT JOIN unidadaprendizaje AS ua ON s.clave_UnidadAprendizaje = ua.clave_UnidadAprendizaje LEFT JOIN sala AS sal ON h.clave_Sala = sal.clave_Sala', (err, results) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).send("Error interno del servidor");
+      }
+      res.status(200).json(results);
+    });
+});
+
+router.post("/registrarHorarioYSubGrupo", (req, res) => {
+    const {
+        hora_Entrada,
+        hora_Salida,
+        clave_Dia,
+        clave_Sala,
+        no_SubGrupo,
+        capacidad_SubGrupo,
+        horas_Asignadas,
+        clave_Grupo,
+        no_Empleado_Docente,
+        clave_UnidadAprendizaje,
+        clave_TipoSubGrupo
+    } = req.body;
+
+    if (hora_Salida < hora_Entrada) {
+        return res.status(401).send("La hora de salida debe ser posterior a la hora de entrada");
+    }
+
+    db.beginTransaction((err) => {
+        if (err) {
+            console.error("Error al iniciar la transacción:", err);
+            return res.status(500).send("Error interno del servidor");
+        }
+
+        db.query('SELECT * FROM horario WHERE clave_Dia = ? AND clave_Sala = ? AND ((? >= hora_Entrada AND ? < hora_Salida) OR (? > hora_Entrada AND ? <= hora_Salida) OR (? <= hora_Entrada AND ? >= hora_Salida))',
+            [clave_Dia, clave_Sala, hora_Entrada, hora_Salida, hora_Entrada, hora_Salida, hora_Entrada, hora_Salida], (err, results) => {
+                if (err) {
+                    console.error(err);
+                    return db.rollback(() => {
+                        res.status(500).send("Error interno del servidor");
+                    });
+                }
+
+                if (results.length > 0) {
+                    return db.rollback(() => {
+                        res.status(402).send("Registro existente");
+                    });
+                }
+
+                db.query('INSERT INTO subgrupo(no_SubGrupo, capacidad_SubGrupo, horas_Asignadas, clave_Grupo, no_Empleado_Docente, clave_UnidadAprendizaje, clave_TipoSubGrupo) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [no_SubGrupo, capacidad_SubGrupo, horas_Asignadas, clave_Grupo, no_Empleado_Docente, clave_UnidadAprendizaje, clave_TipoSubGrupo], (err, result) => {
+                        if (err) {
+                            console.error(err);
+                            return db.rollback(() => {
+                                res.status(500).send("Error interno del servidor");
+                            });
+                        }
+
+                        const clave_SubGrupo = result.insertId; // Obtener el ID autoincremental generado
+
+                        db.query('INSERT INTO horario(hora_Entrada, hora_Salida, clave_Dia, clave_SubGrupo, clave_Sala) VALUES (?, ?, ?, ?, ?)',
+                            [hora_Entrada, hora_Salida, clave_Dia, clave_SubGrupo, clave_Sala], (err, result) => {
+                                if (err) {
+                                    console.error(err);
+                                    return db.rollback(() => {
+                                        res.status(500).send("Error interno del servidor");
+                                    });
+                                }
+
+                                db.commit((err) => {
+                                    if (err) {
+                                        return db.rollback(() => {
+                                            console.error("Error al confirmar la transacción:", err);
+                                            res.status(500).send("Error interno del servidor");
+                                        });
+                                    }
+
+                                    res.status(200).send("Horario y SubGrupo registrados con éxito");
+                                });
+                            });
+                    });
+            });
+    });
+});
+
+
 module.exports = router;

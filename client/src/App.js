@@ -32,6 +32,9 @@ import SubGrupo from './components/SubGrupo';
 import Material from './components/Material';
 import Grupo from './components/Grupo';
 import DocenteN from './components/DocenteN';
+import HorarioN from './components/HorarioN';
+import HorarioNC from './components/HorarioNCuadricula';
+import HorarioNdos from './components/HorarioNdos.js';
 function App() {
   return (
     <div className="App">
@@ -65,6 +68,9 @@ function App() {
           <Route path='/Inicio' element={<Inicio/>}/>
           <Route path='/Material' element={<Material/>}/>
           <Route path='/Grupo' element={<Grupo/>}/>
+          <Route path='/HorarioN' element={<HorarioN/>}/>
+          <Route path='/HorarioNdos' element={<HorarioNdos/>}/>
+          <Route path='/HorarioNC' element={<HorarioNC/>}/>
         </Routes>
       </BrowserRouter>    
     </div>

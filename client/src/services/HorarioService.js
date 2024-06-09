@@ -12,6 +12,12 @@ const HorarioService = {
     },    
     CONSULTARSG:()=>{
         return Axios.get("http://localhost:3001/horario/CONSULTARSG");
+    },    
+    consultaCompletaHorario:()=>{
+        return Axios.get("http://localhost:3001/horario/consultaCompletaHorario");
+    },    
+    registrarHorarioYSubGrupo:()=>{
+        return Axios.get("http://localhost:3001/horario/registrarHorarioYSubGrupo");
     }
 }
 
