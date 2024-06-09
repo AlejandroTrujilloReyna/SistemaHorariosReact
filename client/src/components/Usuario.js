@@ -46,6 +46,7 @@ const Usuario = () => {
   });  
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
   const [datosCopia, setDatosCopia] = useState({
+    clave_Usuario:"",
     nombre_Usuario: "",
     apellidoP_Usuario: "",
     apellidoM_Usuario: "",
@@ -239,13 +240,13 @@ const Usuario = () => {
           setclave_Permiso(rowData.clave_Permiso);
 
           setDatosCopia({
-            clave_Usuario:clave_Usuario,
-            nombre_Usuario:nombre_Usuario,
-              apellidoP_Usuario:apellidoP_Usuario,
-              apellidoM_Usuario: apellidoM_Usuario,
-              correo: correo,
-              contrasena: contrasena,
-              clave_Permiso:clave_Permiso
+            clave_Usuario:rowData.clave_Usuario,
+            nombre_Usuario:rowData.nombre_Usuario,
+              apellidoP_Usuario:rowData.apellidoP_Usuario,
+              apellidoM_Usuario: rowData.apellidoM_Usuario,
+              correo: rowData.correo,
+              contrasena: rowData.contrasena,
+              clave_Permiso:rowData.clave_Permiso
           });
           setAbrirDialog(2);
         }}          
@@ -313,7 +314,7 @@ const Usuario = () => {
       {/*PANEL PARA EL REGISTRO*/}
       <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
-        <div className="field col-4">
+        <div className="field col-5">
         <label className='font-bold'>Permiso*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_Permiso}
@@ -327,7 +328,7 @@ const Usuario = () => {
               placeholder="Seleccione el Permiso del Usuario" 
             />
           </div> 
-          <div className="field col-8">
+          <div className="field col-7">
           <label className='font-bold'>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_Usuario} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_Usuario} maxLength={255}
                   onChange={(event)=>{
@@ -360,7 +361,7 @@ const Usuario = () => {
                   placeholder="Ej.Castellanos" 
               className="w-full"/>              
           </div>
-          <div className="field col-8">
+          <div className="field col-12">
           <label className='font-bold'>Correo*</label>
               <InputText invalid={enviado===true && !correo} type="text" keyfilter={/^[a-zA-Z0-9\s@.]*$/} value={correo} maxLength={255}
                   onChange={(event)=>{
@@ -371,7 +372,7 @@ const Usuario = () => {
                   placeholder="Ej.Licenciatura en Sistemas" 
               className="w-full"/>              
           </div>
-          <div className="field col-8">
+          <div className="field col-12">
           <label className='font-bold'>Contraseña*</label>
               <InputText invalid={enviado===true && !contrasena} type="text" keyfilter={/^[a-zA-Z0-9\s@.]*$/} value={contrasena} maxLength={255}
                   onChange={(event)=>{

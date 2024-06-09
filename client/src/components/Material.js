@@ -227,7 +227,7 @@ const Material = () => {
     <Toolbar start={<h2 className="m-0">Material</h2>} end={Herramientas}/>
     <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Dialog className='w-2' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+      <Dialog className='w-3' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
           <div className="field col-12">
               <label className='font-bold'>Nombre*</label>

@@ -295,7 +295,7 @@ const Grupo = () => {
     <Toolbar start={<h2 className="m-0">Grupo</h2>} end={Herramientas}/>
     <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+      <Dialog className='w-6' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
           <div className="field col-2">
               <label className='font-bold'>Clave*</label>

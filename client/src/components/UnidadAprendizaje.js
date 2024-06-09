@@ -156,7 +156,7 @@ const UnidadAprendizaje = () => {
 
   //FUNCION PARA LIMPIAR CAMPOS AL REGISTRAR
   const limpiarCampos = () =>{
-    setclave_UnidadAprendizaje(0);
+    setclave_UnidadAprendizaje("");
     setnombre_UnidadAprendizaje("");
     setclave_PlanEstudios("");
   } 
@@ -275,13 +275,13 @@ const UnidadAprendizaje = () => {
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
-    <Toolbar start={<h2 className="m-0">Programa Educativo</h2>} end={Herramientas}/>
+    <Toolbar start={<h2 className="m-0">Unidad de Aprendizaje</h2>} end={Herramientas}/>
     <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+      <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
         <div className="field col-6">
-              <label>Plan de Estudios*</label>
+              <label className='font-bold'>Plan de Estudios*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_PlanEstudios}
               value={clave_PlanEstudios} 
@@ -294,7 +294,7 @@ const UnidadAprendizaje = () => {
               placeholder="Seleccione un Plan de Estudios" 
             />
           </div> 
-          <div className="field col-4">
+          <div className="field col-6">
               <label className='font-bold'>Clave*</label>
               <InputText disabled={abrirDialog===2} invalid={enviado===true && !clave_UnidadAprendizaje} type="text" keyfilter="pint" value={clave_UnidadAprendizaje} maxLength={10}
                   onChange={(event)=>{
@@ -305,8 +305,8 @@ const UnidadAprendizaje = () => {
               placeholder="Ej.44173"
               className="w-full"/>
           </div>
-          <div className="field col-8">
-              <label>Nombre*</label>
+          <div className="field col-12">
+              <label className='font-bold'>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_UnidadAprendizaje} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_UnidadAprendizaje} maxLength={255}
                   onChange={(event)=>{
                     if (validarTexto(event.target.value)) {  
