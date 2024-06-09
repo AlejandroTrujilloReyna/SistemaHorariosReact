@@ -17,6 +17,8 @@ import GrupoService from '../services/GrupoService';
 import DocenteService from '../services/DocenteService';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 import TipoSubGrupoService from '../services/TipoSubGrupoService';
+import { validarNumero} from '../services/ValidacionGlobalService';
+
 const HorarioNdos = () => {
   //VARIABLES PARA EL REGISTRO  
   const [clave_Grupo,setclave_Grupo] = useState(null);
@@ -28,6 +30,7 @@ const HorarioNdos = () => {
   const [clave_Dia,setclave_Dia] = useState(null);
   const [clave_SubGrupo,setclave_SubGrupo] = useState(null);
   const [clave_Sala,setclave_Sala] = useState(null);
+  const [capacidad_SubGrupo,setcapacidad_SubGrupo] = useState(null);
   //VARIABLES PARA LA CONSULTA
   const [horariolist,sethorariolist] = useState([]);
   const [filtrohorario,setfiltrohorario] = useState([]);
@@ -46,7 +49,41 @@ const HorarioNdos = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    if (!hora_Entrada || !hora_Salida || !clave_Dia || !clave_SubGrupo || !clave_Sala) {
+    if (!clave_Grupo || !clave_UnidadAprendizaje  || !no_Empleado_Docente || !clave_TipoSubGrupo || !capacidad_SubGrupo || !hora_Entrada || !hora_Salida || !clave_Dia || !clave_Sala) {
+      mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
+      return;
+    }
+    //MANDAR A LLAMAR AL REGISTRO SERVICE
+    HorarioService.registrarHorarioYSubGrupo({
+        clave_Grupo: 1,
+        clave_UnidadAprendizaje: clave_UnidadAprendizaje,
+        no_Empleado_Docente: no_Empleado_Docente,
+        clave_TipoSubGrupo: clave_TipoSubGrupo,
+        capacidad_SubGrupo: capacidad_SubGrupo,
+        hora_Entrada:hora_Entrada,
+        hora_Salida:hora_Salida,
+        clave_Dia:clave_Dia,        
+        clave_Sala:clave_Sala      
+    }).then(response=>{
+      if (response.status === 200) {//CASO EXITOSO
+        mostrarExito(toast,"Registro exitoso");
+        get();
+        //limpiarCampos();
+      }
+    }).catch(error=>{//EXCEPCIONES
+      if (error.response.status === 401) {
+        mostrarAdvertencia(toast,"La hora de Salida debe ser posterior a la hora de Entrada");
+      } else if (error.response.status === 402) {
+        mostrarAdvertencia(toast,"Ya existe un Registro en ese Horario");      
+      }else if(error.response.status === 500){          
+        mostrarError(toast,"Error interno del servidor");
+      }     
+    });
+  }
+  
+  const addCompleto = ()=>{
+    //VALIDACION DE CAMPOS VACIOS
+    if (!clave_Grupo || !clave_UnidadAprendizaje  || !no_Empleado_Docente || !clave_TipoSubGrupo || !capacidad_SubGrupo || !hora_Entrada || !hora_Salida || !clave_Dia || !clave_Sala) {
       mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
       return;
     }
@@ -61,7 +98,7 @@ const HorarioNdos = () => {
       if (response.status === 200) {//CASO EXITOSO
         mostrarExito(toast,"Registro exitoso");
         get();
-        limpiarCampos();
+        //limpiarCampos();
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
@@ -73,7 +110,7 @@ const HorarioNdos = () => {
       }     
     });
   }
-  
+
   //FUNCION PARA CONSULTA
   const get = ()=>{
     HorarioService.consultaCompletaHorario().then((response)=>{//CASO EXITOSO
@@ -198,6 +235,55 @@ const HorarioNdos = () => {
         console.error("Error fetching dia:", error);
       });
   }, []);
+/*
+  function sumarUnaHora(hora) {
+    const [horas, minutos] = hora.split(":").map(Number);
+    let nuevasHoras = horas + 1;
+  
+    // Ajustar las horas y los períodos (AM/PM) si es necesario
+    if (nuevasHoras === 24) {
+      nuevasHoras = 0;
+    } else if (nuevasHoras > 12) {
+      nuevasHoras -= 12;
+    }
+  
+    return `${String(nuevasHoras).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
+  }
+  
+  function restarUnaHora(hora) {
+    const [horas, minutos] = hora.split(":").map(Number);
+    let nuevasHoras = horas - 1;
+  
+    // Ajustar las horas y los períodos (AM/PM) si es necesario
+    if (nuevasHoras === -1) {
+      nuevasHoras = 23;
+    } else if (nuevasHoras < 0) {
+      nuevasHoras += 12;
+    }
+  
+    return `${String(nuevasHoras).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
+  }
+  
+  
+  useEffect(() => {
+    const entradaDate = new Date(`1970-01-01T${hora_Entrada}:00`);
+    const salidaDate = new Date(`1970-01-01T${hora_Salida}:00`);
+  
+    if (entradaDate >= salidaDate) {
+      sethora_Salida(sumarUnaHora(hora_Salida));
+    }
+  }, [hora_Entrada]);
+  
+  useEffect(() => {
+    const entradaDate = new Date(`1970-01-01T${hora_Entrada}:00`);
+    const salidaDate = new Date(`1970-01-01T${hora_Salida}:00`);
+  
+    if (entradaDate >= salidaDate) {
+      sethora_Entrada(restarUnaHora(hora_Entrada));
+    }
+  }, [hora_Salida]);*/
+  
+
 
   //MANDAR A LLAMAR A LA LISTA DE DIAS
   useEffect(() => {
@@ -226,9 +312,6 @@ const HorarioNdos = () => {
     if (field === 'clave_Dia') {
       const dia = dias.find((dia) => dia.clave_Dia === rowData.clave_Dia);
       return dia ? `${dia.nombre_Dia}` : '';
-    }else if (field === 'clave_SubGrupo') {
-      const subgrupo = subgrupos.find((subgrupo) => subgrupo.clave_SubGrupo === rowData.clave_SubGrupo);
-      return subgrupo ? `${subgrupo.no_SubGrupo}` : '';
     }else if (field === 'clave_Sala') {
       const sala = salas.find((sala) => sala.clave_Sala === rowData.clave_Sala);
       return sala ? `${sala.nombre_Sala}` : '';
@@ -417,7 +500,25 @@ const HorarioNdos = () => {
                 placeholder="Seleccione un Tipo de SubGrupo"               
               />
             </div>
-            <div className="field col-2">            
+            <div className="field col">
+            <label className="font-bold">
+              Capacidad*
+            </label>
+            <InputText              
+              type="text" 
+              keyfilter={/^[0-9]*$/}
+              value={capacidad_SubGrupo}              
+              onChange={(event)=>{
+                if (validarNumero(event.target.value)) {
+                  setcapacidad_SubGrupo(event.target.value);
+                }
+              }}               
+              required            
+              maxLength={10}
+              placeholder="Ej.25"              
+            />                    
+          </div>
+          <div className="field col-2">            
                 <label>Hora de entrada*</label>
                 <InputText type="time" value={hora_Entrada} maxLength={10}
                     onChange={(event)=>{
@@ -445,20 +546,7 @@ const HorarioNdos = () => {
                 optionValue="clave_Dia" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
                 placeholder="Seleccione un Día" 
               />
-            </div>
-            <div className="field col-3">
-              <label>Subgrupo*</label>
-              <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={clave_SubGrupo} 
-                options={subgrupos} 
-                onChange={(e) => {
-                  setclave_SubGrupo(e.value);
-                }} 
-                optionLabel="clave_SubGrupo" 
-                optionValue="clave_SubGrupo" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-                placeholder="Seleccione un Subgrupo" 
-              />
-            </div>
+            </div>            
             <div className="field col-3">
               <label>Sala*</label>
               <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"

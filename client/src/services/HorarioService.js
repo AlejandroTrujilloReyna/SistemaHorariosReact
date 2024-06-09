@@ -16,8 +16,8 @@ const HorarioService = {
     consultaCompletaHorario:()=>{
         return Axios.get("http://localhost:3001/horario/consultaCompletaHorario");
     },    
-    registrarHorarioYSubGrupo:()=>{
-        return Axios.get("http://localhost:3001/horario/registrarHorarioYSubGrupo");
+    registrarHorarioYSubGrupo:(datos)=>{
+        return Axios.post("http://localhost:3001/horario/registrarHorarioYSubGrupo",datos);
     }
 }
 

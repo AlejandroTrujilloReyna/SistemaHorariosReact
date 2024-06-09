@@ -104,24 +104,28 @@ router.get("/consultaCompletaHorario", (req, res) => {
 });
 
 router.post("/registrarHorarioYSubGrupo", (req, res) => {
-    const {
-        hora_Entrada,
-        hora_Salida,
-        clave_Dia,
-        clave_Sala,
-        no_SubGrupo,
-        capacidad_SubGrupo,
-        horas_Asignadas,
-        clave_Grupo,
-        no_Empleado_Docente,
-        clave_UnidadAprendizaje,
-        clave_TipoSubGrupo
-    } = req.body;
+    
+    const hora_Entrada = req.body.hora_Entrada;
+    const hora_Salida = req.body.hora_Salida;
+    const clave_Dia = req.body.clave_Dia;
+    const clave_Sala = req.body.clave_Sala;
+    const no_SubGrupo = req.body.no_SubGrupo;
+    const capacidad_SubGrupo = req.body.capacidad_SubGrupo;
+    const horas_Asignadas=0;
+    const clave_Grupo = req.body.clave_Grupo;
+    const no_Empleado_Docente = req.body.no_Empleado_Docente;
+    const clave_UnidadAprendizaje = req.body.clave_UnidadAprendizaje;
+    const clave_TipoSubGrupo = req.body.clave_TipoSubGrupo;
+    
 
     if (hora_Salida < hora_Entrada) {
         return res.status(401).send("La hora de salida debe ser posterior a la hora de entrada");
     }
-
+        
+    if(!hora_Entrada || !hora_Salida || !clave_Dia || !clave_Sala || !capacidad_SubGrupo || !clave_Grupo || !no_Empleado_Docente || !clave_UnidadAprendizaje || !clave_TipoSubGrupo){
+        console.error("DATOS: " + hora_Entrada + ", " + hora_Salida + "," + clave_Dia + ", " +  clave_Sala + ", " +  capacidad_SubGrupo + ", " +  horas_Asignadas + ", " +  clave_Grupo + ", " +  no_Empleado_Docente + ", " +  clave_UnidadAprendizaje + ", " +  clave_TipoSubGrupo);
+        return res.status(501).send("Campo vacio");
+    }
     db.beginTransaction((err) => {
         if (err) {
             console.error("Error al iniciar la transacción:", err);
@@ -130,28 +134,30 @@ router.post("/registrarHorarioYSubGrupo", (req, res) => {
 
         db.query('SELECT * FROM horario WHERE clave_Dia = ? AND clave_Sala = ? AND ((? >= hora_Entrada AND ? < hora_Salida) OR (? > hora_Entrada AND ? <= hora_Salida) OR (? <= hora_Entrada AND ? >= hora_Salida))',
             [clave_Dia, clave_Sala, hora_Entrada, hora_Salida, hora_Entrada, hora_Salida, hora_Entrada, hora_Salida], (err, results) => {
+                console.error("ENTRO");
                 if (err) {
                     console.error(err);
                     return db.rollback(() => {
                         res.status(500).send("Error interno del servidor");
                     });
                 }
-
+                
                 if (results.length > 0) {
                     return db.rollback(() => {
                         res.status(402).send("Registro existente");
                     });
                 }
-
-                db.query('INSERT INTO subgrupo(no_SubGrupo, capacidad_SubGrupo, horas_Asignadas, clave_Grupo, no_Empleado_Docente, clave_UnidadAprendizaje, clave_TipoSubGrupo) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [no_SubGrupo, capacidad_SubGrupo, horas_Asignadas, clave_Grupo, no_Empleado_Docente, clave_UnidadAprendizaje, clave_TipoSubGrupo], (err, result) => {
+                console.error("no: "+no_SubGrupo);
+                db.query('INSERT INTO subgrupo(clave_SubGrupo, no_SubGrupo, capacidad_SubGrupo, horas_Asignadas, clave_Grupo, no_Empleado_Docente, clave_UnidadAprendizaje, clave_TipoSubGrupo) VALUES (?,?, ?, ?, ?, ?, ?, ?)',
+                    [null, no_SubGrupo, capacidad_SubGrupo, horas_Asignadas, clave_Grupo, no_Empleado_Docente, clave_UnidadAprendizaje, clave_TipoSubGrupo], (err, result) => {
+                        console.error("DATOS: " + hora_Entrada + ", " + hora_Salida + "," + clave_Dia + ", " +  clave_Sala + ", " +  capacidad_SubGrupo + ", " +  horas_Asignadas + ", " +  clave_Grupo + ", " +  no_Empleado_Docente + ", " +  clave_UnidadAprendizaje + ", " +  clave_TipoSubGrupo);
                         if (err) {
                             console.error(err);
                             return db.rollback(() => {
                                 res.status(500).send("Error interno del servidor");
                             });
                         }
-
+                        
                         const clave_SubGrupo = result.insertId; // Obtener el ID autoincremental generado
 
                         db.query('INSERT INTO horario(hora_Entrada, hora_Salida, clave_Dia, clave_SubGrupo, clave_Sala) VALUES (?, ?, ?, ?, ?)',
