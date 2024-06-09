@@ -60,6 +60,7 @@ const TipoSubGrupo = () => {
       //VALIDACION DE CAMPOS VACIOS
       if (!nombre_TipoSubGrupo) {
         mostrarAdvertencia(toast, "Existen campos Obligatorios vacíos");
+        setEnviado(true);
         return;
       }
       //MANDAR A LLAMAR AL REGISTRO SERVICE
@@ -141,7 +142,7 @@ const TipoSubGrupo = () => {
       
     //COLUMNAS PARA LA TABLA
     const columns = [
-      {field: 'clave_TipoSubGrupo', header: 'Clave', filterHeader: 'Filtro por Clave' },
+      {field: 'clave_TipoSubGrupo', header: 'Clave', filterHeader: 'Filtro por Clave', hidden: true, exportable: true},
       {field: 'nombre_TipoSubGrupo', header: 'Nombre', filterHeader: 'Filtro por Nombre'} 
     ];
     
@@ -219,6 +220,7 @@ const TipoSubGrupo = () => {
       event['first'] = 0;
       setlazyState(event);
     };
+
     return (
       <>
       <Toast ref={toast} />
@@ -256,11 +258,8 @@ const TipoSubGrupo = () => {
           ref={dt} 
           value={filtrotiposubgrupo.length ? filtrotiposubgrupo :tiposubgrupoList}
           size='small'>
-            {columns.map(({ field, header, filterHeader }) => {
-                if(field === "clave_TipoSubGrupo"){
-                  return null;
-                }
-                return <Column style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}} sortable filter filterPlaceholder={filterHeader} 
+            {columns.map(({ field, header, hidden, filterHeader }) => {                
+                return <Column style={hidden ? { display: 'none' } : { minWidth: '40vh' }} bodyStyle={{textAlign:'center'}} sortable filter filterPlaceholder={filterHeader} 
                 filterMatchModeOptions={[
                   { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
                   { label: 'Contiene', value: FilterMatchMode.CONTAINS },

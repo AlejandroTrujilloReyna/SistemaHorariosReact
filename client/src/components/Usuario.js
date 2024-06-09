@@ -16,7 +16,7 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import UsuarioService from '../services/UsuarioService';
 import PermisoService from '../services/PermisoService';
 import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
-import { validarTexto,validarNumero,validarCorreo } from '../services/ValidacionGlobalService';
+import { validarTexto,validarCorreo } from '../services/ValidacionGlobalService';
 import { FilterMatchMode } from 'primereact/api';
 
 const Usuario = () => {
