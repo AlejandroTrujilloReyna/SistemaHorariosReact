@@ -288,10 +288,10 @@ const ProgramaEducativo = () => {
     <Toolbar start={<h2 className="m-0">Programa Educativo</h2>} end={Herramientas}/>
     <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+      <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
-        <div className="field col-8">
-              <label>Unidad Académica*</label>
+        <div className="field col-10">
+            <label className='font-bold'>Unidad Académica*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_UnidadAcademica}
               value={clave_UnidadAcademica} 
@@ -316,7 +316,7 @@ const ProgramaEducativo = () => {
               className="w-full"/>
           </div>
           <div className="field col-8">
-              <label>Nombre*</label>
+              <label className='font-bold'>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_ProgramaEducativo} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_ProgramaEducativo} maxLength={255}
                   onChange={(event)=>{
                     if (validarTexto(event.target.value)) {  
@@ -326,8 +326,8 @@ const ProgramaEducativo = () => {
                   placeholder="Ej.Licenciatura en Sistemas" 
               className="w-full"/>              
           </div>
-          <div className="field col-2">
-              <label>Banco de horas</label>
+          <div className="field col-4">
+              <label className='font-bold'>Banco de horas</label>
               <InputText invalid={enviado===true && !banco_Horas} type="text" keyfilter="pint" value={banco_Horas} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    

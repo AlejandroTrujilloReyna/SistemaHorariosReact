@@ -9,7 +9,6 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { MultiSelect } from 'primereact/multiselect';
 import { Dropdown } from 'primereact/dropdown';
-import { ToggleButton } from 'primereact/togglebutton';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
 import DocenteService from '../services/DocenteService';
@@ -20,32 +19,57 @@ import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService'
 import ImpartirUnidadAprendizajeService from '../services/ImpartirUnidadAprendizajeService';
 import PlanEstudiosService from '../services/PlanEstudiosService';
-import ToastService from '../services/ToastService';
+import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
 import { Toolbar } from 'primereact/toolbar';
 import { Dialog } from 'primereact/dialog';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
+import { FilterMatchMode } from 'primereact/api';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
 
 const DocenteN = () => {
 
   //VARIABLES ESTADO PARA LOS DIALOG, ACCIONES Y FILTRO TABLA
     const [mostrarDialog, setMostrarDialog] = useState(false);
     const [mostrarEliminarDialog, setMostrarEliminarDialog] = useState(false);
-    const [frmEnviado, setFrmEnviado] = useState(false);
-    const [accionesFrozen, setAccionesFrozen] = useState(false);    
+    const [frmEnviado, setFrmEnviado] = useState(false);   
     const [lazyState, setlazyState] = useState({
       filters: {
-        no_EmpleadoDocente: { value: '', matchMode: 'startsWith' },
-        horas_MinimasDocente: { value: '', matchMode: 'equals' },
-        horas_MaximasDocente: { value: '', matchMode: 'equals' },
-        horas_Externas: { value: '', matchMode: 'equals' },
-        clave_TipoEmpleado: { value: '', matchMode: 'startsWith' },
-        clave_GradoEstudio: { value: '', matchMode: 'startsWith' },
-        clave_Usuario: { value: '', matchMode: 'startsWith' },
-        unidadesAprendizaje: { value: '', matchMode: 'contains' },
-        programasEducativos: { value: '', matchMode: 'contains' }
+        no_EmpleadoDocente: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        horas_MinimasDocente: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        horas_MaximasDocente: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        horas_Externas: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        clave_TipoEmpleado: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        clave_GradoEstudio: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        clave_Usuario: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        unidadesAprendizaje: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+        programasEducativos: { value: '', matchMode: FilterMatchMode.STARTS_WITH }
       },
-    });  
+    });
+  //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
+  const [datosCopia, setDatosCopia] = useState({
+    no_EmpleadoDocente: "",
+    horas_MinimasDocente: "",
+    horas_MaximasDocente: "",
+    horas_Externas: "",
+    clave_TipoEmpleado: "",
+    clave_GradoEstudio: "",
+    clave_Usuario: "",
+    clave_PlanEstudios: "",
+    unidadesseleccionadas: []
+  });
+  const confirmar1 = (action) => {
+    confirmDialog({
+      message: '¿Seguro que quieres proceder?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'accept',
+      accept: action,
+      reject: () => mostrarAdvertencia(toast, "Cancelado")
+    });
+  };         
   //VARIABLES PARA EL REGISTRO
   const [no_EmpleadoDocente, setno_EmpleadoDocente] = useState("");
   const [horas_MinimasDocente,sethoras_MinimasDocente] = useState("");
@@ -72,31 +96,18 @@ const DocenteN = () => {
   const toast = useRef(null);
   const dt = useRef(null);
 
-  //MENSAJE DE EXITO
-  const mostrarExito = (mensaje) => {
-    toast.current.show({severity:'success', summary: 'Exito', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ADVERTENCIA
-  const mostrarAdvertencia = (mensaje) => {
-      toast.current.show({severity:'warn', summary: 'Advertencia', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ERROR
-  const mostrarError = (mensaje) => {
-    toast.current.show({severity:'error', summary: 'Error', detail:mensaje, life: 3000});
-  }   
-
   //FUNCION PARA REGISTRAR
   const save = () => {
     setFrmEnviado(true);
     //VALIDACION DE CAMPOS VACIOS
     if (!no_EmpleadoDocente || !horas_MinimasDocente || !horas_MaximasDocente || !clave_TipoEmpleado || !clave_GradoEstudio || !clave_Usuario) {
       setFrmEnviado(true);
-      mostrarAdvertencia("Existen campos Obligatorios vacíos");
+      mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
     if (!editando) {
-
+      const action = () => {
         DocenteService.registrarDocente({
             no_EmpleadoDocente:no_EmpleadoDocente,
             horas_MinimasDocente:horas_MinimasDocente,
@@ -107,7 +118,7 @@ const DocenteN = () => {
             clave_Usuario:clave_Usuario     
           }).then(response=>{//CASO EXITOSO
             if (response.status === 200) {
-              mostrarExito("Registro Exitoso");
+              mostrarExito(toast,"Registro Exitoso");
               addUnidadAprendizaje();              
               get();
               setFrmEnviado(false);
@@ -115,16 +126,31 @@ const DocenteN = () => {
             }
           }).catch(error=>{//EXCEPCIONES
             if (error.response.status === 400) {        
-              mostrarAdvertencia("Clave ya Existente");
+              mostrarAdvertencia(toast,"Clave ya Existente");
             }else if(error.response.status === 403){
-              mostrarAdvertencia("Favor de Revisar las Horas");        
+              mostrarAdvertencia(toast,"Favor de Revisar las Horas");        
             }else if(error.response.status === 405){
-              mostrarAdvertencia("El Usuario ya esta en uso");        
+              mostrarAdvertencia(toast,"El Usuario ya esta en uso");        
             }else if(error.response.status === 500){  
-              mostrarError("Error interno del servidor");
+              mostrarError(toast,"Error interno del servidor");
             }     
-          })
+          })}; confirmar1(action);
     } else {
+      if (no_EmpleadoDocente === datosCopia.no_EmpleadoDocente
+        && horas_MinimasDocente === datosCopia.horas_MinimasDocente
+        && horas_MaximasDocente === datosCopia.horas_MaximasDocente
+        && horas_Externas === datosCopia.horas_Externas
+        && clave_TipoEmpleado === datosCopia.clave_TipoEmpleado
+        && clave_GradoEstudio === datosCopia.clave_GradoEstudio
+        && clave_Usuario === datosCopia.clave_Usuario
+        && unidadesseleccionadas === datosCopia.unidadesseleccionadas) {
+        mostrarInformacion(toast, "No se han realizado cambios");
+        seteditando(false);
+        setMostrarDialog(false);
+        limpiarCampos();
+        return;
+      } 
+        const action = () => {     
         DocenteService.modificarDocente({
         no_EmpleadoDocente:no_EmpleadoDocente,
         horas_MinimasDocente:horas_MinimasDocente,
@@ -138,22 +164,23 @@ const DocenteN = () => {
         if (response.status === 200) {                 
           //addProgramaEducativoDocente();                                                                     
           addUnidadAprendizaje();
-          mostrarExito("Modificación Exitosa");
+          mostrarExito(toast,"Modificación Exitosa");
           setFrmEnviado(false);
           seteditando(false);
+          get();get();
           setMostrarDialog(false);                              
         }
       }).catch(error => {//EXCEPCIONES
         if (error.response.status === 400) {        
-            mostrarAdvertencia("Clave ya Existente");
+            mostrarAdvertencia(toast,"Clave ya Existente");
           }else if(error.response.status === 403){
-            mostrarAdvertencia("Favor de Revisar las Horas");        
+            mostrarAdvertencia(toast,"Favor de Revisar las Horas");        
           }else if(error.response.status === 405){
-            mostrarAdvertencia("El Usuario ya esta en uso");        
+            mostrarAdvertencia(toast,"El Usuario ya esta en uso");        
           }else if(error.response.status === 500){  
-            mostrarError("Error interno del servidor");
+            mostrarError(toast,"Error interno del servidor");
           }
-      })
+      })}; confirmar1(action);
     }    
     
   }
@@ -170,7 +197,7 @@ const DocenteN = () => {
         }
       }).catch(error => {//EXCEPCIONES
         if (error.response.status === 500) {
-          mostrarError("Error interno del servidor");
+          mostrarError(toast,"Error interno del servidor");
         }
       })
   }
@@ -180,13 +207,13 @@ const DocenteN = () => {
     //mostrarExito("Registro Exitoso Unidades: "+ unidadesseleccionadas[0]+":" + unidadesseleccionadas[1]+":" + unidadesseleccionadas[2]);
     if(editando){
       if(unidadesseleccionadas === unidadesoriginal){
-        mostrarAdvertencia("IGUAL");
+        mostrarAdvertencia(toast,"IGUAL");
       }else{
         eliminarImpartir();
       }      
     }
     if (!unidadesseleccionadas) {      
-      mostrarAdvertencia("Existen campos Obligatorios vacíos");
+      mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
       return;
     }
 
@@ -205,7 +232,7 @@ const DocenteN = () => {
       }
       }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 500){  
-          mostrarError("Error interno del servidor");
+          mostrarError(toast,"Error interno del servidor");
       }     
       });  
     }    
@@ -366,7 +393,7 @@ const DocenteN = () => {
       const filtroseleccionadas = unidadesoriginal.filter(uni => unidadesseleccionadas.includes(uni.clave_UnidadAprendizaje));
       setunidadesaprendizajeList(filtroseleccionadas);
     }     
-  }, [clave_PlanEstudios,editando]);
+  }, [clave_PlanEstudios,editando,unidadesoriginal,unidadesseleccionadas]);
 
   const filtrarUsuariosenUso = () => {
     return usuariosList.filter(us => {
@@ -472,9 +499,17 @@ const DocenteN = () => {
     const unidadesAprendizajeArray = docente.unidadesAprendizaje
     ? docente.unidadesAprendizaje.split(',').map(item => item.trim()).map(Number)
     : [];
-    
-    setunidadesseleccionadas(unidadesAprendizajeArray);    
-    //mostrarAdvertencia("Unidades"+docente.unidadesAprendizaje);      
+    setunidadesseleccionadas(unidadesAprendizajeArray);
+    setDatosCopia({
+      no_EmpleadoDocente:docente.no_EmpleadoDocente,
+      clave_Usuario:docente.clave_Usuario,
+      clave_TipoEmpleado:docente.clave_TipoEmpleado,
+      clave_GradoEstudio:docente.clave_GradoEstudio,
+      horas_MinimasDocente:docente.horas_MinimasDocente,
+      horas_MaximasDocente:docente.horas_MaximasDocente,
+      horas_Externas:docente.horas_Externas,
+      unidadesseleccionadas: unidadesAprendizajeArray
+    });        
   }
 
   // Funcion para contenido de Footer del Dialog Guardado
@@ -496,18 +531,23 @@ const DocenteN = () => {
   const exportCSV = () => {
     dt.current.exportCSV();
   };
-  //Lado Izquierdo del Toolbar, boton Nuevo y boton para congelar columna acciones
-  const leftToolbarTemplate = () => {
-    return (
-        <div className="flex flex-wrap gap-2">
-            <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={abrirNuevo}/>  
-            <ToggleButton checked={accionesFrozen} onChange={(e) => setAccionesFrozen(e.value)} onIcon="pi pi-lock" offIcon="pi pi-lock-open" onLabel="Acciones" offLabel="Acciones" />          
-        </div>
-    );
-  };
   //Lado Derecho del Toolbar, boton Exportar
   const rightToolbarTemplate = () => {
-    return <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={exportCSV}/>;
+    return (
+      <div className="flex flex-wrap gap-2">
+          <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={abrirNuevo}/>
+          <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={exportCSV}/>
+          <IconField iconPosition="left">
+        <InputIcon className="pi pi-search" />
+        <InputText
+          type="search"
+          //onInput={(e) => setGlobalFilter(e.target.value)}
+        onInput={(e) => onSearch(e)}
+          placeholder="Buscar..."
+        />
+      </IconField>              
+      </div>
+    );
   };
   
   //!!!EXTRAS DIALOG DE CONFIRMACION DE ELIMINAR
@@ -552,23 +592,6 @@ const DocenteN = () => {
     {field: 'unidadesAprendizaje', header: 'Unidades Aprendizaje' }
   ];
 
-  //Cabecera de la Tabla
-  const header = (
-    <div className="flex flex-wrap gap-2 align-items-center justify-content-between">              
-      <IconField iconPosition="left">
-        <InputIcon className="pi pi-search" />
-        <InputText
-        className='mr-4'
-          type="search"
-          //onInput={(e) => setGlobalFilter(e.target.value)}
-        onInput={(e) => onSearch(e)}
-          placeholder="Buscar..."
-        />
-      </IconField>
-    </div>
-    
-  );
-
   // Contenido de la columna de Acciones (Modificar y Eliminar)
   const accionesTabla = (rowData) => {
     return (
@@ -597,52 +620,22 @@ const DocenteN = () => {
     event['first'] = 0;
     setlazyState(event);
   };
- 
-  /*const manejoInputPrograma = (code, value) => {
-    sethorasprogramaseducativos((prevValues) => ({
-      ...prevValues,
-      [code]: value,
-    }));
-
-    // Encuentra el ProgramaEducativo correspondiente
-    const programaeducativo = programaseducativosList.find((p) => p.clave_ProgramaEducativo === code);
-
-    // If the country is not already selected, add it to the selected countries
-    if (programaeducativo && !programaseducativosseleccionados.some((p) => p.clave_ProgramaEducativo === code)) {
-      setprogramaseducativosseleccionados((prevSelected) => [...prevSelected, programaeducativo]);
-    }
-  };*/
-
-  /*const elementosProgramaEducativo = (option) => {
-    return (
-      <React.Fragment>
-      <div className="flex align-items-center">
-        <div>{option.clave_ProgramaEducativo} - {option.nombre_ProgramaEducativo}</div>
-        <input
-          type="text"
-          value={horasprogramaseducativos[option.clave_ProgramaEducativo] || ''}
-          onChange={(e) => manejoInputPrograma(option.clave_ProgramaEducativo, e.target.value)}
-          placeholder="hrs"
-          className="ml-2 p-inputtext p-component"
-          onClick={(e) => e.stopPropagation()}
-          onFocus={(e) => e.stopPropagation()}
-        />
-      </div>
-      </React.Fragment>
-    );
-  };*/
 
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
-    <Toast ref={toast} />            
+    <Toast ref={toast} />
+    <ConfirmDialog />            
       {/*Dialog para Registrar y Modificar Docente*/}       
       <Dialog
         visible={mostrarDialog}
         style={{ width: '32rem' }}
         breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-        header={`${editando ? "Modificar ": "Registrar"} Docente`}
         modal
+        header={    <div className="formgrid grid justify-content-center border-bottom-1 border-300">
+          {(mostrarDialog===true && !editando) && (<h4>Registrar Docente</h4>)}
+          {(mostrarDialog===true && editando) && (<h4>Modificar Docente</h4>)}
+        </div>}        
         className="p-fluid"
         footer={footerDialog}
         onHide={esconderDialog}
@@ -857,29 +850,33 @@ const DocenteN = () => {
           )}
         </div>
       </Dialog>   
-      {/*Barra de herramientas con boton nuevo, boton para anclar la columna de Acciones y Exportar*/} 
-      <div className='mt-1'>
-        <label className="text-left text-4xl font-bold mt-1">Docente</label>
-      </div>      
-      <Toolbar className="mt-3" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+      {/*Barra de herramientas con boton nuevo, boton para anclar la columna de Acciones y Exportar*/}       
+      <Toolbar  start={<h2 className="m-0">Docente</h2>} end={rightToolbarTemplate}></Toolbar>
       {/*Tabla de Contenido*/}         
       <div className="card">        
-        <DataTable ref={dt} value={filtroDocente.length ? filtroDocente :docentesList} scrollable scrollHeight="400px" size='small' tableStyle={{ minWidth: '50rem' }}         
+        <DataTable ref={dt} value={filtroDocente.length ? filtroDocente :docentesList} scrollable scrollHeight="78vh" size='small' tableStyle={{ minWidth: '50rem' }}         
         filterDisplay="row"         
         onFilter={onFilter}       
-        filters={lazyState.filters}
-          
-          header={header}>
+        filters={lazyState.filters}>
           {columns.map(({ field, header }) => {
-              return <Column className="scrollable-cell" sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
-               filter filterPlaceholder="Buscar"/>;
+              return <Column className="scrollable-cell" sortable={editando === false} key={field} field={field} header={header} style={{minWidth:'40vh'}} body={(rowData) => renderBody(rowData, field)}
+               filter filterPlaceholder="Buscar"
+               filterMatchModeOptions={[
+                { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
+                { label: 'Contiene', value: FilterMatchMode.CONTAINS },
+                { label: 'No contiene', value: FilterMatchMode.NOT_CONTAINS },
+                { label: 'Termina con', value: FilterMatchMode.ENDS_WITH },
+                { label: 'Igual', value: FilterMatchMode.EQUALS },
+                { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
+              ]} 
+               />;
           })}
           <Column
             body={accionesTabla}
             exportable={false}
             style={{ minWidth: '15%' }}
             alignFrozen="right" 
-            frozen={accionesFrozen}
+            frozen={true}
           ></Column>
         </DataTable>
       </div>            

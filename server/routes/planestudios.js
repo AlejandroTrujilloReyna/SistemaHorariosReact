@@ -64,7 +64,7 @@ router.put("/modificarPlanEstudios", (req, res) => {
         if(results.length > 0) {
             return res.status(401).send("El nombre del Programa educativo ya existe en el Plan de Estudios");
         }
-        db.query('UPDATE planestudios SET nombre_PlanEstudios = ?, cant_semestres = ?, clave_ProgramaEducativo = ? WHERE clave_PlanEstudios= ?',[nombre_PlanEstudios,cant_semestres,clave_ProgramaEducativo,clave_PlanEstudios],(err,result) =>{
+        db.query('UPDATE planestudios SET nombre_PlanEstudios = ?, cant_semestres = ?, clave_ProgramaEducativo = ? WHERE clave_PlanEstudios = ?',[nombre_PlanEstudios,cant_semestres,clave_ProgramaEducativo,clave_PlanEstudios],(err,result) =>{
             if (err) {
                 console.log(err);
                 return res.status(500).send("Error interno del servidor");
