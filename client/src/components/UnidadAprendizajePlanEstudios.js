@@ -2,7 +2,6 @@ import React from 'react';
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
-import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -10,6 +9,14 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import UnidadAprendizajePlanEstudiosService from '../services/UnidadAprendizajePlanEstudiosService';
+import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
+import { validarNumero } from '../services/ValidacionGlobalService';//AGREGADO
+import { Toolbar } from 'primereact/toolbar';//NUEVO
+import { Dialog } from 'primereact/dialog';//NUEVO
+import { IconField } from 'primereact/iconfield';//NUEVO
+import { InputIcon } from 'primereact/inputicon';//NUEVO
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
+import { FilterMatchMode } from 'primereact/api';
 import EtapaService from '../services/EtapaService';
 import ClasificacionUnidadAprendizajeService from '../services/ClasificacionUnidadAprendizajeService';
 import PlanEstudiosService from '../services/PlanEstudiosService';
@@ -18,6 +25,7 @@ import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 const UnidadAprendizajePlanEstudios = () => {
 
  //VARIABLES PARA EL REGISTRO
+ const [clave_UnidadAprendizajePlanEstudios,setclave_UnidadAprendizajePlanEstudios] = useState("");
  const [semestre,setsemestre] = useState("");
  const [clave_ClasificacionUnidadAprendizaje,setclave_ClasificacionUnidadAprendizaje] = useState(null);
  const [clave_Etapa,setclave_Etapa] = useState(null);
@@ -30,33 +38,55 @@ const UnidadAprendizajePlanEstudios = () => {
  const [etapas, setetapas] = useState([]);
  const [planestudios, setplanestudios] = useState([]);
  const [unidadesaprendizaje, setunidadesaprendizaje] = useState([]);
- //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
- const [editando,seteditando] = useState(false);
+ const dt = useRef(null);
+ const [lazyState, setlazyState] = useState({
+  filters: {
+    clave_UnidadAprendizajePlanEstudios: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+    semestre: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+    clave_ClasificacionUnidadAprendizaje: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+    clave_Etapa: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+    clave_PlanEstudios: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+    clave_UnidadAprendizaje: { value: '', matchMode: FilterMatchMode.STARTS_WITH }
+  },
+ });
+  //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
+  const [datosCopia, setDatosCopia] = useState({
+    clave_UnidadAprendizajePlanEstudios: "",
+    semestre: "",
+    clave_ClasificacionUnidadAprendizaje: "",
+    clave_Etapa: "",
+    clave_PlanEstudios: "",
+    clave_UnidadAprendizaje: ""
+  });    
  //VARIABLES PARA EL ERROR
  const toast = useRef(null);
- 
+  //ESTADOS PARA CONDICIONES
+  const [enviado, setEnviado] = useState(false);
+  const [abrirDialog,setAbrirDialog] = useState(0);
 
-  //MENSAJE DE EXITO
-  const mostrarExito = (mensaje) => {
-    toast.current.show({severity:'success', summary: 'Exito', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ADVERTENCIA
-  const mostrarAdvertencia = (mensaje) => {
-      toast.current.show({severity:'warn', summary: 'Advertencia', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ERROR
-  const mostrarError = (mensaje) => {
-    toast.current.show({severity:'error', summary: 'Error', detail:mensaje, life: 3000});
-  }  
+  const confirmar1 = (action) => {
+    confirmDialog({
+      message: '¿Seguro que quieres proceder?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'accept',
+      accept: action,
+      reject: () => mostrarAdvertencia(toast, "Cancelado")
+    });
+  };       
 
 //FUNCION PARA REGISTRAR
 const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!semestre || !clave_ClasificacionUnidadAprendizaje || !clave_Etapa || !clave_PlanEstudios || !clave_UnidadAprendizaje) {      
-      mostrarAdvertencia("Existen campos Obligatorios vacíos");
+      mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
+      setEnviado(true);
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
+    const action = () => {  
     UnidadAprendizajePlanEstudiosService.registrarUnidadAprendizajePlanEstudios({
       semestre:semestre,
       clave_ClasificacionUnidadAprendizaje:clave_ClasificacionUnidadAprendizaje,
@@ -65,17 +95,19 @@ const add = ()=>{
       clave_UnidadAprendizaje:clave_UnidadAprendizaje   
     }).then(response=>{//CASO EXITOSO
       if (response.status === 200) {
-        mostrarExito("Registro Exitoso");
+        mostrarExito(toast,"Registro Exitoso");
         get();
         limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);    
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 500){  
-        mostrarError("Error interno del servidor");
+        mostrarError(toast,"Error interno del servidor");
       }     
     });
+    };confirmar1(action);
   }  
-
 
   //FUNCION PARA CONSULTA
   const get = ()=>{
@@ -88,20 +120,47 @@ const add = ()=>{
     });    
   }
 
-
   //FUNCION PARA LA MODIFICACION
-  const put = (rowData) =>{
-    UnidadAprendizajePlanEstudiosService.modificarUnidadAprendizajePlanEstudios(rowData).then((response)=>{//CASO EXITOSO
+  const put = () =>{
+    if (!semestre || !clave_ClasificacionUnidadAprendizaje || !clave_Etapa || !clave_PlanEstudios || !clave_UnidadAprendizaje) {      
+      mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
+      setEnviado(true);
+      return;
+    }    
+    if (clave_UnidadAprendizajePlanEstudios === datosCopia.clave_UnidadAprendizajePlanEstudios
+      && semestre === datosCopia.semestre
+      && clave_ClasificacionUnidadAprendizaje === datosCopia.clave_ClasificacionUnidadAprendizaje
+      && clave_Etapa === datosCopia.clave_Etapa
+      && clave_PlanEstudios === datosCopia.clave_PlanEstudios
+      && clave_UnidadAprendizaje === datosCopia.clave_UnidadAprendizaje) {
+      mostrarInformacion(toast, "No se han realizado cambios");
+      setAbrirDialog(0);
+      limpiarCampos();
+      return;
+    }
+    const action = () => {      
+    UnidadAprendizajePlanEstudiosService.modificarUnidadAprendizajePlanEstudios({
+      clave_UnidadAprendizajePlanEstudios:clave_UnidadAprendizajePlanEstudios,
+      semestre:semestre,
+      clave_ClasificacionUnidadAprendizaje:clave_ClasificacionUnidadAprendizaje,
+      clave_Etapa:clave_Etapa,
+      clave_PlanEstudios:clave_PlanEstudios,
+      clave_UnidadAprendizaje:clave_UnidadAprendizaje         
+    }).then((response)=>{//CASO EXITOSO
       if (response.status === 200) {
-        mostrarExito("Modificación Exitosa");        
+        mostrarExito(toast, "Modificación Exitosa");
+        get();
+        limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);       
       }
     }).catch(error=>{//EXCEPCIONES
      if (error.response.status === 500) {
-        mostrarError("Error del sistema");
+        mostrarError(toast,"Error del sistema");
       }
     });
+    };confirmar1(action);
   }
-
   
   //!!!EXTRAS DE REGISTRO
 
@@ -117,12 +176,12 @@ const add = ()=>{
 //!!!EXTRAS DE CONSULTA
 //COLUMNAS PARA LA TABLA
   const columns = [
-    {field: 'clave_UnidadAprendizajePlanEstudios', header: 'clave' },
-    {field: 'semestre', header: 'Semestre' },
-    {field: 'clave_ClasificacionUnidadAprendizaje', header: 'Clasificacion' },
-    {field: 'clave_Etapa', header: 'Etapa' },
-    {field: 'clave_PlanEstudios', header: 'Plan de estudios' },
-    {field: 'clave_UnidadAprendizaje', header: 'Unidad de Aprendizaje' },
+    {field: 'clave_UnidadAprendizajePlanEstudios', header: 'clave', filterHeader: 'Filtro por Clave' },
+    {field: 'semestre', header: 'Semestre', filterHeader: 'Filtro por Semestre' },
+    {field: 'clave_ClasificacionUnidadAprendizaje', header: 'Clasificacion', filterHeader: 'Filtro por Clasificacion' },
+    {field: 'clave_Etapa', header: 'Etapa', filterHeader: 'Filtro por Etapa' },
+    {field: 'clave_PlanEstudios', header: 'Plan de estudios', filterHeader: 'Filtro por Plan de estudios' },
+    {field: 'clave_UnidadAprendizaje', header: 'Unidad de Aprendizaje', filterHeader: 'Filtro por Unidad de Aprendizaje' },
    
   ];
 
@@ -149,7 +208,37 @@ const onSearch = (e) => {
         );
     });
     setfiltroUnidadAprendizajePlanEstudios(filteredData);
-  };  
+  };
+  
+  //BOTON PARA MODIFICAR
+  const accionesTabla = (rowData) => {
+    return (<>
+        <Button
+          icon="pi pi-pencil"
+          rounded
+          outlined
+          className="m-1"
+          onClick={() => {
+            setclave_UnidadAprendizajePlanEstudios(rowData.clave_UnidadAprendizajePlanEstudios);
+            setsemestre(rowData.semestre);
+            setclave_ClasificacionUnidadAprendizaje(rowData.clave_ClasificacionUnidadAprendizaje);
+            setclave_Etapa(rowData.clave_Etapa);
+            setclave_PlanEstudios(rowData.clave_PlanEstudios);
+            setclave_UnidadAprendizaje(rowData.clave_UnidadAprendizaje);
+            setDatosCopia({
+              clave_UnidadAprendizajePlanEstudios: rowData.clave_UnidadAprendizajePlanEstudios,
+              semestre: rowData.semestre,
+              clave_ClasificacionUnidadAprendizaje: rowData.clave_ClasificacionUnidadAprendizaje,
+              clave_Etapa: rowData.clave_Etapa,
+              clave_PlanEstudios: rowData.clave_PlanEstudios,
+              clave_UnidadAprendizaje: rowData.clave_UnidadAprendizaje
+            });
+            setAbrirDialog(2);
+          }}          
+        />     
+        </>
+    );
+  };    
 
  //MANDAR A LLAMAR A LA LISTA DE CLASIFICACION DE UNIDAD DE APRENDIZAJE
  useEffect(() => {
@@ -214,164 +303,48 @@ const renderBody = (rowData, field) => {
     }
   };
 
+  //!!!EXTRAS GENERALES
 
-//!!!EXTRAS DE MODIFICACION
-
-  //ACTIVAR EDICION DE CELDA
-  const cellEditor = (options) => {
-    switch (options.field) {
-        case 'semestre':
-            return numberEditor(options);
-      case 'clave_ClasificacionUnidadAprendizaje':
-        return ClasificacionUnidadAprendizajeEditor(options);
-      case 'clave_Etapa':
-        return EtapaEditor(options);
-        case 'clave_PlanEstudios':
-            return PlanEstudiosEditor(options);
-          case 'clave_UnidadAprendizaje':
-            return UnidadAprendizajeEditor(options);     
-      default:
-        return 0;
-    }
-  };
-
-//EDITAR NUMEROS
-const numberEditor = (options) => {
-    return <InputText keyfilter="int"  type="text" maxLength={2} value={options.value} 
-    onChange={(e) => {
-      if (validarNumero(e.target.value)) { 
-        options.editorCallback(e.target.value)
-      }
-    }} onKeyDown={(e) => e.stopPropagation()} />;
-  };
-
-//EDITAR DROPDOWN (PROGRAMA EDUCATIVO)
-const ClasificacionUnidadAprendizajeEditor = (options) => {
-    return (
-        <Dropdown
-            value={options.value}
-            options={clasificacionesunidadaprendizaje}
-            onChange={(e) => options.editorCallback(e.value)}            
-            optionLabel="nombre_ClasificacionUnidAdaprendizaje"
-            optionValue="clave_ClasificacionUnidAdaprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-            placeholder="Seleccione el tipo de Clasificacion"             
-        />
-    );
-  };
-
-
-//EDITAR DROPDOWN (PROGRAMA EDUCATIVO)
-const EtapaEditor = (options) => {
-    return (
-        <Dropdown
-            value={options.value}
-            options={etapas}
-            onChange={(e) => options.editorCallback(e.value)}            
-            optionLabel="nombre_Etapa"
-            optionValue="clave_Etapa" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-            placeholder="Seleccione el tipo de Etapa"             
-        />
-    );
-  };
-
-
-//EDITAR DROPDOWN (PROGRAMA EDUCATIVO)
-const PlanEstudiosEditor = (options) => {
-    return (
-        <Dropdown
-            value={options.value}
-            options={planestudios}
-            onChange={(e) => options.editorCallback(e.value)}            
-            optionLabel="nombre_PlanEstudios"
-            optionValue="clave_PlanEstudios" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-            placeholder="Seleccione el Plan e estudios"             
-        />
-    );
-  };
-
+  //ENCABEZADO DEL DIALOG
+  const headerTemplate = (
+    <div className="formgrid grid justify-content-center border-bottom-1 border-300">
+      {abrirDialog===1 && (<h4>Registrar Unidad de Aprendizaje en un Plan de Estudios</h4>)}
+      {abrirDialog===2 && (<h4>Modificar Unidad de Aprendizaje en un Plan de Estudios</h4>)}
+    </div>
+  );
   
-//EDITAR DROPDOWN (PROGRAMA EDUCATIVO)
-const UnidadAprendizajeEditor = (options) => {
-    return (
-        <Dropdown
-            value={options.value}
-            options={unidadesaprendizaje}
-            onChange={(e) => options.editorCallback(e.value)}            
-            optionLabel="nombre_UnidadAprendizaje"
-            optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-            placeholder="Seleccione la Unidad de Aprendizaje"             
-        />
+  //LISTA DE OPCIONES DE HERRAMIENTAS
+  const Herramientas = () => {
+    return (<div className="flex justify-content-between flex-wrap gap-2 align-items-center">
+            <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={()=>setAbrirDialog(1)}/>
+            <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={()=>{dt.current.exportCSV();}}/>
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch}/>  
+              </IconField>
+            </div>              
     );
   };
-
-    //COMPLETAR MODIFICACION
-    const onCellEditComplete = (e) => {
-        let { rowData, newValue, field, originalEvent: event } = e;
-        switch (field) {
-          //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
-          case 'semestre':
-            if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-              rowData[field] = newValue; 
-              put(rowData);
-            }else{
-              event.preventDefault();
-            }
-            break;
-          case 'clave_ClasificacionUnidadAprendizaje':
-            if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-              rowData[field] = newValue; 
-              put(rowData);
-            }else{
-              event.preventDefault();
-            }
-            break;  
-            case 'clave_Etapa':
-                if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-                  rowData[field] = newValue; 
-                  put(rowData);
-                }else{
-                  event.preventDefault();
-                }
-                break;
-              case 'clave_PlanEstudios':
-                if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-                  rowData[field] = newValue; 
-                  put(rowData);
-                }else{
-                  event.preventDefault();
-                }
-                break;  
-                case 'clave_UnidadAprendizaje':
-                    if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-                      rowData[field] = newValue; 
-                      put(rowData);
-                    }else{
-                      event.preventDefault();
-                    }
-                    break;      
-          default:
-          break;
-        }
-        seteditando(false);
-    }; 
-    
-    const validarNumero = (value) => {
-        // Expresión regular para validar números enteros positivos
-        const regex = /^[0-9]\d*$/;
-        // Verificar si el valor coincide con la expresión regular
-        return value==='' || regex.test(value);
-      };  
+  
+  //FUNCION PARA ACTIVAR EL FILTRADO
+  const onFilter = (event) => {
+    event['first'] = 0;
+    setlazyState(event);
+  };    
 
 return (
 <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
+    <Toolbar start={<h2 className="m-0">Unidad de Aprendizaje en un Plan de Estudios</h2>} end={Herramientas}/>
+    <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Panel header="Registrar Unidades de aprendizaje con plan de estudios" className='mt-3' toggleable>        
+      <Dialog className='w-10' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>        
         <div className="formgrid grid mx-8 justify-content-center">
         <div className="field col-3">
             <label>Unidad de Aprendizaje*</label>
-            <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"
+            <Dropdown className="w-full"
+              invalid={enviado===true && !clave_UnidadAprendizaje}
               value={clave_UnidadAprendizaje} 
               options={unidadesaprendizaje} 
               onChange={(e) => {
@@ -384,7 +357,8 @@ return (
           </div>
           <div className="field col-3">
             <label>Plan de Estudios*</label>
-            <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"
+            <Dropdown className="w-full"
+              invalid={enviado===true && !clave_PlanEstudios}
               value={clave_PlanEstudios} 
               options={planestudios} 
               onChange={(e) => {
@@ -398,7 +372,8 @@ return (
           </div>
           <div className="field col-5">
             <label>Clasificacion*</label>
-            <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"
+            <Dropdown className="w-full"
+              invalid={enviado===true && !clave_ClasificacionUnidadAprendizaje}
               value={clave_ClasificacionUnidadAprendizaje} 
               options={clasificacionesunidadaprendizaje} 
               onChange={(e) => {
@@ -411,7 +386,8 @@ return (
           </div>
           <div className="field col-3">
             <label>Etapa*</label>
-            <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"
+            <Dropdown className="w-full"
+              invalid={enviado===true && !clave_Etapa}
               value={clave_Etapa} 
               options={etapas} 
               onChange={(e) => {
@@ -424,42 +400,48 @@ return (
             />
           </div>
           <div className="field col-2">
-              
-              
               <label>Semestre*</label>
               <InputText type="text" keyfilter={/^[0-9]*$/} value={semestre} maxLength={3}
+                  invalid={enviado===true && !semestre}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {
                       setsemestre(event.target.value);
                     }
                   }} 
                   placeholder="Ej.12345678" 
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
-          </div>
-          
-          
-          
-          
-                                                                  
+              className="w-full"/>
+          </div>                                                  
         </div>
-        <div className="mx-8 mt-4">
-          <Button label="Guardar" onClick={add} className="p-button-success" />
+        <div className="formgrid grid justify-content-end">
+          <Button label="Cancelar" icon="pi pi-times" outlined className='m-2' onClick={() => {setAbrirDialog(0); setEnviado(false); limpiarCampos();}} severity='secondary' />
+          {abrirDialog===1 && (
+            <Button label="Guardar" icon="pi pi-check" className='m-2' onClick={add} severity='success' />
+          )}
+          {abrirDialog===2 && (
+            <Button label="Editar" icon="pi pi-check" className='m-2' onClick={put} severity='success' />
+          )}          
         </div>                
-      </Panel>
+      </Dialog>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Unidades de aprendizaje con plan de estudios" className='mt-3' toggleable>
-        <div className="mx-8 mb-4">
-          <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
-        </div>
-        <DataTable value={filtroUnidadAprendizajePlanEstudios.length ? filtroUnidadAprendizajePlanEstudios :unidadaprendizajeplanestudioslist} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
-          {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '5%' }} editor={field === 'clave_UnidadAprendizajePlanEstudios' ? null : (options) => cellEditor(options)}
-              onCellEditComplete={onCellEditComplete}
-              body={(rowData) => renderBody(rowData, field)} // Llama a la función renderBody para generar el cuerpo de la columna
-              onCellEditInit={(e) => seteditando(true)}/>;
+        <DataTable ref={dt} 
+        value={filtroUnidadAprendizajePlanEstudios.length ? filtroUnidadAprendizajePlanEstudios :unidadaprendizajeplanestudioslist} 
+        size='small' 
+        scrollable scrollHeight="78vh"
+        onFilter={onFilter} filters={lazyState.filters} filterDisplay="row" >
+          {columns.map(({ field, header, filterHeader }) => {
+              return <Column sortable filter filterPlaceholder={filterHeader} key={field} field={field} header={header} style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}}
+              body={(rowData) => renderBody(rowData, field)} 
+              filterMatchModeOptions={[
+                { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
+                { label: 'Contiene', value: FilterMatchMode.CONTAINS },
+                { label: 'No contiene', value: FilterMatchMode.NOT_CONTAINS },
+                { label: 'Termina con', value: FilterMatchMode.ENDS_WITH },
+                { label: 'Igual', value: FilterMatchMode.EQUALS },
+                { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
+              ]} />;
           })}
-        </DataTable>          
-      </Panel>     
+          <Column body={accionesTabla} alignFrozen={'right'} frozen={true}></Column>
+        </DataTable>
     </>
 
 )
