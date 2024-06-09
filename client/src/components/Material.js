@@ -230,7 +230,7 @@ const Material = () => {
       <Dialog className='w-2' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
           <div className="field col-12">
-              <label>Nombre*</label>
+              <label className='font-bold'>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_Material} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_Material} maxLength={255}
                   onChange={(event)=>{
                     if (validarTexto(event.target.value)) {  

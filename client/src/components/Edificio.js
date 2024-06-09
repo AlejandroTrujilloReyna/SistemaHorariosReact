@@ -292,7 +292,7 @@ const Edificio = () => {
       <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
         <div className="field col-3">
-              <label>Clave*</label>
+              <label className='font-bold'>Clave*</label>
               <InputText disabled={abrirDialog===2} invalid={enviado===true && !clave_Edificio} type="text" keyfilter="pint" value={clave_Edificio} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
@@ -303,7 +303,7 @@ const Edificio = () => {
               className="w-full"/>
           </div>
           <div className="field col-9">
-              <label>Nombre*</label>
+              <label className='font-bold'>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_Edificio} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_Edificio} maxLength={255}
                   onChange={(event)=>{
                     if (validarTexto(event.target.value)) {  
@@ -314,7 +314,7 @@ const Edificio = () => {
               className="w-full"/>              
           </div>
           <div className="field col-12">
-              <label>Programa Educativo*</label>
+              <label className='font-bold'>Programa Educativo*</label>
             <Dropdown className="w-full"showClear
               value={clave_ProgramaEducativo} 
               options={programas} 
@@ -327,7 +327,7 @@ const Edificio = () => {
             />
           </div>                              
           <div className="field col-12">
-              <label>Unidad Academica*</label>
+              <label className='font-bold'>Unidad Academica*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_UnidadAcademica}
               value={clave_UnidadAcademica} 

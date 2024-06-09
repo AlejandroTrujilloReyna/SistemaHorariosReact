@@ -272,7 +272,7 @@ const PlanEstudios = () => {
       <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
           <div className="field col-6">
-              <label>Nombre*</label>
+              <label className='font-bold'>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_PlanEstudios} type="text" keyfilter={/^[0-9a-zA-Z\-/]*$/} value={nombre_PlanEstudios} maxLength={255}
                   onChange={(event)=>{
                     if (validarAlfanumerico(event.target.value)) {  
@@ -283,7 +283,7 @@ const PlanEstudios = () => {
               className="w-full"/>              
           </div>
           <div className="field col-6">
-              <label>Cantidad Semestres*</label>
+              <label className='font-bold'>Cantidad Semestres*</label>
               <InputText invalid={enviado===true && !cant_semestres} type="text" keyfilter="pint" value={cant_semestres} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
@@ -294,7 +294,7 @@ const PlanEstudios = () => {
               className="w-full"/>
           </div>
           <div className="field col-12">
-              <label>Programa Educativo*</label>
+              <label className='font-bold'>Programa Educativo*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_ProgramaEducativo}
               value={clave_ProgramaEducativo} 

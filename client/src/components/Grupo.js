@@ -10,7 +10,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { ToggleButton } from 'primereact/togglebutton';
 import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
-import { validarTexto, validarNumero} from '../services/ValidacionGlobalService';
+import { validarNumero} from '../services/ValidacionGlobalService';
 import { Toolbar } from 'primereact/toolbar';
 import { Dialog } from 'primereact/dialog';
 import { IconField } from 'primereact/iconfield';
@@ -176,7 +176,7 @@ const Grupo = () => {
   const columns = [
     {field: 'clave_Grupo', header: 'Clave', filterHeader: 'Filtro por Clave' },
     {field: 'nombre_Grupo', header: 'Nombre', filterHeader: 'Filtro por Nombre' },
-    {field: 'semestre', header: 'semestre', filterHeader: 'Filtro por Semestre'},
+    {field: 'semestre', header: 'Semestre', filterHeader: 'Filtro por Semestre'},
     {field: 'uso', header: 'Uso', filterHeader: 'Filtro por Uso'},
     {field: 'clave_PlanEstudios', header: 'Plan de Estudios',filterHeader: 'Filtro por Plan de Estudios'}    
   ];
@@ -245,6 +245,17 @@ const Grupo = () => {
     if (field === 'clave_PlanEstudios') {
       const plan = planesestudio.find((plan) => plan.clave_PlanEstudios === rowData.clave_PlanEstudios);
       return plan ? `${plan.nombre_PlanEstudios}` : '';
+    }else if (field === 'uso'){
+      return (
+        <ToggleButton
+          onLabel="Si"
+          onIcon="pi pi-check"
+          offIcon="pi pi-times"
+          checked={rowData[field] === 1}
+          className="w-8rem"
+          disabled={true} // Para hacerlo no editable
+        />
+      );
     }else {
       return rowData[field]; 
     }
@@ -284,7 +295,7 @@ const Grupo = () => {
     <Toolbar start={<h2 className="m-0">Grupo</h2>} end={Herramientas}/>
     <ConfirmDialog />
       {/*PANEL PARA EL REGISTRO*/}
-      <Dialog className='w-7' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+      <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
           <div className="field col-2">
               <label className='font-bold'>Clave*</label>
@@ -297,11 +308,11 @@ const Grupo = () => {
               placeholder="Ej.100"
               className="w-full"/>
           </div>
-          <div className="field col-4">
-              <label>Nombre*</label>
-              <InputText invalid={enviado===true && !nombre_Grupo} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_Grupo} maxLength={255}
+          <div className="field col-10">
+              <label className='font-bold'>Nombre*</label>
+              <InputText invalid={enviado===true && !nombre_Grupo} type="text" keyfilter={/^[0-9]\d*$/} value={nombre_Grupo} maxLength={255}
                   onChange={(event)=>{
-                    if (validarTexto(event.target.value)) {  
+                    if (validarNumero(event.target.value)) {  
                       setnombre_Grupo(event.target.value);
                     }
                   }}  
@@ -309,7 +320,7 @@ const Grupo = () => {
               className="w-full"/>              
           </div>
           <div className="field col-2">
-              <label>Semestre*</label>
+              <label className='font-bold'>Semestre*</label>
               <InputText invalid={enviado===true && !semestre} type="text" keyfilter="pint" value={semestre} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
@@ -319,19 +330,8 @@ const Grupo = () => {
                   placeholder="Ej.120"  
               className="w-full"/>
           </div>
-          <div className="field col-2">
-              <label>Uso*</label>
-              <ToggleButton
-                onLabel="Si"
-                onIcon="pi pi-check" 
-                offIcon="pi pi-times" 
-                checked={uso === 1} 
-                onChange={(e) => setuso(e.value ? 1 : 0)} 
-                className="w-8rem" 
-            />
-          </div>
           <div className="field col-8">
-              <label>Plan Estudios*</label>
+              <label className='font-bold'>Plan Estudios*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_PlanEstudios}
               value={clave_PlanEstudios} 
@@ -342,6 +342,17 @@ const Grupo = () => {
               optionLabel="nombre_PlanEstudios" 
               optionValue="clave_PlanEstudios" 
               placeholder="Seleccione un Plan de Estudios" 
+            />
+          </div>
+          <div className="field col-2">
+              <label className='font-bold'>Uso*</label>
+              <ToggleButton
+                onLabel="Si"
+                onIcon="pi pi-check" 
+                offIcon="pi pi-times" 
+                checked={uso === 1} 
+                onChange={(e) => setuso(e.value ? 1 : 0)} 
+                className="w-full" 
             />
           </div>                                                                           
         </div>

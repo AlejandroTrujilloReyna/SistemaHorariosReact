@@ -290,8 +290,8 @@ const ProgramaEducativo = () => {
       {/*PANEL PARA EL REGISTRO*/}
       <Dialog className='w-4' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
-        <div className="field col-8">
-              <label>Unidad Académica*</label>
+        <div className="field col-10">
+            <label className='font-bold'>Unidad Académica*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_UnidadAcademica}
               value={clave_UnidadAcademica} 
@@ -304,7 +304,7 @@ const ProgramaEducativo = () => {
               placeholder="Seleccione una Unidad Académica" 
             />
           </div> 
-          <div className="field col-4">
+          <div className="field col-2">
               <label className='font-bold'>Clave*</label>
               <InputText disabled={abrirDialog===2} invalid={enviado===true && !clave_ProgramaEducativo} type="text" keyfilter="pint" value={clave_ProgramaEducativo} maxLength={10}
                   onChange={(event)=>{
@@ -316,7 +316,7 @@ const ProgramaEducativo = () => {
               className="w-full"/>
           </div>
           <div className="field col-8">
-              <label>Nombre*</label>
+              <label className='font-bold'>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_ProgramaEducativo} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_ProgramaEducativo} maxLength={255}
                   onChange={(event)=>{
                     if (validarTexto(event.target.value)) {  
@@ -327,7 +327,7 @@ const ProgramaEducativo = () => {
               className="w-full"/>              
           </div>
           <div className="field col-4">
-              <label>Banco de horas</label>
+              <label className='font-bold'>Banco de horas</label>
               <InputText invalid={enviado===true && !banco_Horas} type="text" keyfilter="pint" value={banco_Horas} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    

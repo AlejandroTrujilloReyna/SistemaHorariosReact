@@ -423,7 +423,7 @@ const SalaN = () => {
       <div className="flex flex-wrap gap-2">
           <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={abrirNuevo}/>
           <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={exportCSV}/>
-          <IconField iconPosition="left">
+        <IconField iconPosition="left">
         <InputIcon className="pi pi-search" />
         <InputText
           type="search"
