@@ -31,17 +31,8 @@ const Menu = () => {
             icon: 'pi pi-building',
             items: [
                 {
-                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Edificio</span>,
-                    items: [
-                        {
-                            label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Edificios</span>,
-                            command: () => { window.location.href = '/Edificio'; }
-                        },
-                        {
-                            label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Uso de Edificios</span>,
-                            command: () => { window.location.href = '/UsarEdificio'; }
-                        }
-                    ]
+                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Edificios</span>,
+                    command: () => { window.location.href = '/Edificio'; }
                 },
                 {
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Sala</span>,
@@ -87,14 +78,6 @@ const Menu = () => {
                             command: () => { window.location.href = '/UnidadAprendizajePlanEstudios'; }
                         }
                     ]
-                },
-                {
-                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Actividad</span>,
-                    command: () => { window.location.href = '/Actividad'; }
-                },
-                {
-                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Horario de Actividad</span>,
-                    command: () => { window.location.href = '/HorarioActividad'; }
                 },
                 {
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Horarios</span>,

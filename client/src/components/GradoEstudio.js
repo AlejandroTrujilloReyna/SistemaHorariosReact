@@ -273,7 +273,7 @@ return (
                 className="w-full"/>              
             </div>   
             <div className="field col-2">
-              <label>Horas Minimas</label>
+              <label className='font-bold'>Horas Minimas</label>
               <InputText invalid={enviado===true && !horas_MinimasGradoEstudio} type="int" keyfilter="pint" value={horas_MinimasGradoEstudio} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
@@ -284,7 +284,7 @@ return (
               className="w-full"/>
           </div>
           <div className="field col-2">
-              <label>Horas Maximas</label>
+              <label className='font-bold'>Horas Maximas</label>
               <InputText invalid={enviado===true && !horas_MaximasGradoEstudio} type="text" keyfilter="pint" value={horas_MaximasGradoEstudio} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
