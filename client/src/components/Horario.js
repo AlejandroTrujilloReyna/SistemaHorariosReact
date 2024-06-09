@@ -4,18 +4,24 @@ import { useEffect } from 'react';
 import { useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
-import { Panel } from 'primereact/panel';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { mostrarExito, mostrarAdvertencia, mostrarError } from '../services/ToastService';
+import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
+import { Toolbar } from 'primereact/toolbar';//NUEVO
+import { Dialog } from 'primereact/dialog';//NUEVO
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
+import { IconField } from 'primereact/iconfield';//NUEVO
+import { InputIcon } from 'primereact/inputicon';//NUEVO
+import { FilterMatchMode } from 'primereact/api';
 import HorarioService from '../services/HorarioService';
 import DiaService from '../services/DiaService';
 import SalaService from '../services/SalaService';
 
 const Horario = () => {
-  //VARIABLES PARA EL REGISTRO  
+  //VARIABLES PARA EL REGISTRO
+  const [clave_Horario,setclave_Horario] = useState();  
   const [hora_Entrada,sethora_Entrada] = useState();
   const [hora_Salida,sethora_Salida] = useState();
   const [clave_Dia,setclave_Dia] = useState(null);
@@ -27,19 +33,55 @@ const Horario = () => {
   const [dias, setDias] = useState([]);
   const [subgrupos, setSubgrupos] = useState([]);
   const [salas, setSalas] = useState([]);
+  const dt = useRef(null);
+  const [lazyState, setlazyState] = useState({
+    filters: {
+      clave_Horario: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      hora_Entrada: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      hora_Salida: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      clave_Dia: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      clave_SubGrupo: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      clave_Sala: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+    },
+  });
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
-  const [editando,seteditando] = useState(false);  
+  const [datosCopia, setDatosCopia] = useState({
+    clave_Horario: "",
+    hora_Entrada: "",
+    hora_Salida: "",
+    clave_Dia: "",
+    clave_SubGrupo: "",
+    clave_Sala: ""
+  });       
   //VARIABLES PARA EL ERROR
   const toast = useRef(null);
+  //ESTADOS PARA CONDICIONES
+  const [enviado, setEnviado] = useState(false);
+  const [abrirDialog,setAbrirDialog] = useState(0);
+  
+  const confirmar1 = (action) => {
+    confirmDialog({
+      message: '¿Seguro que quieres proceder?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'accept',
+      accept: action,
+      reject: () => mostrarAdvertencia(toast, "Cancelado")
+    });
+  };    
 
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!hora_Entrada || !hora_Salida || !clave_Dia || !clave_SubGrupo || !clave_Sala) {
-      mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
+      mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
+      setEnviado(true);
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
+    const action = () => {
     HorarioService.registrarHorario({
         hora_Entrada:hora_Entrada,
         hora_Salida:hora_Salida,
@@ -48,9 +90,11 @@ const Horario = () => {
         clave_Sala:clave_Sala      
     }).then(response=>{
       if (response.status === 200) {//CASO EXITOSO
-        mostrarExito(toast,"Registro exitoso");
+        mostrarExito(toast,"Registro Exitoso");
         get();
         limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
@@ -61,6 +105,7 @@ const Horario = () => {
         mostrarError(toast,"Error interno del servidor");
       }     
     });
+    };confirmar1(action);
   }
   
   //FUNCION PARA CONSULTA
@@ -75,10 +120,39 @@ const Horario = () => {
   }
   
   //FUNCION PARA LA MODIFICACION
-  const put = (rowData) =>{
-    HorarioService.modificarHorario(rowData).then(response=>{//CASO EXITOSO
+  const put = () =>{
+    //VALIDACION DE CAMPOS VACIOS
+    if (!hora_Entrada || !hora_Salida || !clave_Dia || !clave_SubGrupo || !clave_Sala) {
+      mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
+      setEnviado(true);
+      return;
+    }
+    if (clave_Horario === datosCopia.clave_Horario
+      && hora_Entrada === datosCopia.hora_Entrada
+      && hora_Salida === datosCopia.hora_Salida
+      && clave_Dia === datosCopia.clave_Dia
+      && clave_SubGrupo === datosCopia.clave_SubGrupo
+      && clave_Sala === datosCopia.clave_Sala) {
+      mostrarInformacion(toast, "No se han realizado cambios");
+      setAbrirDialog(0);
+      limpiarCampos();
+      return;
+    }
+    const action = () => {        
+    HorarioService.modificarHorario({
+      clave_Horario:clave_Horario,
+      hora_Entrada:hora_Entrada,
+      hora_Salida:hora_Salida,
+      clave_Dia:clave_Dia,
+      clave_SubGrupo:clave_SubGrupo,
+      clave_Sala:clave_Sala  
+    }).then(response=>{//CASO EXITOSO
       if(response.status === 200){
-        mostrarExito(toast,"Modificación Exitosa");
+        mostrarExito(toast, "Modificación Exitosa");
+        get();
+        limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 401) {
@@ -90,7 +164,8 @@ const Horario = () => {
       }else if(error.response.status === 500){          
         mostrarError(toast,"Error interno del servidor");
       }
-    })
+    }); 
+    };confirmar1(action);
   }    
   
   //!!!EXTRAS DE REGISTRO
@@ -108,12 +183,12 @@ const Horario = () => {
 
   //COLUMNAS PARA LA TABLA
   const columns = [
-    {field: 'clave_Horario', header: 'Clave' },
-    {field: 'hora_Entrada', header: 'Entrada' },
-    {field: 'hora_Salida', header: 'Salida'},
-    {field: 'clave_Dia', header: 'Día'},
-    {field: 'clave_SubGrupo', header: 'Subgrupo'},
-    {field: 'clave_Sala', header: 'Sala'}         
+    {field: 'clave_Horario', header: 'Clave', filterHeader: 'Filtro por Clave' },
+    {field: 'hora_Entrada', header: 'Entrada', filterHeader: 'Filtro por Entrada'},
+    {field: 'hora_Salida', header: 'Salida', filterHeader: 'Filtro por Salida'},
+    {field: 'clave_Dia', header: 'Día', filterHeader: 'Filtro por Dia'},
+    {field: 'clave_SubGrupo', header: 'Subgrupo', filterHeader: 'Filtro por Subgrupo'},
+    {field: 'clave_Sala', header: 'Sala', filterHeader: 'Filtro por Sala'}         
   ];  
 
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -135,7 +210,37 @@ const Horario = () => {
         );
     });
     setfiltrohorario(filteredData);
-  };     
+  };
+  
+  //BOTON PARA MODIFICAR
+  const accionesTabla = (rowData) => {
+    return (<>
+        <Button
+          icon="pi pi-pencil"
+          rounded
+          outlined
+          className="m-1"
+          onClick={() => {
+            setclave_Horario(rowData.clave_Horario);
+            sethora_Entrada(rowData.hora_Entrada);
+            sethora_Salida(rowData.hora_Salida);
+            setclave_Dia(rowData.clave_Dia);
+            setclave_SubGrupo(rowData.clave_SubGrupo);
+            setclave_Sala(rowData.clave_Sala);
+            setDatosCopia({
+              clave_Horario: rowData.clave_Horario,
+              hora_Entrada: rowData.hora_Entrada,
+              hora_Salida: rowData.hora_Salida,
+              clave_Dia: rowData.clave_Dia,
+              clave_SubGrupo: rowData.clave_SubGrupo,
+              clave_Sala: rowData.clave_Sala
+            });
+            setAbrirDialog(2);
+          }}          
+        />     
+        </>
+    );
+  };      
   
   //MANDAR A LLAMAR A LA LISTA DE DIAS
   useEffect(() => {
@@ -186,149 +291,62 @@ const Horario = () => {
     }
   };
 
-  //!!!EXTRAS DE MODIFICACION
+  //!!!EXTRAS GENERALES
 
-  //ACTIVAR EDICION DE CELDA
-  const cellEditor = (options) => {
-    switch (options.field) {
-      case 'hora_Entrada':
-        return timeEditor(options);
-      case 'hora_Salida':
-        return timeEditor(options);
-      case 'clave_Dia':
-        return DiaEditor(options);
-      case 'clave_SubGrupo':
-        return SubgrupoEditor(options);
-      case 'clave_Sala':
-        return SalaEditor(options);        
-      default:
-        return 0;
-    }
-  };
-
+  //ENCABEZADO DEL DIALOG
+  const headerTemplate = (
+    <div className="formgrid grid justify-content-center border-bottom-1 border-300">
+      {abrirDialog===1 && (<h4>Registrar Horario</h4>)}
+      {abrirDialog===2 && (<h4>Modificar Horario</h4>)}
+    </div>
+  );
   
-  // EDITOR DE TIEMPO
-  const timeEditor = (options) => {
-    return <InputText type="time" value={options.value} 
-    onChange={(e) =>{ 
-        options.editorCallback(e.target.value)
-    }}
-    onKeyDown={(e) => e.stopPropagation()} />;
-  };
-  
-  //EDITAR DROPDOWN (DIA)
-  const DiaEditor = (options) => {
-    return (
-      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={options.value} 
-                options={dias}  
-                onChange={(e) => options.editorCallback(e.value)}
-                optionLabel="nombre_Dia" 
-                optionValue="clave_Dia"
-                placeholder="Selecciona un Día" 
-      />
+  //LISTA DE OPCIONES DE HERRAMIENTAS
+  const Herramientas = () => {
+    return (<div className="flex justify-content-between flex-wrap gap-2 align-items-center">
+            <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={()=>setAbrirDialog(1)}/>
+            <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={()=>{dt.current.exportCSV();}}/>
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch}/>  
+              </IconField>
+            </div>              
     );
   };
   
-  //EDITAR DROPDOWN (SUBGRUPO)
-  const SubgrupoEditor = (options) => {
-    return (
-      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={options.value} 
-                options={subgrupos}  
-                onChange={(e) => options.editorCallback(e.value)}
-                optionLabel="no_SubGrupo" 
-                optionValue="clave_SubGrupo"
-                placeholder="Selecciona un Subgrupo" 
-      />
-    );
-  };
-  
-  //EDITAR DROPDOWN (SALA)
-  const SalaEditor = (options) => {
-    return (
-      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={options.value} 
-                options={salas}  
-                onChange={(e) => options.editorCallback(e.value)}
-                optionLabel="nombre_Sala" 
-                optionValue="clave_Sala"
-                placeholder="Selecciona una Sala" 
-      />
-    );
-  };
-  
-  //COMPLETAR MODIFICACION
-  const onCellEditComplete = (e) => {
-    let { rowData, newValue, field, originalEvent: event } = e;
-    switch (field) {
-      //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
-      case 'hora_Entrada':
-        if(newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;
-      case 'hora_Salida':
-        if(newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;
-      case 'clave_Dia':
-        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;
-      case 'clave_SubGrupo':
-        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;  
-      case 'clave_Sala':
-        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;        
-      default:
-      break;
-    }
-    seteditando(false);
-  };   
+  //FUNCION PARA ACTIVAR EL FILTRADO
+  const onFilter = (event) => {
+    event['first'] = 0;
+    setlazyState(event);
+  };  
     
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
-      <Panel header="Registrar Horario" className='mt-3' toggleable>
+    <Toolbar start={<h2 className="m-0">Horarios</h2>} end={Herramientas}/>
+    <ConfirmDialog />    
+      <Dialog className='w-10' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
           <div className="formgrid grid mx-8 justify-content-center">
             <div className="field col-2">            
                 <label>Hora de entrada*</label>
-                <InputText type="time" value={hora_Entrada} maxLength={10}
+                <InputText type="time" value={hora_Entrada} maxLength={10} invalid={enviado===true && !hora_Entrada}
                     onChange={(event)=>{
                         sethora_Entrada(event.target.value);
                     }}  
-                className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>          
+                className="w-full"/>          
             </div>
             <div className="field col-2">
                 <label>Hora de salida*</label>
-                <InputText type="time" value={hora_Salida} maxLength={10}
+                <InputText type="time" value={hora_Salida} maxLength={10} invalid={enviado===true && !hora_Salida}
                     onChange={(event)=>{
                         sethora_Salida(event.target.value);
                     }}  
-                className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
+                className="w-full"/>              
             </div>
             <div className="field col-3">
               <label>Día*</label>
-              <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+              <Dropdown className="w-full" invalid={enviado===true && !clave_Dia}
                 value={clave_Dia} 
                 options={dias} 
                 onChange={(e) => {
@@ -341,8 +359,9 @@ const Horario = () => {
             </div>
             <div className="field col-3">
               <label>Subgrupo*</label>
-              <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={clave_SubGrupo} 
+              <Dropdown className="w-full"
+                value={clave_SubGrupo}
+                invalid={enviado===true && !clave_SubGrupo} 
                 options={subgrupos} 
                 onChange={(e) => {
                   setclave_SubGrupo(e.value);
@@ -354,8 +373,9 @@ const Horario = () => {
             </div>
             <div className="field col-3">
               <label>Sala*</label>
-              <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={clave_Sala} 
+              <Dropdown className="w-full"
+                value={clave_Sala}
+                invalid={enviado===true && !clave_Sala}  
                 options={salas} 
                 onChange={(e) => {
                   setclave_Sala(e.value);
@@ -366,23 +386,35 @@ const Horario = () => {
               />
             </div>                                                                                               
           </div>
-          <div className="mx-8 mt-4">
-            <Button label="Guardar" onClick={add} className="p-button-success" />
+          <div className="formgrid grid justify-content-end">
+            <Button label="Cancelar" icon="pi pi-times" outlined className='m-2' onClick={() => {setAbrirDialog(0); setEnviado(false); limpiarCampos();}} severity='secondary' />
+            {abrirDialog===1 && (
+              <Button label="Guardar" icon="pi pi-check" className='m-2' onClick={add} severity='success' />
+            )}
+            {abrirDialog===2 && (
+              <Button label="Editar" icon="pi pi-check" className='m-2' onClick={put} severity='success' />
+            )}          
           </div>   
-      </Panel>
+      </Dialog>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Horarios" className='mt-3' toggleable>
-      <div className="mx-8 mb-4">
-        <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} 
-        className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
-      </div>
-      <DataTable value={filtrohorario.length ? filtrohorario :horariolist} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
-          {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
-              editor={field === 'clave_Horario' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
+      <DataTable
+      onFilter={onFilter} filters={lazyState.filters} filterDisplay="row" 
+      ref={dt} scrollable scrollHeight="78vh"  value={filtrohorario.length ? filtrohorario :horariolist} size='small'>
+          {columns.map(({ field, header, filterHeader }) => {
+              return <Column sortable filter filterPlaceholder={filterHeader} key={field} field={field} header={header}
+              filterMatchModeOptions={[
+                { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
+                { label: 'Contiene', value: FilterMatchMode.CONTAINS },
+                { label: 'No contiene', value: FilterMatchMode.NOT_CONTAINS },
+                { label: 'Termina con', value: FilterMatchMode.ENDS_WITH },
+                { label: 'Igual', value: FilterMatchMode.EQUALS },
+                { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
+              ]} 
+              style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}} body={(rowData) => renderBody(rowData, field)}
+              />;
           })}
-      </DataTable>                
-      </Panel>        
+          <Column body={accionesTabla} alignFrozen={'right'} frozen={true}></Column>    
+      </DataTable>                     
     </>
   )
 }
