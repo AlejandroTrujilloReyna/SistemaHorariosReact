@@ -1,102 +1,162 @@
 import React from 'react';
 import { useState } from "react";
-import { useEffect } from "react";
+import { useEffect } from 'react';
 import { useRef } from 'react';
-import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
+import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
+import { validarTexto, validarNumero} from '../services/ValidacionGlobalService';
+import { Toolbar } from 'primereact/toolbar';
+import { Dialog } from 'primereact/dialog';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import GradoEstudioService from '../services/GradoEstudioService';
+import { FilterMatchMode } from 'primereact/api';
 
 const GradoEstudio = () => {
   //VARIABLES PARA EL REGISTRO  
+  const [clave_GradoEstudio,setclave_GradoEstudio] = useState("");  
   const [nombre_GradoEstudio,setnombre_GradoEstudio] = useState("");
   const [horas_MinimasGradoEstudio,sethoras_MinimasGradoEstudio] = useState("");
   const [horas_MaximasGradoEstudio,sethoras_MaximasGradoEstudio] = useState("");
   //VARIABLES PARA LA CONSULTA
   const [gradoestudiolist,setgradoestudiolist] = useState([]);
   const [filtrogradoestudio,setfiltrogradoestudio] = useState([]);
-  //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
-  const [editando,seteditando] = useState(false);
-  //VARIABLES PARA EL ERROR
-  const toast = useRef(null);
+  
 
-//MENSAJE DE EXITO
-const mostrarExito = (mensaje) => {
-    toast.current.show({severity:'success', summary: 'Exito', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ADVERTENCIA
-  const mostrarAdvertencia = (mensaje) => {
-      toast.current.show({severity:'warn', summary: 'Advertencia', detail:mensaje, life: 3000});
-  }
-  //MENSAJE DE ERROR
-  const mostrarError = (mensaje) => {
-    toast.current.show({severity:'error', summary: 'Error', detail:mensaje, life: 3000});
-  }  
+  const dt = useRef(null);
+  //INICIALIZACION DE FILTROS
+  const [lazyState, setlazyState] = useState({
+    filters: {
+      clave_GradoEstudio: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      nombre_GradoEstudio: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      horas_MinimasGradoEstudio: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      horas_MaximasGradoEstudio: { value: '', matchMode: FilterMatchMode.STARTS_WITH }
+    },
+  });
+//VARIABLES PARA MODIFICACIÓN (SIEMPRE SERA UNA COPIA DE LAS VARIABLES DE REGISTRO PARA REALIZAR COMPARACIONES)
+const [datosCopia, setDatosCopia] = useState({
+  clave_GradoEstudio: "",
+  nombre_GradoEstudio: "",
+  horas_MinimasGradoEstudio:"",
+  horas_MaximasGradoEstudio:""
+});   
+//VARIABLES PARA MANEJAR MENSAJES
+const toast = useRef(null);
+//ESTADOs PARA LAS CONDICIONES
+const [enviado, setEnviado] = useState(false);
+const [abrirDialog,setAbrirDialog] = useState(0);
+
+const confirmar1 = (action) => {
+  confirmDialog({
+    message: '¿Seguro que quieres proceder?',
+    header: 'Confirmar',
+    icon: 'pi pi-exclamation-triangle',
+    acceptLabel: 'Sí',
+    rejectLabel: 'No',
+    defaultFocus: 'accept',
+    accept: action,
+    reject: () => mostrarAdvertencia(toast, "Cancelado")
+  });
+};
+
+
 
   //FUNCION PARA REGISTRAR
   const add = ()=>{
-  //VALIDACION DE CAMPOS VACIOS
-  if (!nombre_GradoEstudio || !horas_MinimasGradoEstudio || !horas_MaximasGradoEstudio) {
-    mostrarAdvertencia("Existen campos Obligatorios vacíos");
+    //VALIDACION DE CAMPOS VACIOS
+    if (!nombre_GradoEstudio || !horas_MinimasGradoEstudio || !horas_MaximasGradoEstudio) {
+      mostrarAdvertencia(toast, "Existen campos obligatorios vacíos");
+      setEnviado(true);
+      return;
+    }
+    const action = () => {
+      GradoEstudioService.registrarGradoEstudio({
+        nombre_GradoEstudio: nombre_GradoEstudio,
+        horas_MinimasGradoEstudio: horas_MinimasGradoEstudio,
+        horas_MaximasGradoEstudio: horas_MaximasGradoEstudio
+
+      }).then(response => {
+        if (response.status === 200) {
+          mostrarExito(toast, "Registro Exitoso");
+          get();
+          limpiarCampos();
+          setEnviado(false);
+          setAbrirDialog(0);
+        }
+      }).catch(error => {
+       if (error.response.status === 401) {
+          mostrarAdvertencia(toast, "Nombre ya Existente");
+        } else if (error.response.status === 403) {
+          mostrarAdvertencia(toast, "Error en la horas");
+        } else if (error.response.status === 500) {
+          mostrarError(toast, "Error interno del servidor");
+        }
+      });
+    };
+    confirmar1(action);
+  }
+
+//FUNCION PARA LA CONSULTA
+const get = ()=>{
+  GradoEstudioService.consultarGradoEstudio().then((response)=>{//CASO EXITOSO
+      setgradoestudiolist(response.data);  
+  }).catch(error=>{//EXCEPCIONES
+    if (error.response.status === 500) {
+      //setmensajeError("Error del sistema");
+    }
+  });    
+}
+
+ //FUNCION PARA LA MODIFICACION
+ const put = () => {
+  if (!clave_GradoEstudio || !nombre_GradoEstudio || !horas_MinimasGradoEstudio || !horas_MaximasGradoEstudio) {
+    mostrarAdvertencia(toast, "Existen campos obligatorios vacíos");
+    setEnviado(true);
     return;
   }
-  //MANDAR A LLAMAR AL REGISTRO SERVICE
-  GradoEstudioService.registrarGradoEstudio({    
-    nombre_GradoEstudio:nombre_GradoEstudio,
-    horas_MinimasGradoEstudio:horas_MinimasGradoEstudio,
-    horas_MaximasGradoEstudio:horas_MaximasGradoEstudio
-  }).then(response=>{//CASO EXITOSO
+  if (clave_GradoEstudio === datosCopia.clave_GradoEstudio
+    && nombre_GradoEstudio === datosCopia.nombre_GradoEstudio
+    && horas_MinimasGradoEstudio === datosCopia.horas_MinimasGradoEstudio
+    && horas_MaximasGradoEstudio === datosCopia.horas_MaximasGradoEstudio) {
+    mostrarInformacion(toast, "No se han realizado cambios");
+    setAbrirDialog(0);
+    limpiarCampos();
+    return;
+  }
+  const action = () => {
+  GradoEstudioService.modificarGradoEstudio({
+    clave_GradoEstudio: clave_GradoEstudio,
+    nombre_GradoEstudio: nombre_GradoEstudio,
+    horas_MinimasGradoEstudio: horas_MinimasGradoEstudio,
+    horas_MaximasGradoEstudio: horas_MaximasGradoEstudio
+
+  }).then(response => {
     if (response.status === 200) {
-      mostrarExito("Registro Exitoso");
+      mostrarExito(toast, "Modificación Exitosa");
       get();
       limpiarCampos();
+      setEnviado(false);
+      setAbrirDialog(0);
     }
-  }).catch(error=>{//EXCEPCIONES
-    if (error.response.status === 400) {
-      mostrarAdvertencia("Clave ya Existente");
-    } else if(error.response.status === 401){
-      mostrarAdvertencia("Nombre ya Existente");
-    }else if(error.response.status === 403){
-      mostrarAdvertencia("Favor de Revisar las Horas");        
-    } else if(error.response.status === 500){
-      mostrarError("Error en el sistema");   
-    }  
+  }).catch(error => {
+    if (error.response.status === 401) {
+      mostrarAdvertencia(toast, "Nombre ya Existente");
+      get();
+    } else if (error.response.status === 403) {
+      mostrarAdvertencia(toast, "Error en la horas");
+    }  else if (error.response.status === 500) {
+      mostrarError(toast, "Error del sistema");
+    }
   });
-  }
+};
+confirmar1(action);
+};
 
- //FUNCION PARA LA CONSULTA
- const get = ()=>{
-    GradoEstudioService.consultarGradoEstudio().then((response)=>{//CASO EXITOSO
-        setgradoestudiolist(response.data);  
-    }).catch(error=>{//EXCEPCIONES
-      if (error.response.status === 500) {
-        //setmensajeError("Error del sistema");
-      }
-    });    
-  }
-
-
-//FUNCION PARA LA MODIFICACION
-const put = (rowData) =>{
-    GradoEstudioService.modificarGradoEstudio(rowData).then((response)=>{//CASO EXITOSO
-      if(response.status === 200){
-        mostrarExito("Modificación Exitosa");
-      }
-    }).catch(error=>{//EXCEPCIONES
-      if (error.response.status === 401) {
-        mostrarAdvertencia("Nombre ya Existente");
-        get();
-      }else if(error.response.status === 403){
-        mostrarAdvertencia("Favor de Revisar las Horas");
-        get();        
-      }else if (error.response.status === 500) {
-        mostrarError("Error del sistema");
-      }
-    });
-  }
 
  //!!!EXTRAS DE REGISTRO
 
@@ -109,10 +169,10 @@ const put = (rowData) =>{
 
   //COLUMNAS PARA LA TABLA
   const columns = [
-    { field: 'clave_GradoEstudio', header: 'Clave' },
-    { field: 'nombre_GradoEstudio', header: 'Nombre' },
-    {field: 'horas_MinimasGradoEstudio', header: 'Hora Mínimas'},
-    {field: 'horas_MaximasGradoEstudio', header: 'Hora Máximas'}  
+    { field: 'clave_GradoEstudio', header: 'Clave', filterHeader: 'Filtro por Clave' },
+    { field: 'nombre_GradoEstudio', header: 'Nombre', filterHeader: 'Filtro por Nombre' },
+    {field: 'horas_MinimasGradoEstudio', header: 'Hora Mínimas', filterHeader: 'Filtro por Horas Mínimas'},
+    {field: 'horas_MaximasGradoEstudio', header: 'Hora Máximas', filterHeader: 'Filtro por Horas Maximas'}  
   ];
 
   //MANDAR A LLAMAR LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -135,156 +195,138 @@ const put = (rowData) =>{
     setfiltrogradoestudio(filteredData);
   };  
 
-//!!!EXTRAS DE MODIFICACION
 
-  //ACTIVAR EDICION DE CELDA
-  const cellEditor = (options) => {
-    switch (options.field) {      
-      case 'nombre_GradoEstudio':
-        return textEditor(options);                
-      case 'horas_MinimasGradoEstudio':
-        return numberEditor(options);
-        case 'horas_MaximasGradoEstudio':
-        return numberEditor(options);                 
-      default:
-        return textEditor(options); 
-    }  
-  }
+  //BOTON PARA MODIFICAR
+  const accionesTabla = (rowData) => {
+    return (<>
+        <Button
+          icon="pi pi-pencil"
+          rounded
+          outlined
+          className="m-1"
+          onClick={() => {
+            setclave_GradoEstudio(rowData.clave_GradoEstudio);
+            setnombre_GradoEstudio(rowData.nombre_GradoEstudio);
+            sethoras_MinimasGradoEstudio(rowData.horas_MinimasGradoEstudio);
+            sethoras_MaximasGradoEstudio(rowData.horas_MaximasGradoEstudio);
+            setDatosCopia({
+              clave_GradoEstudio: rowData.clave_GradoEstudio,
+              nombre_GradoEstudio: rowData.nombre_GradoEstudio,
+              horas_MinimasGradoEstudio: rowData.horas_MinimasGradoEstudio,
+              horas_MaximasGradoEstudio: rowData.horas_MaximasGradoEstudio
+            });
+            setAbrirDialog(2);
+          }}          
+        />
+             
+        </>
+    );
+  };  
 
-  //EDITAR TEXTO
-  const textEditor = (options) => {
-    return <InputText keyfilter={/^[a-zA-Z\s]*$/} type="text"  maxLength={255} value={options.value} 
-      onChange={(e) => {
-        if (validarTexto(e.target.value)) {
-          options.editorCallback(e.target.value)
-        }
-      }}
-      onKeyDown={(e) => e.stopPropagation()} />;
+ //!!!EXTRAS GENERALES
+
+  //ENCABEZADO DEL DIALOG
+  const headerTemplate = (
+    <div className="formgrid grid justify-content-center border-bottom-1 border-300">
+      {abrirDialog===1 && (<h4>Registrar Grado de Estudios</h4>)}
+      {abrirDialog===2 && (<h4>Modificar Grado de Estudios</h4>)}
+    </div>
+  );  
+
+
+  //LISTA DE OPCIONES DE HERRAMIENTAS
+  const Herramientas = () => {
+    return (<div className="flex justify-content-between flex-wrap gap-2 align-items-center">
+            <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={()=>setAbrirDialog(1)}/>
+            <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={()=>{dt.current.exportCSV();}}/>
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch}/>  
+              </IconField>
+            </div>              
+    );
   };
 
-  //EDITAR NUMEROS
-  const numberEditor = (options) => {
-    return <InputText keyfilter="int"  type="text" maxLength={11} value={options.value} 
-    onChange={(e) => {
-      if (validarNumero(e.target.value)) { 
-        options.editorCallback(e.target.value)
-      }
-    }} onKeyDown={(e) => e.stopPropagation()} />;
-  };
-
- //COMPLETAR MODIFICACION
- const onCellEditComplete = (e) => {
-    let { rowData, newValue, field, originalEvent: event } = e;
-    switch (field) {
-      //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
-      case 'nombre_GradoEstudio':
-        if (newValue.trim().length > 0 && newValue !== rowData[field]){ 
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        } 
-      break;
-      case 'horas_MinimasGradoEstudio':
-        if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();          
-        } 
-      break;
-case 'horas_MaximasGradoEstudio':
-    if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
-        rowData[field] = newValue; put(rowData);
-      }else{
-        event.preventDefault();          
-      } 
-    break;
-      default:
-      break;
-    }
-    seteditando(false);
-    };
-
-
- //!!!EXTRAS CAMPOS
-
- const validarTexto = (value) => {
-    // Expresión regular para validar caracteres alfabeticos y espacios
-    const regex = /^[a-zA-Z\s]*$/;
-    // Verificar si el valor coincide con la expresión regular
-    return regex.test(value);
-  };
-
-  const validarNumero = (value) => {
-    // Expresión regular para validar números enteros positivos
-    const regex = /^[0-9]\d*$/;
-    // Verificar si el valor coincide con la expresión regular
-    return value==='' || regex.test(value);
-  };
+//FUNCION PARA ACTIVAR EL FILTRADO
+const onFilter = (event) => {
+  event['first'] = 0;
+  setlazyState(event);
+};
+    
 
 return (
 <>
-    {/*APARICION DE LOS MENSAJES (TOAST)*/}
-    <Toast ref={toast} />
-      {/*PANEL PARA EL REGISTRO*/}
-      <Panel header="Registrar Grado de Estudio" className='mt-3' toggleable>
-        <div className="formgrid grid mx-8 justify-content-center">
-        
-          <div className="field col-8">
-          <label>Nombre*</label>
-          <InputText type="text" keyfilter={/^[a-zA-Z\s]*$/} value={nombre_GradoEstudio} maxLength={255}
-              onChange={(event) => {
-                if (validarTexto(event.target.value)) {
-                  setnombre_GradoEstudio(event.target.value);
-                }        
-              }}  
-              placeholder="Ej.Doctorado"
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-          />              
-          </div>                            
-          
-          <div className="field col-2">
-              <label>Horas Mínimas*</label>
-              <InputText type="text" keyfilter="pint" value={horas_MinimasGradoEstudio} maxLength={11}
-                  onChange={(event)=>{
-                    if (validarNumero(event.target.value)) {
-                      sethoras_MinimasGradoEstudio(event.target.value);
+      <Toast ref={toast} />
+      <Toolbar start={<h2 className="m-0">Grado de Estudios</h2>} end={Herramientas}/>
+      <ConfirmDialog />
+      <Dialog header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
+        <div className="formgrid grid justify-content-center">          
+            <div className="field col-6">
+                <label className='font-bold'>Nombre*</label>
+                <InputText invalid={enviado===true && !nombre_GradoEstudio} type="text" keyfilter={/^[a-zA-Z\s]+$/} value={nombre_GradoEstudio} maxLength={255}
+                  onChange={(event) => {
+                    if (validarTexto(event.target.value)) {
+                      setnombre_GradoEstudio(event.target.value);
                     }
-                  }}  
-                  placeholder="Ej.12"
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
-          </div>  
-
-          <div className="field col-2">
-              <label>Horas Máximas*</label>
-              <InputText type="text" keyfilter="pint" value={horas_MaximasGradoEstudio} maxLength={11}
+                  }}
+                placeholder="Ej.Doctorado"
+                className="w-full"/>              
+            </div>   
+            <div className="field col-2">
+              <label>Horas Minimas</label>
+              <InputText invalid={enviado===true && !horas_MinimasGradoEstudio} type="int" keyfilter="pint" value={horas_MinimasGradoEstudio} maxLength={10}
                   onChange={(event)=>{
-                    if (validarNumero(event.target.value)) {
-                      sethoras_MaximasGradoEstudio(event.target.value);
+                    if (validarNumero(event.target.value)) {    
+                      	sethoras_MinimasGradoEstudio(event.target.value);
                     }
-                  }}  
-                  placeholder="Ej.16"
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
+                  }}
+                  placeholder="Ej.120"  
+              className="w-full"/>
+          </div>
+          <div className="field col-2">
+              <label>Horas Maximas</label>
+              <InputText invalid={enviado===true && !horas_MaximasGradoEstudio} type="text" keyfilter="pint" value={horas_MaximasGradoEstudio} maxLength={10}
+                  onChange={(event)=>{
+                    if (validarNumero(event.target.value)) {    
+                      	sethoras_MaximasGradoEstudio(event.target.value);
+                    }
+                  }}
+                  placeholder="Ej.120"  
+              className="w-full"/>
           </div>
 
-          </div>
-        <div className="mx-8 mt-4">
-          <Button label="Guardar" onClick={add} className="p-button-success" />
-        </div>      
-      </Panel>
-      {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-      <Panel header="Consultar Grados de Estudios" className='mt-3' toggleable>
-      <div className="mx-8 mb-4">
-        <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
-      </div>  
-        <DataTable value={filtrogradoestudio.length ? filtrogradoestudio :gradoestudiolist} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
-          {columns.map(({ field, header }) => {
-              return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '25%' }} 
-              editor={field === 'clave_GradoEstudio' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} onCellEditInit={(e) => seteditando(true)}/>;
+        </div>
+        <div className="formgrid grid justify-content-end">
+          <Button label="Cancelar" icon="pi pi-times" outlined className='m-2' onClick={() => {setAbrirDialog(0); setEnviado(false); limpiarCampos();}} severity='secondary' />
+          {abrirDialog===1 && (
+            <Button label="Guardar" icon="pi pi-check" className='m-2' onClick={add} severity='success' />
+          )}
+          {abrirDialog===2 && (
+            <Button label="Editar" icon="pi pi-check" className='m-2' onClick={put} severity='success' />
+          )}          
+        </div>  
+      </Dialog>
+      <DataTable 
+      onFilter={onFilter} filters={lazyState.filters} filterDisplay="row" 
+      scrollable scrollHeight="78vh"
+      ref={dt} 
+      value={filtrogradoestudio.length ? filtrogradoestudio :gradoestudiolist} 
+      size='small'>
+         {columns.map(({ field, header, filterHeader }) => {
+              return <Column style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}} sortable filter filterPlaceholder={filterHeader}
+              filterMatchModeOptions={[
+                { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
+                { label: 'Contiene', value: FilterMatchMode.CONTAINS },
+                { label: 'No contiene', value: FilterMatchMode.NOT_CONTAINS },
+                { label: 'Termina con', value: FilterMatchMode.ENDS_WITH },
+                { label: 'Igual', value: FilterMatchMode.EQUALS },
+                { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
+              ]}
+              key={field} field={field} header={header}/>;
           })}
-        </DataTable>
-      </Panel> 
-  </>
-
+          <Column body={accionesTabla} alignFrozen={'right'} frozen={true}></Column>          
+      </DataTable>          
+    </>
 )
 
 }

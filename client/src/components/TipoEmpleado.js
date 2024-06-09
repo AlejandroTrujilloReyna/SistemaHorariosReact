@@ -114,7 +114,7 @@ const TipoEmpleado = () => {
  //FUNCION PARA LA MODIFICACION
  const put = () => {
   if (!clave_TipoEmpleado || !nombre_TipoEmpleado || !horas_MinimasTipoEmpleado || !horas_MaximasTipoEmpleado) {
-    mostrarAdvertencia(toast, "Existen campos obligatorios vacíos 2");
+    mostrarAdvertencia(toast, "Existen campos obligatorios vacíos");
     setEnviado(true);
     return;
   }
@@ -164,8 +164,8 @@ confirmar1(action);
   const limpiarCampos = () =>{
   
     setnombre_TipoEmpleado("")
-    sethoras_MinimasTipoEmpleado(0);
-    sethoras_MaximasTipoEmpleado(0)
+    sethoras_MinimasTipoEmpleado("");
+    sethoras_MaximasTipoEmpleado("")
   } 
 
    //COLUMNAS PARA LA TABLA
@@ -227,8 +227,8 @@ confirmar1(action);
   //ENCABEZADO DEL DIALOG
   const headerTemplate = (
     <div className="formgrid grid justify-content-center border-bottom-1 border-300">
-      {abrirDialog===1 && (<h4>Registrar Unidad Academica</h4>)}
-      {abrirDialog===2 && (<h4>Modificar Unidad Academica</h4>)}
+      {abrirDialog===1 && (<h4>Registrar Tipo de Empleado</h4>)}
+      {abrirDialog===2 && (<h4>Modificar Tipo de Empleado</h4>)}
     </div>
   );  
 
@@ -271,7 +271,7 @@ const onFilter = (event) => {
                 className="w-full"/>              
             </div>   
             <div className="field col-2">
-              <label>Horas Minimas</label>
+              <label className='font-bold'>Horas Minimas</label>
               <InputText invalid={enviado===true && !horas_MinimasTipoEmpleado} type="int" keyfilter="pint" value={horas_MinimasTipoEmpleado} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    
@@ -282,7 +282,7 @@ const onFilter = (event) => {
               className="w-full"/>
           </div>
           <div className="field col-2">
-              <label>Horas Maximas</label>
+              <label className='font-bold'>Horas Maximas</label>
               <InputText invalid={enviado===true && !horas_MaximasTipoEmpleado} type="text" keyfilter="pint" value={horas_MaximasTipoEmpleado} maxLength={10}
                   onChange={(event)=>{
                     if (validarNumero(event.target.value)) {    

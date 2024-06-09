@@ -62,7 +62,6 @@ const TipoSala = () => {
       setEnviado(true);
       return;
     }
-
     //MANDAR A LLAMAR AL REGISTRO SERVICE
     const action = () => {
       TipoSalaService.registrarTipoSala({
@@ -226,7 +225,7 @@ const TipoSala = () => {
     <>
         {/*APARICION DE LOS MENSAJES (TOAST)*/}
         <Toast ref={toast} />
-        <Toolbar start={<h2 className="m-0">Unidad Academica</h2>} end={Herramientas}/>
+        <Toolbar start={<h2 className="m-0">Tipo Sala</h2>} end={Herramientas}/>
         <ConfirmDialog />      
         <Dialog header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>        
         <div className="formgrid grid justify-content-center">          
@@ -240,7 +239,7 @@ const TipoSala = () => {
                   }}  
                   required
                   placeholder="Ej.Aula Audiovisual" 
-              className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full custom-input-text"/>              
+              className="w-full"/>              
           </div>                                                                                     
         </div>
         <div className="formgrid grid justify-content-end">

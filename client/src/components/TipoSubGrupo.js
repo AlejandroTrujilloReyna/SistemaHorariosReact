@@ -197,8 +197,8 @@ const TipoSubGrupo = () => {
   
     const headerTemplate = (
       <div className="formgrid grid justify-content-center border-bottom-1 border-300">
-        {abrirDialog===1 && (<h4>Registrar Unidad Academica</h4>)}
-        {abrirDialog===2 && (<h4>Modificar Unidad Academica</h4>)}
+        {abrirDialog===1 && (<h4>Registrar Tipo de Subgrupo</h4>)}
+        {abrirDialog===2 && (<h4>Modificar Tipo de Subgrupo</h4>)}
       </div>
     );  
 
@@ -224,7 +224,7 @@ const TipoSubGrupo = () => {
     return (
       <>
       <Toast ref={toast} />
-      <Toolbar start={<h2 className="m-0">Unidad Academica</h2>} end={Herramientas}/>
+      <Toolbar start={<h2 className="m-0">Tipo de Subgrupo</h2>} end={Herramientas}/>
       <ConfirmDialog />
         <Dialog header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
           <div className="formgrid grid justify-content-center">            
@@ -238,7 +238,7 @@ const TipoSubGrupo = () => {
                     }}  
                     required
                     placeholder="Ej.Taller"
-                className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"/>              
+                className="w-full"/>              
             </div>                                                                           
           </div>
           <div className="formgrid grid justify-content-end">
