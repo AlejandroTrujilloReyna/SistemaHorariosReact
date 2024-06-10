@@ -18,6 +18,9 @@ const HorarioService = {
     },    
     registrarHorarioYSubGrupo:(datos)=>{
         return Axios.post("http://localhost:3001/horario/registrarHorarioYSubGrupo",datos);
+    },    
+    modificarHorarioYSubGrupo:(datos)=>{
+        return Axios.put("http://localhost:3001/horario/modificarHorarioYSubGrupo",datos);
     }
 }
 

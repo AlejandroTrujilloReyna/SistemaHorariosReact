@@ -531,7 +531,7 @@ const cellEditor = (options) => {
   
     sethorariolist(updatedHorarios); // Actualizar el estado de los horarios con los datos editados
   };
-  
+    
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}

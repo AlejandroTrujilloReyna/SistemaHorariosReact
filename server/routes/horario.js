@@ -185,5 +185,70 @@ router.post("/registrarHorarioYSubGrupo", (req, res) => {
     });
 });
 
+router.put("/modificarHorarioYSubGrupo", (req, res) => {
+    
+    const clave_Horario = req.body.clave_Horario;
+    const clave_SubGrupo = req.body.clave_SubGrupo;
+    const hora_Entrada = req.body.hora_Entrada;
+    const hora_Salida = req.body.hora_Salida;
+    const clave_Dia = req.body.clave_Dia;
+    const clave_Sala = req.body.clave_Sala;
+    const no_SubGrupo = req.body.no_SubGrupo;
+    const capacidad_SubGrupo = req.body.capacidad_SubGrupo;
+    const horas_Asignadas=0;
+    const clave_Grupo = req.body.clave_Grupo;
+    const no_Empleado_Docente = req.body.no_Empleado_Docente;
+    const clave_UnidadAprendizaje = req.body.clave_UnidadAprendizaje;
+    const clave_TipoSubGrupo = req.body.clave_TipoSubGrupo;
+    
+    
+
+    if (hora_Salida < hora_Entrada) {
+        return res.status(401).send("La hora de salida debe ser posterior a la hora de entrada");
+    }
+        
+    if(!clave_Horario || !clave_SubGrupo || !hora_Entrada || !hora_Salida || !clave_Dia || !clave_Sala || !capacidad_SubGrupo || !clave_Grupo || !no_Empleado_Docente || !clave_UnidadAprendizaje || !clave_TipoSubGrupo){
+        console.error("DATOS: " + hora_Entrada + ", " + hora_Salida + "," + clave_Dia + ", " +  clave_Sala + ", " +  capacidad_SubGrupo + ", " +  horas_Asignadas + ", " +  clave_Grupo + ", " +  no_Empleado_Docente + ", " +  clave_UnidadAprendizaje + ", " +  clave_TipoSubGrupo);
+        return res.status(501).send("Campo vacio");
+    }
+    db.beginTransaction((err) => {
+        if (err) {
+            console.error("Error al iniciar la transacción:", err);
+            return res.status(500).send("Error interno del servidor");
+        }
+
+        db.query('UPDATE subgrupo SET no_SubGrupo = ?, capacidad_SubGrupo = ?, horas_Asignadas = ?, clave_Grupo = ?, no_Empleado_Docente = ?, clave_UnidadAprendizaje = ?, clave_TipoSubGrupo = ? WHERE clave_SubGrupo = ?',
+            [no_SubGrupo, capacidad_SubGrupo, horas_Asignadas, clave_Grupo, no_Empleado_Docente, clave_UnidadAprendizaje, clave_TipoSubGrupo,clave_SubGrupo], (err, result) => {
+                console.error("DATOS: " + hora_Entrada + ", " + hora_Salida + "," + clave_Dia + ", " + clave_Sala + ", " + capacidad_SubGrupo + ", " + horas_Asignadas + ", " + clave_Grupo + ", " + no_Empleado_Docente + ", " + clave_UnidadAprendizaje + ", " + clave_TipoSubGrupo + ", "+clave_SubGrupo);
+                if (err) {
+                    console.error(err);
+                    return db.rollback(() => {
+                        res.status(500).send("Error interno del servidor");
+                    });
+                }                
+
+                db.query('UPDATE horario SET hora_Entrada = ?, hora_Salida = ?, clave_Dia = ?, clave_SubGrupo = ?, clave_Sala = ? WHERE clave_Horario = ?',
+                    [hora_Entrada, hora_Salida, clave_Dia, clave_SubGrupo, clave_Sala,clave_SubGrupo,clave_Horario], (err, result) => {
+                        if (err) {
+                            console.error(err);
+                            return db.rollback(() => {
+                                res.status(500).send("Error interno del servidor");
+                            });
+                        }
+
+                        db.commit((err) => {
+                            if (err) {
+                                return db.rollback(() => {
+                                    console.error("Error al confirmar la transacción:", err);
+                                    res.status(500).send("Error interno del servidor");
+                                });
+                            }
+
+                            res.status(200).send("Horario y SubGrupo Modificado con éxito");
+                        });
+                    });
+            });
+    });
+});
 
 module.exports = router;
