@@ -14,25 +14,39 @@ import { Dialog } from 'primereact/dialog';//NUEVO
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
 import { IconField } from 'primereact/iconfield';//NUEVO
 import { InputIcon } from 'primereact/inputicon';//NUEVO
+import { validarNumero} from '../services/ValidacionGlobalService';
 import { FilterMatchMode } from 'primereact/api';
 import HorarioService from '../services/HorarioService';
 import DiaService from '../services/DiaService';
 import SalaService from '../services/SalaService';
+import GrupoService from '../services/GrupoService';
+import DocenteService from '../services/DocenteService';
+import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
+import TipoSubGrupoService from '../services/TipoSubGrupoService';
 
 const Horario = () => {
   //VARIABLES PARA EL REGISTRO
   const [clave_Horario,setclave_Horario] = useState();  
-  const [hora_Entrada,sethora_Entrada] = useState();
-  const [hora_Salida,sethora_Salida] = useState();
+  const [clave_Grupo,setclave_Grupo] = useState(null);
+  const [clave_UnidadAprendizaje,setclave_UnidadAprendizaje] = useState(null);
+  const [no_Empleado_Docente,setno_Empleado_Docente] = useState(null);
+  const [clave_TipoSubGrupo,setclave_TipoSubGrupo] = useState(null);
+  const [hora_Entrada,sethora_Entrada] = useState('');
+  const [hora_Salida,sethora_Salida] = useState('');
   const [clave_Dia,setclave_Dia] = useState(null);
   const [clave_SubGrupo,setclave_SubGrupo] = useState(null);
   const [clave_Sala,setclave_Sala] = useState(null);
+  const [capacidad_SubGrupo,setcapacidad_SubGrupo] = useState("");
   //VARIABLES PARA LA CONSULTA
   const [horariolist,sethorariolist] = useState([]);
   const [filtrohorario,setfiltrohorario] = useState([]);
   const [dias, setDias] = useState([]);
   const [subgrupos, setSubgrupos] = useState([]);
   const [salas, setSalas] = useState([]);
+  const [gruposList, setGrupoList] = useState([]);
+  const [docenteList, setdocenteList] = useState([]);
+  const [unidadesAprendizajeList, setunidadesAprendizajeList] = useState([]);
+  const [tipoSubGrupoList, settipoSubGrupoList] = useState([]);
   const dt = useRef(null);
   const [lazyState, setlazyState] = useState({
     filters: {
@@ -45,14 +59,21 @@ const Horario = () => {
     },
   });
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
-  const [datosCopia, setDatosCopia] = useState({
-    clave_Horario: "",
+  const [datosCopia, setDatosCopia] = useState({    
+    clave_Horario:"",
+    clave_Grupo:"",
+    clave_UnidadAprendizaje: "",
+    no_Empleado_Docente: "",
+    clave_TipoSubGrupo: "",
+    capacidad_SubGrupo:"",
     hora_Entrada: "",
     hora_Salida: "",
     clave_Dia: "",
     clave_SubGrupo: "",
     clave_Sala: ""
   });       
+
+  const [selectedRow, setSelectedRow] = useState(null); // Estado para almacenar la fila seleccionada
   //VARIABLES PARA EL ERROR
   const toast = useRef(null);
   //ESTADOS PARA CONDICIONES
@@ -75,19 +96,23 @@ const Horario = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    if (!hora_Entrada || !hora_Salida || !clave_Dia || !clave_SubGrupo || !clave_Sala) {
+    if (!clave_Grupo || !clave_UnidadAprendizaje  || !no_Empleado_Docente || !clave_TipoSubGrupo || !capacidad_SubGrupo || !hora_Entrada || !hora_Salida || !clave_Dia || !clave_Sala) {
       mostrarAdvertencia(toast,"Existen campos obligatorios vacíos");
       setEnviado(true);
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
     const action = () => {
-    HorarioService.registrarHorario({
-        hora_Entrada:hora_Entrada,
-        hora_Salida:hora_Salida,
-        clave_Dia:clave_Dia,
-        clave_SubGrupo:clave_SubGrupo,
-        clave_Sala:clave_Sala      
+    HorarioService.registrarHorarioYSubGrupo({
+      clave_Grupo: clave_Grupo,
+      clave_UnidadAprendizaje: clave_UnidadAprendizaje,
+      no_Empleado_Docente: no_Empleado_Docente,
+      clave_TipoSubGrupo: clave_TipoSubGrupo,
+      capacidad_SubGrupo: capacidad_SubGrupo,
+      hora_Entrada:hora_Entrada,
+      hora_Salida:hora_Salida,
+      clave_Dia:clave_Dia,        
+      clave_Sala:clave_Sala          
     }).then(response=>{
       if (response.status === 200) {//CASO EXITOSO
         mostrarExito(toast,"Registro Exitoso");
@@ -110,7 +135,7 @@ const Horario = () => {
   
   //FUNCION PARA CONSULTA
   const get = ()=>{
-    HorarioService.consultarHorario().then((response)=>{//CASO EXITOSO
+    HorarioService.consultaCompletaHorario().then((response)=>{//CASO EXITOSO
       sethorariolist(response.data);  
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 500) {
@@ -139,13 +164,19 @@ const Horario = () => {
       return;
     }
     const action = () => {        
-    HorarioService.modificarHorario({
+    HorarioService.modificarHorarioYSubGrupo({
       clave_Horario:clave_Horario,
+      clave_SubGrupo: clave_SubGrupo,
+      clave_Grupo: clave_Grupo,
+      clave_UnidadAprendizaje: clave_UnidadAprendizaje,
+      no_Empleado_Docente: no_Empleado_Docente,
+      clave_TipoSubGrupo: clave_TipoSubGrupo,
+      capacidad_SubGrupo: capacidad_SubGrupo,
       hora_Entrada:hora_Entrada,
       hora_Salida:hora_Salida,
-      clave_Dia:clave_Dia,
-      clave_SubGrupo:clave_SubGrupo,
-      clave_Sala:clave_Sala  
+      clave_Dia:clave_Dia,        
+      clave_Sala:clave_Sala,
+      no_SubGrupo:0
     }).then(response=>{//CASO EXITOSO
       if(response.status === 200){
         mostrarExito(toast, "Modificación Exitosa");
@@ -183,13 +214,19 @@ const Horario = () => {
 
   //COLUMNAS PARA LA TABLA
   const columns = [
-    {field: 'clave_Horario', header: 'Clave', filterHeader: 'Filtro por Clave' },
-    {field: 'hora_Entrada', header: 'Entrada', filterHeader: 'Filtro por Entrada'},
-    {field: 'hora_Salida', header: 'Salida', filterHeader: 'Filtro por Salida'},
-    {field: 'clave_Dia', header: 'Día', filterHeader: 'Filtro por Dia'},
-    {field: 'clave_SubGrupo', header: 'Subgrupo', filterHeader: 'Filtro por Subgrupo'},
-    {field: 'clave_Sala', header: 'Sala', filterHeader: 'Filtro por Sala'}         
-  ];  
+    {field: 'clave_SubGrupo', header: 'Clave SubGrupo', hidden: true, exportable: true },
+    {field: 'clave_Horario', header: 'Clave Horario', hidden: true, exportable: true },
+    {field: 'clave_UnidadAprendizaje', header: 'Clave Unidad Aprendizaje', hidden: true, exportable: true },
+    {field: 'unidadAprendizaje', header: 'Unidad Aprendizaje' },
+    {field: 'no_Empleado_Docente', header: 'NoEmpleado Docente', hidden: true, exportable: true },  
+    {field: 'docente', header: 'Docente' }, 
+    {field: 'clave_TipoSubGrupo', header: 'Tipo de SubGrupo' },
+    {field: 'capacidad_SubGrupo', header: 'Capacidad' },
+    {field: 'hora_Entrada', header: 'Entrada' },
+    {field: 'hora_Salida', header: 'Salida'},
+    {field: 'clave_Dia', header: 'Día'},    
+    {field: 'clave_Sala', header: 'Sala'},    
+  ];
 
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
   useEffect(() => {
@@ -198,9 +235,12 @@ const Horario = () => {
   
   //FUNCION PARA LA BARRA DE BUSQUEDA
   const onSearch = (e) => {
-    const value = e.target.value.toLowerCase();
+    const value = e.target.value.toLowerCase();    
     const filteredData = horariolist.filter((item) => {
         return (
+            item.unidadAprendizaje.toString().includes(value)||
+            item.docente.toString().includes(value)||
+            item.capacidad_SubGrupo.toString().includes(value)||
             item.clave_Horario.toString().includes(value)||
             item.hora_Entrada.toString().includes(value) ||
             item.hora_Salida.toString().includes(value) ||
@@ -212,6 +252,130 @@ const Horario = () => {
     setfiltrohorario(filteredData);
   };
   
+  const inicializar = (init) => {    
+    setclave_Horario(init.clave_Horario);
+    setclave_Grupo(init.clave_Grupo);
+    setclave_UnidadAprendizaje(init.clave_UnidadAprendizaje);
+    setno_Empleado_Docente(init.no_Empleado_Docente);
+    setclave_TipoSubGrupo(init.clave_TipoSubGrupo);
+    setcapacidad_SubGrupo(init.capacidad_SubGrupo);
+    sethora_Entrada(init.hora_Entrada);
+    sethora_Salida(init.hora_Salida);
+    setclave_Dia(init.clave_Dia);
+    setclave_SubGrupo(init.clave_SubGrupo);
+    setclave_Sala(init.clave_Sala);
+    setDatosCopia({
+      clave_Horario: clave_Horario,
+      clave_Grupo: clave_Grupo,
+      clave_UnidadAprendizaje: clave_UnidadAprendizaje,
+      no_Empleado_Docente: no_Empleado_Docente,
+      clave_TipoSubGrupo: clave_TipoSubGrupo,
+      capacidad_SubGrupo: capacidad_SubGrupo,
+      hora_Entrada: hora_Entrada,
+      hora_Salida: hora_Salida,
+      clave_Dia: clave_Dia,
+      clave_SubGrupo: clave_SubGrupo,
+      clave_Sala: clave_Sala
+    });
+  }
+  
+  const ediciones = (edit) =>{ 
+    console.error("AAAAA");
+    /*inicializar(edit.rowData);    
+    switch (edit.field) {
+      case 'unidadAprendizaje':
+        return (
+          <Dropdown className="w-full" invalid={enviado === true && !clave_UnidadAprendizaje}
+            value={clave_UnidadAprendizaje}
+            options={unidadesAprendizajeList}
+            onChange={(e) => {
+              setclave_UnidadAprendizaje(e.value);
+            }}
+
+            optionLabel={(option) => `${option.clave_UnidadAprendizaje} - ${option.nombre_UnidadAprendizaje}`}
+            optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            placeholder="Seleccione la Unidad de Aprendizaje"
+          />);
+      case 'docente':
+        return (
+          <Dropdown className="w-full" invalid={enviado === true && !no_Empleado_Docente}
+            value={no_Empleado_Docente}
+            options={docenteList}
+            onChange={(e) => {
+              setno_Empleado_Docente(e.value);
+            }}
+
+            optionLabel="no_EmpleadoDocente"
+            optionValue="no_EmpleadoDocente" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            placeholder="Seleccione El docente a impartir"
+          />);
+      case 'clave_TipoSubGrupo':
+        return (
+          <Dropdown className="w-full" invalid={enviado === true && !clave_TipoSubGrupo}
+            value={clave_TipoSubGrupo}
+            options={tipoSubGrupoList}
+            onChange={(e) => {
+              setclave_TipoSubGrupo(e.value);
+            }}
+
+            optionLabel="nombre_TipoSubGrupo"
+            optionValue="clave_TipoSubGrupo" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            placeholder="Seleccione un Tipo de SubGrupo"
+          />);
+      case 'capacidad_SubGrupo':
+        return (
+          <InputText type="text" keyfilter={/^[0-9]*$/} value={capacidad_SubGrupo} maxLength={10} invalid={enviado === true && !hora_Entrada}
+            onChange={(event) => {
+              if (validarNumero(event.target.value)) {
+                setcapacidad_SubGrupo(event.target.value);
+              }
+            }}
+            placeholder="Ej.25"
+          />);
+      case 'hora_Entrada':
+        return (
+          <InputText type="time" value={hora_Entrada} maxLength={10} invalid={enviado === true && !hora_Entrada}
+            onChange={(event) => {
+              sethora_Entrada(event.target.value);
+            }}
+            className="w-full" />);
+      case 'hora_Salida':
+        return (
+          <InputText type="time" value={hora_Salida} maxLength={10} invalid={enviado === true && !hora_Salida}
+            onChange={(event) => {
+              sethora_Salida(event.target.value);
+            }}
+            className="w-full" />);
+      case 'clave_Dia':
+        return (
+          <Dropdown className="w-full" invalid={enviado === true && !clave_Dia}
+            value={clave_Dia}
+            options={dias}
+            onChange={(e) => {
+              setclave_Dia(e.value);
+            }}
+            optionLabel="nombre_Dia"
+            optionValue="clave_Dia" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            placeholder="Seleccione un Día"
+          />);
+      case 'clave_Sala':
+        return (
+          <Dropdown className="w-full"
+            value={clave_Sala}
+            invalid={enviado === true && !clave_Sala}
+            options={salas}
+            onChange={(e) => {
+              setclave_Sala(e.value);
+            }}
+            optionLabel="nombre_Sala"
+            optionValue="clave_Sala" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            placeholder="Seleccione una Salas"
+          />);                                                                                               
+      default:
+        return 0;
+    }*/
+  }
+
   //BOTON PARA MODIFICAR
   const accionesTabla = (rowData) => {
     return (<>
@@ -222,13 +386,23 @@ const Horario = () => {
           className="m-1"
           onClick={() => {
             setclave_Horario(rowData.clave_Horario);
+            setclave_Grupo(rowData.clave_Grupo);
+            setclave_UnidadAprendizaje(rowData.clave_UnidadAprendizaje);
+            setno_Empleado_Docente(rowData.no_Empleado_Docente);
+            setclave_TipoSubGrupo(rowData.clave_TipoSubGrupo);
+            setcapacidad_SubGrupo(rowData.capacidad_SubGrupo);
             sethora_Entrada(rowData.hora_Entrada);
             sethora_Salida(rowData.hora_Salida);
             setclave_Dia(rowData.clave_Dia);
             setclave_SubGrupo(rowData.clave_SubGrupo);
             setclave_Sala(rowData.clave_Sala);
             setDatosCopia({
-              clave_Horario: rowData.clave_Horario,
+              clave_Horario:clave_Horario,
+              clave_Grupo:clave_Grupo,
+              clave_UnidadAprendizaje: clave_UnidadAprendizaje,
+              no_Empleado_Docente: no_Empleado_Docente,
+              clave_TipoSubGrupo: clave_TipoSubGrupo,  
+              capacidad_SubGrupo:capacidad_SubGrupo,            
               hora_Entrada: rowData.hora_Entrada,
               hora_Salida: rowData.hora_Salida,
               clave_Dia: rowData.clave_Dia,
@@ -247,6 +421,34 @@ const Horario = () => {
     DiaService.consultarDia()
       .then(response => {
         setDias(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching dia:", error);
+      });
+      GrupoService.consultarGrupo()
+      .then(response => {
+        setGrupoList(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching dia:", error);
+      });
+    DocenteService.consultarDocente()
+      .then(response => {
+        setdocenteList(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching dia:", error);
+      });
+    UnidadAprendizajeService.consultarUnidadAprendizaje()
+      .then(response => {
+        setunidadesAprendizajeList(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching dia:", error);
+      });
+    TipoSubGrupoService.consultarTipoSubGrupo()
+      .then(response => {
+        settipoSubGrupoList(response.data);
       })
       .catch(error => {
         console.error("Error fetching dia:", error);
@@ -280,10 +482,13 @@ const Horario = () => {
     if (field === 'clave_Dia') {
       const dia = dias.find((dia) => dia.clave_Dia === rowData.clave_Dia);
       return dia ? `${dia.nombre_Dia}` : '';
-    }else if (field === 'clave_SubGrupo') {
+    }else if (field === 'clave_TipoSubGrupo') {
+      const tiposubgrupo = tipoSubGrupoList.find((tiposubgrupo) => tiposubgrupo.clave_TipoSubGrupo === rowData.clave_TipoSubGrupo);
+      return tiposubgrupo ? `${tiposubgrupo.nombre_TipoSubGrupo}` : '';
+    }/*else if (field === 'clave_SubGrupo') {
       const subgrupo = subgrupos.find((subgrupo) => subgrupo.clave_SubGrupo === rowData.clave_SubGrupo);
       return subgrupo ? `${subgrupo.no_SubGrupo}` : '';
-    }else if (field === 'clave_Sala') {
+    }*/else if (field === 'clave_Sala') {
       const sala = salas.find((sala) => sala.clave_Sala === rowData.clave_Sala);
       return sala ? `${sala.nombre_Sala}` : '';
     }else {
@@ -320,6 +525,10 @@ const Horario = () => {
     setlazyState(event);
   };  
     
+  const allowEdit = (rowData) => {    
+    return rowData;
+  };
+  
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
@@ -327,25 +536,91 @@ const Horario = () => {
     <Toolbar start={<h2 className="m-0">Horarios</h2>} end={Herramientas}/>
     <ConfirmDialog />    
       <Dialog className='w-10' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
-          <div className="formgrid grid mx-8 justify-content-center">
-            <div className="field col-2">            
-                <label>Hora de entrada*</label>
+          <div className="formgrid grid justify-content-center">
+            <div className="field mr-2">
+              <label className="font-bold">Grupo*</label>
+              <Dropdown className="w-full" invalid={enviado===true && !clave_Grupo}
+                value={clave_Grupo} 
+                options={gruposList} 
+                onChange={(e) => {
+                  setclave_Grupo(e.value);
+                }} 
+                
+                optionLabel = "nombre_Grupo"
+                optionValue="clave_Grupo" // Aquí especificamos que la clave del grupo se utilice como el valor de la opción seleccionada
+                placeholder="Seleccione un Grupo"               
+              />
+            </div>
+            <div className="field mr-2">
+              <label className="font-bold">Unidad de Aprendizaje*</label><br></br>      
+              <Dropdown  invalid={enviado===true && !clave_UnidadAprendizaje}
+                value={clave_UnidadAprendizaje} 
+                options={unidadesAprendizajeList} 
+                onChange={(e) => {
+                  setclave_UnidadAprendizaje(e.value);
+                }}                 
+                optionLabel = {(option) => `${option.clave_UnidadAprendizaje} - ${option.nombre_UnidadAprendizaje}`}
+                optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+                placeholder="Seleccione la Unidad de Aprendizaje"               
+              />
+            </div>
+            <div className="field col-3">
+              <label className="font-bold">Docente*</label>
+              <Dropdown invalid={enviado===true && !no_Empleado_Docente}
+                value={no_Empleado_Docente} 
+                options={docenteList} 
+                onChange={(e) => {
+                  setno_Empleado_Docente(e.value);
+                }} 
+                className="w-full"
+                optionLabel = "no_EmpleadoDocente"
+                optionValue="no_EmpleadoDocente" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+                placeholder="Seleccione El docente a impartir"               
+              />
+            </div>
+            <div className="field col-3 mr-2">
+              <label className="font-bold">Tipo de SubGrupo*</label>
+              <Dropdown invalid={enviado===true && !clave_TipoSubGrupo}
+                value={clave_TipoSubGrupo} 
+                options={tipoSubGrupoList} 
+                onChange={(e) => {
+                  setclave_TipoSubGrupo(e.value);
+                }} 
+                className="w-full"
+                optionLabel = "nombre_TipoSubGrupo"
+                optionValue="clave_TipoSubGrupo" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+                placeholder="Seleccione un Tipo de SubGrupo"               
+              />
+            </div>
+            <div className="field col mr-2">
+              <label className="font-bold"> Capacidad*</label>
+              <InputText className="w-full" type="text" keyfilter={/^[0-9]*$/} value={capacidad_SubGrupo} maxLength={10} invalid={enviado===true && !hora_Entrada}          
+                onChange={(event)=>{
+                  if (validarNumero(event.target.value)) {
+                    setcapacidad_SubGrupo(event.target.value);
+                  }
+                }}                               
+                placeholder="Ej.25"              
+              />                    
+            </div>
+            <div className="field col">            
+                <label className="font-bold">Hora de entrada*</label>
                 <InputText type="time" value={hora_Entrada} maxLength={10} invalid={enviado===true && !hora_Entrada}
                     onChange={(event)=>{
                         sethora_Entrada(event.target.value);
                     }}  
                 className="w-full"/>          
             </div>
-            <div className="field col-2">
-                <label>Hora de salida*</label>
+            <div className="field col">
+                <label className="font-bold">Hora de salida*</label>
                 <InputText type="time" value={hora_Salida} maxLength={10} invalid={enviado===true && !hora_Salida}
                     onChange={(event)=>{
                         sethora_Salida(event.target.value);
                     }}  
                 className="w-full"/>              
             </div>
-            <div className="field col-3">
-              <label>Día*</label>
+            <div className="field col">
+              <label className="font-bold">Día*</label>
               <Dropdown className="w-full" invalid={enviado===true && !clave_Dia}
                 value={clave_Dia} 
                 options={dias} 
@@ -356,23 +631,9 @@ const Horario = () => {
                 optionValue="clave_Dia" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
                 placeholder="Seleccione un Día" 
               />
-            </div>
-            <div className="field col-3">
-              <label>Subgrupo*</label>
-              <Dropdown className="w-full"
-                value={clave_SubGrupo}
-                invalid={enviado===true && !clave_SubGrupo} 
-                options={subgrupos} 
-                onChange={(e) => {
-                  setclave_SubGrupo(e.value);
-                }} 
-                optionLabel="clave_SubGrupo" 
-                optionValue="clave_SubGrupo" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
-                placeholder="Seleccione un Subgrupo" 
-              />
-            </div>
-            <div className="field col-3">
-              <label>Sala*</label>
+            </div>            
+            <div className="field col">
+              <label className="font-bold">Sala*</label>
               <Dropdown className="w-full"
                 value={clave_Sala}
                 invalid={enviado===true && !clave_Sala}  
@@ -398,9 +659,15 @@ const Horario = () => {
       </Dialog>
       {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
       <DataTable
-      onFilter={onFilter} filters={lazyState.filters} filterDisplay="row" 
+      editMode="row"
+      onFilter={onFilter} filters={lazyState.filters} filterDisplay="row"  dataKey="clave_Horario"
       ref={dt} scrollable scrollHeight="78vh"  value={filtrohorario.length ? filtrohorario :horariolist} size='small'>
-          {columns.map(({ field, header, filterHeader }) => {
+          {/*<Column
+            rowEditor={allowEdit}
+            headerStyle={{ width: '10%', minWidth: '8rem' }}
+            bodyStyle={{ textAlign: 'center' }}
+          ></Column>*/}
+          {columns.map(({ field, header, hidden, filterHeader }) => {
               return <Column sortable filter filterPlaceholder={filterHeader} key={field} field={field} header={header}
               filterMatchModeOptions={[
                 { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
@@ -410,8 +677,8 @@ const Horario = () => {
                 { label: 'Igual', value: FilterMatchMode.EQUALS },
                 { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
               ]} 
-              style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}} body={(rowData) => renderBody(rowData, field)}
-              />;
+              style={hidden ? { display: 'none' } : { minWidth: '40vh' }} bodyStyle={{textAlign:'center'}} body={(rowData) => renderBody(rowData, field)}
+              editor={(rowData) => ediciones(rowData,field)}/>;
           })}
           <Column body={accionesTabla} alignFrozen={'right'} frozen={true}></Column>    
       </DataTable>                     

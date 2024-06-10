@@ -102,10 +102,6 @@ const Menu = () => {
                     command: () => { window.location.href = '/GradoEstudio'; }
                 },
                 {
-                    label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Subgrupos</span>,
-                    command: () => { window.location.href = '/SubGrupo'; }
-                },
-                {
                     label: <span style={{ color: "white", fontWeight: "bold", flex: "2", fontFamily: 'Arial, sans-serif' }}>Modificar Subgrupos</span>,
                     command: () => { window.location.href = '/ModificarSubgrupos'; }
                 },
