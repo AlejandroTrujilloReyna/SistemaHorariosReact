@@ -4,17 +4,23 @@ import { useEffect } from "react";
 import { useRef } from 'react';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
-import { Panel } from 'primereact/panel';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
-import { mostrarExito, mostrarAdvertencia, mostrarError } from '../services/ToastService';
+import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion} from '../services/ToastService';
+import { Toolbar } from 'primereact/toolbar';//NUEVO
+import { Dialog } from 'primereact/dialog';//NUEVO
+import { IconField } from 'primereact/iconfield';//NUEVO
+import { InputIcon } from 'primereact/inputicon';//NUEVO
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
+import { FilterMatchMode } from 'primereact/api';
 import ModificarSubgruposService from '../services/ModificarSubgruposService';
 import ProgramaEducativoService from '../services/ProgramaEducativoService';
 
 const ModificarSubgrupos = () => {
   //VARIABLES PARA EL REGISTRO
+  const [clave_ModificarSubgrupos, setclave_ModificarSubgrupos] = useState(null);
   const [clave_ProgramaEducativo,setclave_ProgramaEducativo] = useState(null);
   const [clave_UnidadAprendizajePlanEstudios,setclave_UnidadAprendizajePlanEstudios] = useState(null);
   //VARIABLES PARA LA CONSULTA
@@ -22,19 +28,49 @@ const ModificarSubgrupos = () => {
   const [filtroModificarSubgrupos, setfiltroModificarSubgrupos] = useState([]);
   const [programaseducativos, setprogramaseducativos] = useState([]);
   const [unidadesaprenizajeplanesestudios, setunidadesaprenizajeplanesestudios] = useState([]);
+  const dt = useRef(null);
+  const [lazyState, setlazyState] = useState({
+    filters: {
+      clave_ModificarSubgrupos: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      clave_ProgramaEducativo: { value: '', matchMode: FilterMatchMode.STARTS_WITH },
+      clave_UnidadAprendizajePlanEstudios: { value: '', matchMode: FilterMatchMode.STARTS_WITH }
+    },
+  });
   //VARIABLE PARA LA MODIFICACION QUE INDICA QUE SE ESTA EN EL MODO EDICION
-  const [editando,seteditando] = useState(false);  
+  const [datosCopia, setDatosCopia] = useState({
+    clave_ModificarSubgrupos: "",
+    clave_ProgramaEducativo: "",
+    clave_UnidadAprendizajePlanEstudios: ""
+  });      
   //VARIABLES PARA EL ERROR
   const toast = useRef(null);
+  //ESTADOS PARA CONDICIONES
+  const [enviado, setEnviado] = useState(false);
+  const [abrirDialog,setAbrirDialog] = useState(0);
+  
+  const confirmar1 = (action) => {
+    confirmDialog({
+      message: '¿Seguro que quieres proceder?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'accept',
+      accept: action,
+      reject: () => mostrarAdvertencia(toast, "Cancelado")
+    });
+  };  
 
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
     if (!clave_ProgramaEducativo || !clave_UnidadAprendizajePlanEstudios) {
       mostrarAdvertencia(toast, "Existen campos Obligatorios vacíos");
+      setEnviado(true);
       return;
     }
     //MANDAR A LLAMAR AL REGISTRO SERVICE
+    const action = () => {
     ModificarSubgruposService.registrarModificarSubgrupos({
       clave_ProgramaEducativo:clave_ProgramaEducativo,
       clave_UnidadAprendizajePlanEstudios:clave_UnidadAprendizajePlanEstudios 
@@ -43,6 +79,8 @@ const ModificarSubgrupos = () => {
         mostrarExito(toast, "Registro Exitoso");
         get();
         limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);
       }
     }).catch(error=>{//EXCEPCIONES
       if (error.response.status === 400) {
@@ -51,6 +89,7 @@ const ModificarSubgrupos = () => {
         mostrarError(toast, "Error interno del servidor");
       }     
     });
+    };confirmar1(action);
   }
 
   //FUNCION PARA CONSULTA
@@ -65,10 +104,33 @@ const ModificarSubgrupos = () => {
   }
   
   //FUNCION PARA LA MODIFICACION
-  const put = (rowData) =>{
-    ModificarSubgruposService.modificarModificarSubgrupos(rowData).then(response=>{//CASO EXITOSO
+  const put = () =>{
+    //VALIDACION DE CAMPOS VACIOS
+    if (!clave_ProgramaEducativo || !clave_UnidadAprendizajePlanEstudios) {
+      mostrarAdvertencia(toast, "Existen campos Obligatorios vacíos");
+      setEnviado(true);
+      return;
+    }    
+    if (clave_ModificarSubgrupos === datosCopia.clave_ModificarSubgrupos
+      && clave_ProgramaEducativo === datosCopia.clave_ProgramaEducativo
+      && clave_UnidadAprendizajePlanEstudios === datosCopia.clave_UnidadAprendizajePlanEstudios) {
+      mostrarInformacion(toast, "No se han realizado cambios");
+      setAbrirDialog(0);
+      limpiarCampos();
+      return;
+    }
+    const action = () => {      
+    ModificarSubgruposService.modificarModificarSubgrupos({
+      clave_ModificarSubgrupos:clave_ModificarSubgrupos,
+      clave_ProgramaEducativo:clave_ProgramaEducativo,
+      clave_UnidadAprendizajePlanEstudios:clave_UnidadAprendizajePlanEstudios 
+    }).then(response=>{//CASO EXITOSO
       if(response.status === 200){
         mostrarExito(toast, "Modificación Exitosa");
+        get();
+        limpiarCampos();
+        setEnviado(false);
+        setAbrirDialog(0);
       }
     }).catch(error=>{//EXCEPCIONES
       if(error.response.status === 400){
@@ -77,7 +139,8 @@ const ModificarSubgrupos = () => {
       }else if(error.response.status === 500){
         mostrarError(toast, "Error del sistema");
       }
-    })
+    });
+    };confirmar1(action);
   }  
   
   //!!!EXTRAS DE REGISTRO
@@ -92,9 +155,9 @@ const ModificarSubgrupos = () => {
 
   //COLUMNAS PARA LA TABLA
   const columns = [
-    {field: 'clave_ModificarSubgrupos', header: 'Clave' },
-    {field: 'clave_ProgramaEducativo', header: 'Programa Educativo' },
-    {field: 'clave_UnidadAprendizajePlanEstudios', header: 'Unidad de Aprendizaje'}
+    {field: 'clave_ModificarSubgrupos', header: 'Clave', filterHeader: 'Filtro por Clave' },
+    {field: 'clave_ProgramaEducativo', header: 'Programa Educativo', filterHeader: 'Filtro por Programa Educativo' },
+    {field: 'clave_UnidadAprendizajePlanEstudios', header: 'Unidad de Aprendizaje', filterHeader: 'Filtro por Unidad de Aprendizaje'}
   ];
   
   //MANDAR A LLAMAR A LOS DATOS EN CUANTO SE INGRESA A LA PAGINA
@@ -113,6 +176,30 @@ const ModificarSubgrupos = () => {
         );
     });
     setfiltroModificarSubgrupos(filteredData);
+  };
+  
+  //BOTON PARA MODIFICAR
+  const accionesTabla = (rowData) => {
+    return (<>
+        <Button
+          icon="pi pi-pencil"
+          rounded
+          outlined
+          className="m-1"
+          onClick={() => {
+            setclave_ModificarSubgrupos(rowData.clave_ModificarSubgrupos);
+            setclave_ProgramaEducativo(rowData.clave_ProgramaEducativo);
+            setclave_UnidadAprendizajePlanEstudios(rowData.clave_UnidadAprendizajePlanEstudios);
+            setDatosCopia({
+              clave_ModificarSubgrupos: rowData.clave_ModificarSubgrupos,
+              clave_ProgramaEducativo: rowData.clave_ProgramaEducativo,
+              clave_UnidadAprendizajePlanEstudios: rowData.clave_UnidadAprendizajePlanEstudios
+            });
+            setAbrirDialog(2);
+          }}          
+        />     
+        </>
+    );
   };   
 
   //MANDAR A LLAMAR A LA LISTA DE PROGRAMAS EDUCATIVOS
@@ -149,84 +236,48 @@ const ModificarSubgrupos = () => {
       return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
     }
   };
+
+  //!!!EXTRAS GENERALES
+
+  //ENCABEZADO DEL DIALOG
+  const headerTemplate = (
+    <div className="formgrid grid justify-content-center border-bottom-1 border-300">
+      {abrirDialog===1 && (<h4>Registrar Asignación de subgrupos</h4>)}
+      {abrirDialog===2 && (<h4>Modificar Asignación de subgrupos</h4>)}
+    </div>
+  );
   
-  //!!!EXTRAS DE MODIFICACION
-
-  //ACTIVAR EDICION DE CELDA
-  const cellEditor = (options) => {
-    switch (options.field) {
-      case 'clave_ProgramaEducativo':
-        return ProgramaEducativoEditor(options);
-      case 'clave_UnidadAprendizajePlanEstudios':
-        return UnidadAprendizajePlanEstudiosEditor(options);
-      default:
-        return 0;
-    }
-  };
-
-  //COMPLETAR MODIFICACION
-  const onCellEditComplete = (e) => {
-    let { rowData, newValue, field, originalEvent: event } = e;
-    switch (field) {
-      //CADA CAMPO QUE SE PUEDA MODIRICAR ES UN CASO
-      case 'clave_ProgramaEducativo':
-        if (newValue > 0 && newValue !== null && newValue !== rowData[field]){ 
-          rowData[field] = newValue; put(rowData);
-        }
-        else{
-          event.preventDefault();
-        } 
-        break;
-      case 'clave_UnidadAprendizajePlanEstudios':
-        if(newValue > 0 && newValue !== null && newValue !== rowData[field]){
-          rowData[field] = newValue; put(rowData);
-        }else{
-          event.preventDefault();
-        }
-        break;  
-      default:
-      break;
-    }
-    seteditando(false);
-  };    
-
-  //EDITAR DROPDOWN (PROGRAMA EDUCATIVO)
-  const ProgramaEducativoEditor = (options) => {
-    return (
-      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={options.value} 
-                options={programaseducativos}  
-                onChange={(e) => options.editorCallback(e.value)}
-                optionLabel="nombre_ProgramaEducativo" 
-                optionValue="clave_ProgramaEducativo"
-                placeholder="Selecciona un Programa Educativo" 
-      />
+  //LISTA DE OPCIONES DE HERRAMIENTAS
+  const Herramientas = () => {
+    return (<div className="flex justify-content-between flex-wrap gap-2 align-items-center">
+            <Button label="Nuevo" icon="pi pi-plus" severity="success" onClick={()=>setAbrirDialog(1)}/>
+            <Button label="Exportar" icon="pi pi-upload" className="p-button-help"  onClick={()=>{dt.current.exportCSV();}}/>
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch}/>  
+              </IconField>
+            </div>              
     );
-  };
-  
-  //EDITAR DROPDOWN (UNIDAD DE APRENDIZAJE PLAN DE ESTUDIOS)
-  const UnidadAprendizajePlanEstudiosEditor = (options) => {
-    return (
-      <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-                value={options.value} 
-                options={unidadesaprenizajeplanesestudios}  
-                onChange={(e) => options.editorCallback(e.value)}
-                optionLabel="clave_UnidadAprendizaje" 
-                optionValue="clave_UnidadAprendizajePlanEstudios"
-                placeholder="Selecciona una Unidad de Aprendizaje" 
-      />
-    );
-  };
+  };  
+
+  //FUNCION PARA ACTIVAR EL FILTRADO
+  const onFilter = (event) => {
+    event['first'] = 0;
+    setlazyState(event);
+  };  
 
   return (
     <>
     {/*APARICION DE LOS MENSAJES (TOAST)*/}
     <Toast ref={toast} />
-    <Panel header="Registrar Modificar Subgrupo" className='mt-3' toggleable>
+    <Toolbar start={<h2 className="m-0">Asignar Subgrupos </h2>} end={Herramientas}/>
+    <ConfirmDialog />
+    <Dialog className='w-8' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid mx-8 justify-content-center">
           <div className="field col-6">
               <label>Programa Educativo*</label>
-            <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+            <Dropdown className="w-full"
+              invalid={enviado===true && !clave_ProgramaEducativo}
               value={clave_ProgramaEducativo} 
               options={programaseducativos} 
               onChange={(e) => {
@@ -238,8 +289,9 @@ const ModificarSubgrupos = () => {
             />
           </div>
           <div className="field col-6">
-              <label>Unidad de Aprendizaje*</label>
-            <Dropdown className="text-base text-color surface-overlay p-0 m-0 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+            <label>Unidad de Aprendizaje*</label>
+            <Dropdown className="w-full"
+              invalid={enviado===true && !clave_UnidadAprendizajePlanEstudios}
               value={clave_UnidadAprendizajePlanEstudios} 
               options={unidadesaprenizajeplanesestudios} 
               onChange={(e) => {
@@ -251,23 +303,37 @@ const ModificarSubgrupos = () => {
             />
           </div>                                                                                      
         </div>
-        <div className="mx-8 mt-4">
-          <Button label="Guardar" onClick={add} className="p-button-success" />
-        </div>   
-    </Panel>
+        <div className="formgrid grid justify-content-end">
+          <Button label="Cancelar" icon="pi pi-times" outlined className='m-2' onClick={() => {setAbrirDialog(0); setEnviado(false); limpiarCampos();}} severity='secondary' />
+          {abrirDialog===1 && (
+            <Button label="Guardar" icon="pi pi-check" className='m-2' onClick={add} severity='success' />
+          )}
+          {abrirDialog===2 && (
+            <Button label="Editar" icon="pi pi-check" className='m-2' onClick={put} severity='success' />
+          )}          
+        </div>    
+    </Dialog>
     {/*PANEL PARA LA CONSULTA DONDE SE INCLUYE LA MODIFICACION*/}
-    <Panel header="Consultar Modificar Subgrupo" className='mt-3' toggleable>
-    <div className="mx-8 mb-4">
-      <InputText type="search" placeholder="Buscar..." maxLength={255} onChange={onSearch} 
-      className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none w-full" />  
-    </div>  
-      <DataTable value={filtroModificarSubgrupos.length ? filtroModificarSubgrupos :modificarsubgruposList} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} editMode='cell' size='small' tableStyle={{ minWidth: '50rem' }}>
-        {columns.map(({ field, header }) => {
-            return <Column sortable={editando === false} key={field} field={field} header={header} style={{ width: '15%' }} body={(rowData) => renderBody(rowData, field)}
-            onCellEditInit={(e) => seteditando(true)} editor={field === 'clave_ModificarSubgrupos' ? null : (options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}/>;
+      <DataTable
+      onFilter={onFilter} filters={lazyState.filters} filterDisplay="row"  
+      ref={dt} 
+      value={filtroModificarSubgrupos.length ? filtroModificarSubgrupos :modificarsubgruposList} 
+      size='small'
+      scrollable scrollHeight="78vh">
+        {columns.map(({ field, header, filterHeader }) => {
+            return <Column 
+            filterMatchModeOptions={[
+              { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
+              { label: 'Contiene', value: FilterMatchMode.CONTAINS },
+              { label: 'No contiene', value: FilterMatchMode.NOT_CONTAINS },
+              { label: 'Termina con', value: FilterMatchMode.ENDS_WITH },
+              { label: 'Igual', value: FilterMatchMode.EQUALS },
+              { label: 'No igual', value: FilterMatchMode.NOT_EQUALS },
+            ]} 
+            sortable filter filterPlaceholder={filterHeader} key={field} field={field} header={header} style={{minWidth:'40vh'}} bodyStyle={{textAlign:'center'}} body={(rowData) => renderBody(rowData, field)}/>;
         })}
-      </DataTable>
-    </Panel>             
+        <Column body={accionesTabla} alignFrozen={'right'} frozen={true}></Column>  
+      </DataTable>         
     </>
   )
 }
