@@ -186,9 +186,9 @@ const DocenteN = () => {
   }
 
   const eliminarImpartir = ()=>{
-    if(unidadesseleccionadas.length ===0){// Si se desea que Unidades Aprendizaje a impartir pueda modificarse a vacio quitar
+    /*if(unidadesseleccionadas.length ===0){// Si se desea que Unidades Aprendizaje a impartir pueda modificarse a vacio quitar
         return 0;
-    }
+    }*/
     ImpartirUnidadAprendizajeService.eliminarImpartirUnidadAprendizaje({
         no_EmpleadoDocente:no_EmpleadoDocente
       }).then(response => {//CASO EXITOSO

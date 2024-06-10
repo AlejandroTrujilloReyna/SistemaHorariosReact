@@ -137,7 +137,8 @@ const SalaN = () => {
         && validar_Traslape === datosCopia.validar_Traslape
         && nota_Descriptiva === datosCopia.nota_Descriptiva
         && clave_Edificio === datosCopia.clave_Edificio
-        && clave_TipoSala === datosCopia.clave_TipoSala) {
+        && clave_TipoSala === datosCopia.clave_TipoSala
+       && materialesseleccionados === datosCopia.materialesseleccionados) {
         mostrarInformacion(toast, "No se han realizado cambios");
         seteditando(false);
         setMostrarDialog(false);
@@ -179,9 +180,9 @@ const SalaN = () => {
   }
 
   const eliminarImpartir = ()=>{
-    if(materialesseleccionados.length ===0){// Si se desea que Unidades Aprendizaje a impartir pueda modificarse a vacio quitar
+    /*if(materialesseleccionados.length ===0){// Si se desea que Unidades Aprendizaje a impartir pueda modificarse a vacio quitar
         return 0;
-    }
+    }*/
     SalaMaterialService.eliminarSalaMaterial({
         clave_Sala:clave_Sala
       }).then(response => {//CASO EXITOSO
