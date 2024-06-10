@@ -341,7 +341,7 @@ return (
       {/*PANEL PARA EL REGISTRO*/}
       <Dialog className='w-10' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>        
         <div className="formgrid grid mx-8 justify-content-center">
-        <div className="field col-3">
+        <div className="field col-4">
             <label>Unidad de Aprendizaje*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_UnidadAprendizaje}
@@ -355,7 +355,7 @@ return (
               placeholder="Seleccione la Unidad de Aprendizaje"               
             />
           </div>
-          <div className="field col-3">
+          <div className="field col-4">
             <label>Plan de Estudios*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_PlanEstudios}
@@ -370,7 +370,7 @@ return (
               placeholder="Seleccione el Plan de Estudios"               
             />
           </div>
-          <div className="field col-5">
+          <div className="field col-4">
             <label>Clasificacion*</label>
             <Dropdown className="w-full"
               invalid={enviado===true && !clave_ClasificacionUnidadAprendizaje}

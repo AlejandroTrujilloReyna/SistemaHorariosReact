@@ -299,7 +299,7 @@ const Edificio = () => {
                       	setclave_Edificio(event.target.value);
                     }
                   }}
-                  placeholder="Ej.120"  
+                  placeholder="Ej.3"  
               className="w-full"/>
           </div>
           <div className="field col-9">
@@ -310,7 +310,7 @@ const Edificio = () => {
                       setnombre_Edificio(event.target.value);
                     }
                   }}  
-                  placeholder="Nombre" 
+                  placeholder="Edificio Facultad de Ingenieria" 
               className="w-full"/>              
           </div>
           <div className="field col-12">

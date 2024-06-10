@@ -369,7 +369,7 @@ const Usuario = () => {
                       setcorreo(event.target.value);
                     }
                   }}  
-                  placeholder="Ej.Licenciatura en Sistemas" 
+                  placeholder="Ej.martinez.miguel@uabc.edu.mx" 
               className="w-full"/>              
           </div>
           <div className="field col-12">
