@@ -35,6 +35,7 @@ import DocenteN from './components/DocenteN';
 import HorarioN from './components/HorarioN';
 import HorarioNCuadricula from './components/HorarioNCuadricula';
 import HorarioNdos from './components/HorarioNdos.js';
+import HorarioNV2 from './components/HorarioNV2.js';
 function App() {
   return (
     <div className="App">
@@ -69,6 +70,7 @@ function App() {
           <Route path='/Material' element={<Material/>}/>
           <Route path='/Grupo' element={<Grupo/>}/>
           <Route path='/HorarioN' element={<HorarioN/>}/>
+          <Route path='/HorarioNV2' element={<HorarioNV2/>}/>
           <Route path='/HorarioNdos' element={<HorarioNdos/>}/>
           <Route path='/HorarioNCuadricula' element={<HorarioNCuadricula/>}/>
         </Routes>
