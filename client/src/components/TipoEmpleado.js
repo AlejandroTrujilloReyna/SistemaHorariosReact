@@ -7,13 +7,13 @@ import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';//AGREGADO
-import { validarTexto, validarNumero} from '../services/ValidacionGlobalService';//AGREGADO
-import { Toolbar } from 'primereact/toolbar';//NUEVO
-import { Dialog } from 'primereact/dialog';//NUEVO
-import { IconField } from 'primereact/iconfield';//NUEVO
-import { InputIcon } from 'primereact/inputicon';//NUEVO
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
+import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
+import { validarTexto, validarNumero} from '../services/ValidacionGlobalService';
+import { Toolbar } from 'primereact/toolbar';
+import { Dialog } from 'primereact/dialog';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import TipoEmpleadoService from '../services/TipoEmpleadoService';
 import { FilterMatchMode } from 'primereact/api';
 
@@ -267,7 +267,7 @@ const onFilter = (event) => {
                       setnombre_TipoEmpleado(event.target.value);
                     }
                   }}
-                placeholder="Ej.Tiempo Completo"
+                placeholder="Ej.Asignatura"
                 className="w-full"/>              
             </div>   
             <div className="field col-2">
@@ -278,7 +278,7 @@ const onFilter = (event) => {
                       	sethoras_MinimasTipoEmpleado(event.target.value);
                     }
                   }}
-                  placeholder="Ej.120"  
+                  placeholder="Ej.12"  
               className="w-full"/>
           </div>
           <div className="field col-2">
@@ -289,7 +289,7 @@ const onFilter = (event) => {
                       	sethoras_MaximasTipoEmpleado(event.target.value);
                     }
                   }}
-                  placeholder="Ej.120"  
+                  placeholder="Ej.25"  
               className="w-full"/>
           </div>
 

@@ -8,11 +8,11 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';//NUEVO
-import { Dialog } from 'primereact/dialog';//NUEVO
-import { IconField } from 'primereact/iconfield';//NUEVO
-import { InputIcon } from 'primereact/inputicon';//NUEVO
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
+import { Toolbar } from 'primereact/toolbar';
+import { Dialog } from 'primereact/dialog';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import UnidadAprendizajeService from '../services/UnidadAprendizajeService';
 import PlanEstudiosService from '../services/PlanEstudiosService';
 import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
@@ -236,7 +236,7 @@ const UnidadAprendizaje = () => {
       const plan = planesdeestudios.find((plan) => plan.clave_PlanEstudios === rowData.clave_PlanEstudios);
       return plan ? `${plan.nombre_PlanEstudios}` : '';
     }else {
-      return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
+      return rowData[field]; 
     }
   };
   

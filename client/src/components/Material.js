@@ -237,7 +237,7 @@ const Material = () => {
                       setnombre_Material(event.target.value);
                     }
                   }}  
-                  placeholder="Ej.Cañon" 
+                  placeholder="Ej.Cañon/Proyector" 
               className="w-full"/>              
           </div>                                                                        
         </div>

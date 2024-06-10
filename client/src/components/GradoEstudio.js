@@ -280,7 +280,7 @@ return (
                       	sethoras_MinimasGradoEstudio(event.target.value);
                     }
                   }}
-                  placeholder="Ej.120"  
+                  placeholder="Ej.12"  
               className="w-full"/>
           </div>
           <div className="field col-2">
@@ -291,7 +291,7 @@ return (
                       	sethoras_MaximasGradoEstudio(event.target.value);
                     }
                   }}
-                  placeholder="Ej.120"  
+                  placeholder="Ej.16"  
               className="w-full"/>
           </div>
 

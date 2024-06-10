@@ -190,7 +190,7 @@ const Sala = () => {
         />
       );
     }else {
-      return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
+      return rowData[field]; 
     }
   };  
 
@@ -246,7 +246,7 @@ const Sala = () => {
             options={edificios}
             onChange={(e) => options.editorCallback(e.value)}            
             optionLabel = {(option) => `${option.clave_Edificio} - ${option.nombre_Edificio}`}
-            optionValue="clave_Edificio" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            optionValue="clave_Edificio" 
             placeholder="Seleccione un Edificio" 
         />
     );

@@ -279,7 +279,7 @@ const PlanEstudios = () => {
                       setnombre_PlanEstudios(event.target.value);
                     }
                   }}  
-                  placeholder="Nombre" 
+                  placeholder="Ej. 2009-1" 
               className="w-full"/>              
           </div>
           <div className="field col-6">
@@ -290,7 +290,7 @@ const PlanEstudios = () => {
                       	setcant_semestres(event.target.value);
                     }
                   }}
-                  placeholder="Ej.120"  
+                  placeholder="Ej.8"  
               className="w-full"/>
           </div>
           <div className="field col-12">

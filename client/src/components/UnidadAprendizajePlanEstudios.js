@@ -10,12 +10,12 @@ import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import UnidadAprendizajePlanEstudiosService from '../services/UnidadAprendizajePlanEstudiosService';
 import { mostrarExito, mostrarAdvertencia, mostrarError, mostrarInformacion } from '../services/ToastService';
-import { validarNumero } from '../services/ValidacionGlobalService';//AGREGADO
-import { Toolbar } from 'primereact/toolbar';//NUEVO
-import { Dialog } from 'primereact/dialog';//NUEVO
-import { IconField } from 'primereact/iconfield';//NUEVO
-import { InputIcon } from 'primereact/inputicon';//NUEVO
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';//NUEVO
+import { validarNumero } from '../services/ValidacionGlobalService';
+import { Toolbar } from 'primereact/toolbar';
+import { Dialog } from 'primereact/dialog';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { FilterMatchMode } from 'primereact/api';
 import EtapaService from '../services/EtapaService';
 import ClasificacionUnidadAprendizajeService from '../services/ClasificacionUnidadAprendizajeService';
@@ -351,7 +351,7 @@ return (
                 setclave_UnidadAprendizaje(e.value);
               }} 
               optionLabel="nombre_UnidadAprendizaje" 
-              optionValue="clave_UnidadAprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+              optionValue="clave_UnidadAprendizaje" 
               placeholder="Seleccione la Unidad de Aprendizaje"               
             />
           </div>
@@ -366,7 +366,7 @@ return (
               }} 
               //optionLabel="nombre_ProgramaEducativo" 
               optionLabel="nombre_PlanEstudios" 
-              optionValue="clave_PlanEstudios" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+              optionValue="clave_PlanEstudios" 
               placeholder="Seleccione el Plan de Estudios"               
             />
           </div>
@@ -380,7 +380,7 @@ return (
                 setclave_ClasificacionUnidadAprendizaje(e.value);
               }} 
               optionLabel="nombre_ClasificacionUnidAdaprendizaje" 
-              optionValue="clave_ClasificacionUnidAdaprendizaje" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+              optionValue="clave_ClasificacionUnidAdaprendizaje" 
               placeholder="Seleccione el tipo de clasificacion"               
             />
           </div>
@@ -395,7 +395,7 @@ return (
               }} 
               //optionLabel="nombre_ProgramaEducativo" 
               optionLabel="nombre_Etapa" 
-              optionValue="clave_Etapa" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+              optionValue="clave_Etapa" 
               placeholder="Seleccione la Etapa"               
             />
           </div>

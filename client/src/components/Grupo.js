@@ -71,7 +71,7 @@ const Grupo = () => {
   //FUNCION PARA REGISTRAR
   const add = ()=>{
     //VALIDACION DE CAMPOS VACIOS
-    if (!clave_PlanEstudios || !clave_Grupo || !nombre_Grupo || !semestre) {
+    if (!clave_PlanEstudios || !nombre_Grupo || !semestre) {
       mostrarAdvertencia(toast,"Existen campos Obligatorios vacíos");
       setEnviado(true);
       return;
@@ -79,7 +79,6 @@ const Grupo = () => {
     const action = () => {
     //MANDAR A LLAMAR AL REGISTRO SERVICE
     GrupoService.registrarGrupo({
-      clave_Grupo:clave_Grupo,
       nombre_Grupo:nombre_Grupo,
       semestre:semestre,
       uso:uso,
@@ -297,17 +296,7 @@ const Grupo = () => {
       {/*PANEL PARA EL REGISTRO*/}
       <Dialog className='w-6' header={headerTemplate} closable={false} visible={abrirDialog!==0} onHide={() => {setAbrirDialog(0)}}>
         <div className="formgrid grid justify-content-center">
-          <div className="field col-2">
-              <label className='font-bold'>Clave*</label>
-              <InputText disabled={abrirDialog===2} invalid={enviado===true && !clave_Grupo} type="text" keyfilter="pint" value={clave_Grupo} maxLength={10}
-                  onChange={(event)=>{
-                    if (validarNumero(event.target.value)) {  
-                      setclave_Grupo(event.target.value);
-                    }
-                  }}  
-              placeholder="Ej.100"
-              className="w-full"/>
-          </div>
+       
           <div className="field col-10">
               <label className='font-bold'>Nombre*</label>
               <InputText invalid={enviado===true && !nombre_Grupo} type="text" keyfilter={/^[0-9]\d*$/} value={nombre_Grupo} maxLength={255}
@@ -316,7 +305,7 @@ const Grupo = () => {
                       setnombre_Grupo(event.target.value);
                     }
                   }}  
-                  placeholder="Nombre" 
+                  placeholder="Ej.151" 
               className="w-full"/>              
           </div>
           <div className="field col-2">
@@ -327,7 +316,7 @@ const Grupo = () => {
                       	setsemestre(event.target.value);
                     }
                   }}
-                  placeholder="Ej.120"  
+                  placeholder="Ej.7/8/9"  
               className="w-full"/>
           </div>
           <div className="field col-8">
@@ -391,3 +380,14 @@ const Grupo = () => {
 }
 
 export default Grupo
+//<div className="field col-2">
+//<label className='font-bold'>Clave*</label>
+//<InputText disabled={abrirDialog===2} invalid={enviado===true && !clave_Grupo} type="text" keyfilter="pint" value={clave_Grupo} maxLength={10}
+  //  onChange={(event)=>{
+    //  if (validarNumero(event.target.value)) {  
+      //  setclave_Grupo(event.target.value);
+     // }
+    //}}  
+//placeholder="Ej.100"
+//className="w-full"/>
+//</div>

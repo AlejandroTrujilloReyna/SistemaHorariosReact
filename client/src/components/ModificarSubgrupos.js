@@ -233,7 +233,7 @@ const ModificarSubgrupos = () => {
       const uap = unidadesaprenizajeplanesestudios.find((uap) => uap.clave_UnidadAprendizajePlanEstudios === rowData.clave_UnidadAprendizajePlanEstudios);
       return uap ? `${uap.clave_UnidadAprendizaje}` : '';      
     }else {
-      return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
+      return rowData[field]; 
     }
   };
 

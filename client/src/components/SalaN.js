@@ -346,7 +346,7 @@ const SalaN = () => {
         />
       );
     }else {
-      return rowData[field]; // Si no es 'clave_UnidadAcademica' ni 'clave_ProgramaEducativo', solo retorna el valor del campo
+      return rowData[field];
     }
   };  
 
@@ -540,7 +540,7 @@ const SalaN = () => {
                 autoFocus
                 required
                 optionLabel="nombre_Edificio" 
-                optionValue="clave_Edificio" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+                optionValue="clave_Edificio" 
                 placeholder="Seleccione un Edificio" 
                 className={classNames({ 'p-invalid': frmEnviado && !clave_Edificio })}
                 />
@@ -559,7 +559,7 @@ const SalaN = () => {
                 }} 
                 required
                 optionLabel="nombre_TipoSala" 
-                optionValue="clave_TipoSala" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+                optionValue="clave_TipoSala" 
                 placeholder="Seleccione un Tipo de Sala" 
                 className={classNames({ 'p-invalid': frmEnviado && !clave_TipoSala })}
                 />
@@ -640,7 +640,7 @@ const SalaN = () => {
             }}             
             filter
             optionLabel = {(option) => `${option.clave_Material} - ${option.nombre_Material}`}
-            optionValue="clave_Material" // Aquí especificamos que la clave de la unidad académica se utilice como el valor de la opción seleccionada
+            optionValue="clave_Material" 
             placeholder="Materiales para seleccionar" 
             display="chip"            
             />            
